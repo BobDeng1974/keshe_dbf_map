@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-
+	<!--list item -->
     <string name="refresh_item0">预计校验时间:</string>
     <string name="refresh_item1">ZC_ID:</string>
     <string name="refresh_item2">CATEGORIES:</string>
@@ -11,6 +11,13 @@
     <string name="refresh_item7">客户:</string>
     <string name="refresh_item8">线路名称:</string>
     <string name="refresh_item9">供电所:</string>
+    <!-- detailActivity title -->
+    <string name="mission_info">任务信息</string>
+    <string name="fengkou_info">封口信息</string>
+    <string name="title_back">返回</string>
+    <string name="title_next">继续</string>
+    <string name="title_quit">确定</string>
+    
     
     <string name="app_name">DEMO</string>
     <string name="demo_name_basemap">基本地图功能</string>

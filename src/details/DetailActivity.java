@@ -16,6 +16,15 @@ import android.widget.ViewAnimator;
 
 public class DetailActivity extends Activity {
 
+	private TextView title;
+	private  Button leftBtn;
+	private Button rightBtn;
+	private ViewAnimator animator;
+	private Animation slideInLeft;
+	private Animation slideInRight;
+	private Animation slideOutLeft;
+	private Animation slideOutRight;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
@@ -23,23 +32,31 @@ public class DetailActivity extends Activity {
 	setContentView(R.layout.detail_acticity);
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
+	initViewAnimatior();
+	initTitleListener();
+    }
 
-	final TextView title = (TextView) findViewById(R.id.detail_title);
-	final Button leftBtn = (Button) findViewById(R.id.title_left_btn);
-	final Button rightBtn = (Button) findViewById(R.id.title_right_btn);
-	title.setText("任务信息");
-	leftBtn.setText("quit");
-	rightBtn.setText("next");
-	final ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
-	final Animation slideInLeft = AnimationUtils.loadAnimation(this,
+
+    private void initViewAnimatior() {
+	// TODO Auto-generated method stub
+	title = (TextView) findViewById(R.id.detail_title);
+	leftBtn = (Button) findViewById(R.id.title_left_btn);
+	rightBtn = (Button) findViewById(R.id.title_right_btn);
+	title.setText(getResources().getString(R.string.mission_info));
+	leftBtn.setText(getResources().getString(R.string.title_quit));
+	rightBtn.setText(getResources().getString(R.string.title_next));
+	animator = (ViewAnimator) findViewById(R.id.animator);
+	slideInLeft = AnimationUtils.loadAnimation(this,
 		R.anim.i_slide_in_left);
-	final Animation slideInRight = AnimationUtils.loadAnimation(this,
+	slideInRight = AnimationUtils.loadAnimation(this,
 		R.anim.i_slide_in_right);
-	final Animation slideOutLeft = AnimationUtils.loadAnimation(this,
+	slideOutLeft = AnimationUtils.loadAnimation(this,
 		R.anim.i_slide_out_left);
-	final Animation slideOutRight = AnimationUtils.loadAnimation(this,
+	slideOutRight = AnimationUtils.loadAnimation(this,
 		R.anim.i_slide_out_right);
-
+    }
+    private void initTitleListener() {
+	// TODO Auto-generated method stub
 	leftBtn.setOnClickListener(new OnClickListener() {
 	    public void onClick(View v) {
 		switch (animator.getDisplayedChild()) {
@@ -47,14 +64,14 @@ public class DetailActivity extends Activity {
 		    finish();
 		    break;
 		case 1:
-		    title.setText("任务信息");
-		    leftBtn.setText("quit");
-		    rightBtn.setText("next");
+		    title.setText(getResources().getString(R.string.mission_info));
+		    leftBtn.setText(getResources().getString(R.string.title_back));
+		    rightBtn.setText(getResources().getString(R.string.title_next));
 		    break;
 		case 2:
-		    title.setText("封口信息");
-		    leftBtn.setText("back");
-		    rightBtn.setText("next");
+		    title.setText(getResources().getString(R.string.fengkou_info));
+		    leftBtn.setText(getResources().getString(R.string.title_back));
+		    rightBtn.setText(getResources().getString(R.string.title_next));
 		    break;
 		default:
 		    break;
@@ -68,14 +85,14 @@ public class DetailActivity extends Activity {
 	    public void onClick(View v) {
 		switch (animator.getDisplayedChild()) {
 		case 0:
-		    title.setText("封口信息");
-		    leftBtn.setText("back");
-		    rightBtn.setText("next");
+		    title.setText(getResources().getString(R.string.fengkou_info));
+		    leftBtn.setText(getResources().getString(R.string.title_back));
+		    rightBtn.setText(getResources().getString(R.string.title_next));
 		    break;
 		case 1:
-		    title.setText("任务状态");
-		    leftBtn.setText("back");
-		    rightBtn.setText("ok");
+		    title.setText(getResources().getString(R.string.mission_info));
+		    leftBtn.setText(getResources().getString(R.string.title_back));
+		    rightBtn.setText(getResources().getString(R.string.title_quit));
 		    break;
 		case 2:
 		    String msg = "任务完成";

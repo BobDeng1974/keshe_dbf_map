@@ -20,16 +20,6 @@ public class MyBaseAdapter extends BaseAdapter {
     private int[] colors = new int[] { 0xff3cb371, 0xffa0a0a0 };
     private Context mContext;
     private List<Map<String, String>> dataList;
-    // private ParseDbf2Map parseDbf2Map;
-
-    private String ConsName = null;// categories=01 客户名
-    private String ElecAddr = null;// 地址
-
-    private String SubsName = null;// categories=02 客户名
-    private String SubstationName = null;// 供电厂名称
-    private String LineName = null;// 线路名称
-
-    private String Made_No = null;// 生产编号
 
     public MyBaseAdapter(Context context, List<Map<String, String>> dataList) {
 	this.mContext = context;
@@ -54,7 +44,7 @@ public class MyBaseAdapter extends BaseAdapter {
     public long getItemId(int position) {
 	return position;
     }
-
+    
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 	ViewHolder holder = null;
@@ -69,6 +59,8 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.categoriesTwo = (LinearLayout) convertView
 		    .findViewById(R.id.categories_02);
 
+	    holder.save_map = (TextView) convertView
+		    .findViewById(R.id.item_save_map);
 	    holder.not_find = (TextView) convertView
 		    .findViewById(R.id.item_not_find);
 	    holder.zc_id = (TextView) convertView.findViewById(R.id.item_zc_id);
@@ -123,9 +115,10 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.substation.setText(searchMap.get(SUBSTATION).trim());
 	    holder.line_name.setText(searchMap.get(LINE_NAME).trim());
 	    holder.made_number.setText(searchMap.get(MADE_NO).trim());
+	    holder.save_map.setText(searchMap.toString());
 
-	    Boolean IsCategoriesOne = getItem(position).get(CATEGORIES)
-		    .substring(0, 2).equals("01");
+	    Boolean IsCategoriesOne = getItem(position).get(CATEGORIES).trim()
+		    .equals("01");
 	    int colorPos = IsCategoriesOne ? 1 : 0;
 	    convertView.setBackgroundColor(colors[colorPos]);
 	    holder.categoriesOne.setVisibility(IsCategoriesOne ? View.VISIBLE
@@ -134,6 +127,7 @@ public class MyBaseAdapter extends BaseAdapter {
 		    : View.VISIBLE);
 
 	} else {
+	    holder.save_map.setText("");
 	    holder.categoriesZero.setVisibility(View.GONE);
 	    holder.not_find.setVisibility(View.VISIBLE);
 	}
@@ -162,6 +156,8 @@ public class MyBaseAdapter extends BaseAdapter {
 	TextView substation;
 	TextView line_name;
 	TextView made_number;
+	// save map
+	TextView save_map;
     }
     // new int[] { R.id.item_zc_id, R.id.item_categories,R.id.item_begin_date,
     // R.id.item_cons_name,R.id.item_address,R.id.item_contact, R.id.item_phone

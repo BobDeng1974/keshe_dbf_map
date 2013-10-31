@@ -50,4 +50,7 @@ public class  StringConstant {
     public static String[] DNBXX = { METER_ID, CONS_NAME, SUBS_NAME, ELEC_ADDR,
 	    SUBSTATION, LINE_NAME, MADE_NO, MODEL, VOLT_NAME, RATED, RC_RATIO,
 	    MULTIRATE, DEMAND, CONST, MD_TYPE };
+    
+    //intent
+    public static String MISSION_DETAIL = "mission_detail";
 }

@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import baidumapsdk.demo.R;
 
@@ -66,14 +67,7 @@ public class RefreshableListViewActivity extends Fragment {
 	protected Map<String, String> doInBackground(Void... params) {
 	    Map<String, String> map = new HashMap<String, String>();
 	    map.put("CONTACT", "李狗蛋");
-	    map.put("ZC_ID", "5438");
-	    map.put("CATEGORIES", "02");
-	    map.put("PHONE", "3845");
-	    map.put("BEGIN_DATE", "");
-	    map.put("SUBS_NAME", "变电所");
-	    map.put("LINE_NAME", "线路名称");
 	    try {
-
 		Thread.sleep(2000);
 	    } catch (InterruptedException e) {
 	    }
@@ -83,7 +77,7 @@ public class RefreshableListViewActivity extends Fragment {
 
 	@Override
 	protected void onPostExecute(Map<String, String> result) {
-	    mItems.add(result);
+//	    mItems.add(result);
 	    // This should be called after refreshing finished
 	    mListView.completeRefreshing();
 
@@ -97,10 +91,11 @@ public class RefreshableListViewActivity extends Fragment {
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 		long id) {
 	    // TODO Auto-generated method stub
-	    HashMap<String, String> map = (HashMap<String, String>) parent
-		    .getItemAtPosition(position + 1);
-
+//	    HashMap<String, String> map = (HashMap<String, String>) parent
+//		    .getItemAtPosition(position + 1);
+	    TextView savedMapTextView = (TextView) view.findViewById(R.id.item_save_map);
 	    Intent intent = new Intent();
+	    intent.putExtra(MISSION_DETAIL, savedMapTextView.getText().toString());
 	    intent.setClass(getActivity(), DetailActivity.class);
 	    startActivity(intent);
 	}

@@ -13,6 +13,12 @@
         android:text="未找到"
         android:visibility="gone" />
 
+    <TextView 
+        android:id="@+id/item_save_map"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        />
     <LinearLayout
         android:id="@+id/categories_00"
         android:layout_width="fill_parent"
