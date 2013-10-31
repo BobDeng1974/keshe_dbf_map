@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#eee"
+    android:orientation="vertical"
+    android:padding="4dip" >
+
+    <ViewAnimator
+        android:id="@+id/animator"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingTop="16dip" >
+
+        <include android:id="@+id/v0" layout="@layout/mission_info"/>
+        <include android:id="@+id/v1" layout="@layout/seal_info"/>
+        <include android:id="@+id/v2" layout="@layout/mission_status"/>
+    </ViewAnimator>
+
+</LinearLayout>
