@@ -4,9 +4,11 @@ import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static refreshablelist.StringConstant.*;
 
+import details.StringToMap;
+import static refreshablelist.StringConstant.*;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import badgeview.BadgeView;
 import baidumapsdk.demo.R;
 
 public class MyBaseAdapter extends BaseAdapter {
@@ -44,7 +47,7 @@ public class MyBaseAdapter extends BaseAdapter {
     public long getItemId(int position) {
 	return position;
     }
-    
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 	ViewHolder holder = null;
@@ -52,6 +55,8 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder = new ViewHolder();
 	    convertView = LayoutInflater.from(mContext).inflate(
 		    R.layout.refresh_list_item, null);
+	    holder.refresh_item = (LinearLayout) convertView
+		    .findViewById(R.id.refreshlist_item);
 	    holder.categoriesZero = (LinearLayout) convertView
 		    .findViewById(R.id.categories_00);
 	    holder.categoriesOne = (LinearLayout) convertView
@@ -83,7 +88,12 @@ public class MyBaseAdapter extends BaseAdapter {
 		    .findViewById(R.id.item_line_name);
 	    holder.made_number = (TextView) convertView
 		    .findViewById(R.id.item_made_number);
-
+	    holder.badgeView_complete = new BadgeView(mContext,
+		    holder.categoriesZero);
+	    holder.badgeView_categories = new BadgeView(mContext,
+		    holder.categoriesZero);
+	    // holder.badgeView_complete.setBadgeBackgroundColor(droidGreen);
+	    // holder.badgeView_complete.setTextColor(Color.BLACK);
 	    // 将holder绑定到convertView
 	    convertView.setTag(holder);
 	} else {
@@ -94,7 +104,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	String[] seleStrings = { getItem(position).get(ZC_ID) };
 	Map<String, String> searchMap = service.viewMyData(METER_ID,
 		seleStrings);
-	System.out.println("------查询单条记录--> " + searchMap.toString());
+	// System.out.println("------查询单条记录--> " + searchMap.toString());
 
 	if (searchMap.size() != 0) {
 	    holder.categoriesZero.setVisibility(View.VISIBLE);
@@ -115,7 +125,9 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.substation.setText(searchMap.get(SUBSTATION).trim());
 	    holder.line_name.setText(searchMap.get(LINE_NAME).trim());
 	    holder.made_number.setText(searchMap.get(MADE_NO).trim());
-	    holder.save_map.setText(searchMap.toString());
+	    StringToMap stringToMap = new StringToMap();
+	    String stringMap = stringToMap.MapToString(searchMap);
+	    holder.save_map.setText(stringMap);
 
 	    Boolean IsCategoriesOne = getItem(position).get(CATEGORIES).trim()
 		    .equals("01");
@@ -126,6 +138,12 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.categoriesTwo.setVisibility(IsCategoriesOne ? View.GONE
 		    : View.VISIBLE);
 
+	    // 设置badgeView
+	    holder.badgeView_complete.setText("完成");
+	    holder.badgeView_complete.setBadgeMargin(5, 50);
+	    holder.badgeView_complete.show();
+	    holder.badgeView_categories.setText("客户1");
+	    holder.badgeView_categories.show();
 	} else {
 	    holder.save_map.setText("");
 	    holder.categoriesZero.setVisibility(View.GONE);
@@ -138,6 +156,7 @@ public class MyBaseAdapter extends BaseAdapter {
      * ViewHolder类用以储存item中控件的引用
      */
     final class ViewHolder {
+	LinearLayout refresh_item;
 	LinearLayout categoriesZero;
 	LinearLayout categoriesOne;
 	LinearLayout categoriesTwo;
@@ -158,6 +177,9 @@ public class MyBaseAdapter extends BaseAdapter {
 	TextView made_number;
 	// save map
 	TextView save_map;
+
+	BadgeView badgeView_complete;
+	BadgeView badgeView_categories;
     }
     // new int[] { R.id.item_zc_id, R.id.item_categories,R.id.item_begin_date,
     // R.id.item_cons_name,R.id.item_address,R.id.item_contact, R.id.item_phone

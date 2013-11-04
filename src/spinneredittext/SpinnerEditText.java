@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.AvoidXfermode.Mode;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,7 +22,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import baidumapsdk.demo.R;
 
-public class SpinnerEditText extends LinearLayout implements OnTouchListener {
+public class SpinnerEditText extends LinearLayout {
 
     private Context mContext;
     private LayoutInflater layoutInflater;
@@ -48,7 +51,7 @@ public class SpinnerEditText extends LinearLayout implements OnTouchListener {
 	adapter = new DropdownAdapter(context, getData());
 	final ListView listView = new ListView(context);
 	listView.setAdapter(adapter);
-//	listView.setBackgroundColor(Color.WHITE);
+	listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 	button.setOnClickListener(new OnClickListener() {
 
 	    @Override
@@ -59,17 +62,15 @@ public class SpinnerEditText extends LinearLayout implements OnTouchListener {
 		    // 创建一个在输入框下方的popup
 		    pop = new PopupWindow(listView, editText1.getWidth(), names
 			    .size() * editText1.getHeight());
-		    // 控制popupwindow点击屏幕其他地方消失  
-		    pop.setBackgroundDrawable(mContext.getResources().getDrawable(  
-			    R.drawable.button_on));
+		    // 控制popupwindow点击屏幕其他地方消失
+		    pop.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.base_tip_bg));
 		    pop.setOutsideTouchable(true);
 		    pop.showAsDropDown(editText1);
-//		    pwMyPopWindow.setFocusable(true);
-		    
+
 		} else {
 		    if (pop.isShowing()) {
 			pop.dismiss();
-		    } else {
+		    } else{
 			pop.showAsDropDown(editText1);
 		    }
 		}
@@ -117,9 +118,7 @@ public class SpinnerEditText extends LinearLayout implements OnTouchListener {
     class DropdownAdapter extends BaseAdapter {
 
 	private Context context;
-	private LayoutInflater layoutInflater;
 	private List<String> list;
-	private TextView content;
 	private ImageButton close;
 
 	public DropdownAdapter(Context context, List<String> list) {
@@ -141,14 +140,24 @@ public class SpinnerEditText extends LinearLayout implements OnTouchListener {
 
 	public View getView(final int position, View convertView,
 		ViewGroup parent) {
-	    layoutInflater = LayoutInflater.from(context);
-	    convertView = layoutInflater.inflate(R.layout.edit_spinner_row,
-		    null);
-	    // close = (ImageButton) convertView.findViewById(R.id.close_row);
-	    content = (TextView) convertView.findViewById(R.id.text_row);
+	    ViewHolder holder = null;
+	    if (convertView == null) {
+		holder = new ViewHolder();
+		convertView = LayoutInflater.from(context).inflate(
+			R.layout.edit_spinner_row, null);
+		// close = (ImageButton)
+		// convertView.findViewById(R.id.close_row);
+		holder.content = (TextView) convertView
+			.findViewById(R.id.text_row);
+
+		convertView.setTag(holder);
+	    } else {
+		holder = (ViewHolder) convertView.getTag();
+	    }
 	    final String editContent = list.get(position);
-	    content.setText(list.get(position).toString());
-	    content.setOnClickListener(new OnClickListener() {
+	    System.out.println( "fuck -->" + editContent);
+	    holder.content.setText(editContent);
+	    holder.content.setOnClickListener(new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -167,14 +176,10 @@ public class SpinnerEditText extends LinearLayout implements OnTouchListener {
 	    return convertView;
 	}
 
+	final class ViewHolder {
+	    TextView content;
+	}
+
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-	// TODO Auto-generated method stub
-	if (pop != null && pop.isShowing()) {
-	    pop.dismiss();
-	}
-	return super.onTouchEvent(event);
-    }
 }

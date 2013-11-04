@@ -2,25 +2,85 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="12dip" >
+    android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/setnavigation"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/change_contact"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="设置导航" />
+        android:clickable="true"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/changecontact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="更改联系人" />
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/change_contact"
+            android:textColor="#000000" />
 
-    <Button
-        android:id="@+id/getposition"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/change_contact_text"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="点击更改联系人"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/get_position"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="获取位置" />
-	
+        android:clickable="true"
+        android:orientation="vertical" >
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/get_position"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/get_position_text"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="点击获取当前位置信息"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/set_navigation"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:orientation="vertical" >
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/set_navigation"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/set_navigation_text"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="点击开始导航"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/mission_info_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent" >
+    </ListView>
+
 </LinearLayout>

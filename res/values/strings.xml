@@ -14,9 +14,15 @@
     <!-- detailActivity title -->
     <string name="mission_info">任务信息</string>
     <string name="fengkou_info">封口信息</string>
+    <string name="mission_status">任务状态</string>
     <string name="title_back">返回</string>
     <string name="title_next">继续</string>
-    <string name="title_quit">确定</string>
+    <string name="confirm">确定</string>
+    <string name="cancle">取消</string>
+    <!-- detailActivity MissionInfo -->
+    <string name="set_navigation">设置导航</string>
+    <string name="change_contact">更改联系人</string>
+    <string name="get_position">获取当前GPS信息</string>
     
     
     <string name="app_name">DEMO</string>

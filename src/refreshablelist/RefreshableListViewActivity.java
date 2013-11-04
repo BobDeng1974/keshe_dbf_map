@@ -94,7 +94,16 @@ public class RefreshableListViewActivity extends Fragment {
 //	    HashMap<String, String> map = (HashMap<String, String>) parent
 //		    .getItemAtPosition(position + 1);
 	    TextView savedMapTextView = (TextView) view.findViewById(R.id.item_save_map);
+	    TextView cate = (TextView) view.findViewById(R.id.item_categories);
+	    TextView cont = (TextView) view.findViewById(R.id.item_contact);
+	    TextView pho = (TextView) view.findViewById(R.id.item_phone);
+	    
 	    Intent intent = new Intent();
+	    if (cate.getText().toString().equals("01") ) {
+		System.out.println("this is categories 01 in RefreshList");
+		intent.putExtra(CONTACT, cont.getText().toString());
+		intent.putExtra(PHONE, pho.getText().toString());
+	    }
 	    intent.putExtra(MISSION_DETAIL, savedMapTextView.getText().toString());
 	    intent.setClass(getActivity(), DetailActivity.class);
 	    startActivity(intent);

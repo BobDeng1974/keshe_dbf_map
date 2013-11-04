@@ -4,7 +4,9 @@
     android:layout_height="fill_parent"
     android:background="#eee"
     android:orientation="vertical"
-    android:padding="4dip" >
+    android:paddingLeft="4dip"
+    android:paddingRight="4dip"
+     >
 
     <ViewAnimator
         android:id="@+id/animator"
