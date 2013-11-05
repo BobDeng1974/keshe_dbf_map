@@ -33,6 +33,7 @@ public class SpinnerEditText extends LinearLayout {
     private DropdownAdapter adapter;
     private List<String> names;
     private PopupWindow pop;
+    private ListView listView;
 
     public SpinnerEditText(Context context) {
 	super(context);
@@ -42,6 +43,7 @@ public class SpinnerEditText extends LinearLayout {
     public SpinnerEditText(Context context, AttributeSet attrs) {
 	super(context, attrs);
 	this.mContext = context;
+	names = new ArrayList<String>();
 	// TODO Auto-generated constructor stub
 	String infService = Context.LAYOUT_INFLATER_SERVICE;
 	layoutInflater = (LayoutInflater) getContext().getSystemService(
@@ -49,7 +51,7 @@ public class SpinnerEditText extends LinearLayout {
 	layoutInflater.inflate(R.layout.my_edit_text, this, true);
 	getViews();
 	adapter = new DropdownAdapter(context, getData());
-	final ListView listView = new ListView(context);
+	listView = new ListView(context);
 	listView.setAdapter(adapter);
 	listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 	button.setOnClickListener(new OnClickListener() {
@@ -93,25 +95,33 @@ public class SpinnerEditText extends LinearLayout {
     }
 
     public List<String> getData() {
-	names = new ArrayList<String>();
 	names.add("电压");
 	names.add("电流");
 	names.add("电阻");
-
 	return names;
     }
 
-    public void setData() {
-
+    public void setData(List<String> itemData) {
+	//此句为了刷新pop的高度
+	names = itemData;
+	adapter.refresh(itemData);
     }
 
-    public void setText() {
-
+    public void setTitle(String title) {
+	textView.setText(title);
+	invalidate();
     }
 
-    public String getText() {
-
-	return null;
+    public String getType() {
+	return editText1.getText().toString();
+    }
+    
+    public String getValue() {
+	return editText2.getText().toString();
+    }
+    
+    public void setOpenDialogListener(View.OnClickListener listener){  
+	editText2.setOnClickListener(listener);
     }
 
     /** 用于显示popupWindow内容的适配器 */
@@ -125,7 +135,11 @@ public class SpinnerEditText extends LinearLayout {
 	    this.context = context;
 	    this.list = list;
 	}
-
+	public void refresh(List<String> itemData) {  
+	        list = itemData;  
+	        notifyDataSetChanged();  
+	    }  
+	
 	public int getCount() {
 	    return list.size();
 	}

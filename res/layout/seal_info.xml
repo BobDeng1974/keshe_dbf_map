@@ -6,23 +6,57 @@
     android:padding="12dip" >
 
     <spinneredittext.SpinnerEditText
-        android:id="@+id/st_1"
+        android:id="@+id/st_cabinet_1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true" />
 
     <spinneredittext.SpinnerEditText
-        android:id="@+id/st_2"
+        android:id="@+id/st_cabinet_2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="30dip" />
+
+    <spinneredittext.SpinnerEditText
+        android:id="@+id/st_table_1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:clickable="true"
         android:focusable="true" />
 
     <spinneredittext.SpinnerEditText
-        android:id="@+id/st_3"
+        android:id="@+id/st_table_2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="30dip" />
+
+    <spinneredittext.SpinnerEditText
+        android:id="@+id/st_box_1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <spinneredittext.SpinnerEditText
+        android:id="@+id/st_box_2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:clickable="true"
         android:focusable="true" />
 

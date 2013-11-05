@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="12dip" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clock_mistake"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/clock_mistake_value"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="输入误差值.."
+            android:textColor="@android:color/widget_edittext_dark" />
+    </LinearLayout>
+
+    <spinneredittext.SpinnerEditText
+        android:id="@+id/clock_mistake_conclusion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ammeter_date"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/clock_mistake_value"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="输入日期.."
+            android:textColor="@android:color/widget_edittext_dark" />
+    </LinearLayout>
+    <spinneredittext.SpinnerEditText
+        android:id="@+id/date_conclusion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true" 
+        />
+
+</LinearLayout>

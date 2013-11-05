@@ -6,20 +6,20 @@
     android:padding="12dip" >
 
     <RadioGroup
-        android:id="@+id/radio_group"
+        android:id="@+id/mission_status_radio_group"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
 
         <RadioButton
-            android:id="@+id/radio_button1"
+            android:id="@+id/mission_status_radio1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="No.1"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
-            android:id="@+id/radio_button2"
+            android:id="@+id/mission_status_radio2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
@@ -28,7 +28,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
-            android:id="@+id/radio_button3"
+            android:id="@+id/mission_status_radio3"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="No.3"

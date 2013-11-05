@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-	<!--list item -->
+
+    <!-- list item -->
     <string name="refresh_item0">预计校验时间:</string>
     <string name="refresh_item1">ZC_ID:</string>
     <string name="refresh_item2">CATEGORIES:</string>
@@ -23,8 +24,19 @@
     <string name="set_navigation">设置导航</string>
     <string name="change_contact">更改联系人</string>
     <string name="get_position">获取当前GPS信息</string>
-    
-    
+    <!-- detailActivity MissionStatus -->
+    <string name="mission_status_1">No1</string>
+    <string name="mission_status_2">No2</string>
+    <string name="mission_status_3">No3</string>
+    <!-- detailActivity SealInfo -->
+    <string name="invalid">无效</string>
+    <string name="damage">损坏</string>
+    <!-- detailActivity Scene State -->
+    <string name="clock_mistake">时钟误差值(分):</string>
+    <string name="clock_mistake_conclusion">时钟误差结论:</string>
+    <string name="ammeter_date">电表日期:</string>
+    <string name="date_conclusion">日期结论:</string>
+    <!-- Baidu -->
     <string name="app_name">DEMO</string>
     <string name="demo_name_basemap">基本地图功能</string>
     <string name="demo_title_basemap">基本地图功能--BaseMapDemo</string>

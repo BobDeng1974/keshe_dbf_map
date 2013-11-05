@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#262626"
+    android:minWidth="300dip"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:background="#262626" >
+
+        <TextView
+            android:id="@+id/seal_dialog_title"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="30dip"
+            android:gravity="center_vertical"
+            android:textColor="@color/blue_light"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="2px"
+        android:background="@color/blue_light" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingBottom="10dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip"
+        android:paddingTop="10dip" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:text="编号:"
+            android:textColor="@color/blue_light" />
+
+        <EditText
+            android:id="@+id/dialog_contact"
+            android:layout_width="match_parent"
+            android:layout_height="40dip"
+            android:background="@android:color/transparent"
+            android:hint="请输入编号.."
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/seal_detail_radio_group"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip" >
+
+        <RadioButton
+            android:id="@+id/seal_detail_radio_invalid"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid"
+            android:textColor="@color/blue_light" />
+
+        <RadioButton
+            android:id="@+id/seal_detail_radio_damage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/damage"
+            android:textColor="@color/blue_light" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:paddingBottom="10dip"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip"
+        android:paddingTop="10dip"
+        android:visibility="visible" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/seal_dialog_cancle_bt"
+                android:layout_width="0dip"
+                android:layout_height="40dip"
+                android:layout_weight=".3"
+                android:text="@string/cancle" >
+            </Button>
+
+            <Button
+                android:id="@+id/seal_dialog_confirm_bt"
+                android:layout_width="0dip"
+                android:layout_height="40dip"
+                android:layout_weight=".7"
+                android:text="@string/confirm" >
+            </Button>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

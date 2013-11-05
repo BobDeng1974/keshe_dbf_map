@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import spinneredittext.SpinnerEditText;
+
 import GPS.GPSManager;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -49,7 +51,7 @@ public class DetailActivity extends Activity {
     private Animation slideInRight;
     private Animation slideOutLeft;
     private Animation slideOutRight;
-    // mission_info
+    // mission_info —— first page
     private LinearLayout setNavigation;
     private TextView setNavigationTextView;
     private LinearLayout changeContact;
@@ -62,6 +64,13 @@ public class DetailActivity extends Activity {
     private String[] missionItem2 = MISSION_INFO_ITEM_02;
     private String contactPerson = "";
     private String contactPhone = "";
+    // seal info —— second page
+    private SpinnerEditText cabinetSealOne;
+    private SpinnerEditText cabinetSealTwo;
+    private SpinnerEditText tableSealOne;
+    private SpinnerEditText tableSealTwo;
+    private SpinnerEditText boxSealOne;
+    private SpinnerEditText boxSealTwo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,9 +79,32 @@ public class DetailActivity extends Activity {
 	setContentView(R.layout.detail_acticity);
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
+	//first page
 	initViewAnimatior();
 	initTitleListener();
 	initMissionInfo();
+	//second page
+	initSpinnerEdittext();
+	
+    }
+
+    private void initSpinnerEdittext() {
+	// TODO Auto-generated method stub
+	cabinetSealOne = (SpinnerEditText) findViewById(R.id.st_cabinet_1);
+	cabinetSealTwo = (SpinnerEditText) findViewById(R.id.st_cabinet_2);
+	tableSealOne = (SpinnerEditText) findViewById(R.id.st_table_1);
+	tableSealTwo = (SpinnerEditText) findViewById(R.id.st_table_2);
+	boxSealOne = (SpinnerEditText) findViewById(R.id.st_box_1);
+	boxSealTwo = (SpinnerEditText) findViewById(R.id.st_box_2);
+	List<String > data = new ArrayList<String>();
+	cabinetSealOne.setTitle("柜封1");
+	cabinetSealOne.setData(data);
+	cabinetSealOne.setOpenDialogListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View arg0) {
+		openClickSealInfoDialog("封口");
+	    }
+	});
     }
 
     /**
@@ -97,7 +129,7 @@ public class DetailActivity extends Activity {
 	changeContact.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
-		openMyDialog("联系人", changeContactPerson.getText().toString(),
+		openChangeContactDialog("联系人", changeContactPerson.getText().toString(),
 			changeContactPhone.getText().toString(),
 			changeContactPerson, changeContactPhone);
 	    }
@@ -256,13 +288,13 @@ public class DetailActivity extends Activity {
 	});
     }
 
-    private void openMyDialog(String title, String personTextString,
+    private void openChangeContactDialog(String title, String personTextString,
 	    String phoneTextString, final TextView personText,
 	    final TextView phoneText) {
 	// 创建自定义dialog
 	final Dialog dialog = new Dialog(this, R.style.dialog);
 	final View myView = LayoutInflater.from(DetailActivity.this).inflate(
-		R.layout.dialog, null);
+		R.layout.change_contact_dialog, null);
 	myView.findFocus();
 	// 获取控件
 	TextView titleTextView = (TextView) myView
@@ -298,6 +330,33 @@ public class DetailActivity extends Activity {
 			dialogContactEditText.getText().toString() + " "
 				+ dialogPhoneEditText.getText().toString(),
 			Toast.LENGTH_SHORT).show();
+		dialog.dismiss();
+	    }
+	});
+	dialog.getWindow().setContentView(myView);
+	dialog.show();
+    }
+    private void openClickSealInfoDialog(String title) {
+	// 创建自定义dialog
+	final Dialog dialog = new Dialog(this, R.style.dialog);
+	final View myView = LayoutInflater.from(DetailActivity.this).inflate(
+		R.layout.seal_detail_dailog, null);
+	myView.findFocus();
+	// 获取控件
+	TextView titleTextView = (TextView) myView.findViewById(R.id.seal_dialog_title);
+	Button dialogCancleButton = (Button) myView.findViewById(R.id.seal_dialog_cancle_bt);
+	Button dialogConfirmButton = (Button) myView.findViewById(R.id.seal_dialog_confirm_bt);
+	titleTextView.setText(title);
+	dialogCancleButton.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		dialog.dismiss();
+	    }
+	});
+	dialogConfirmButton.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		// TODO Auto-generated method stub
 		dialog.dismiss();
 	    }
 	});
