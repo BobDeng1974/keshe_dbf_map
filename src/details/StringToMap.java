@@ -106,7 +106,7 @@ public class StringToMap {
                 continue;  
             }  
             String key = keyText[0]; // key  
-            String value = keyText[1]; // value  
+            String value = keyText[1].trim(); // value  
             if (value.charAt(0) == 'M') {  
                 Map<?, ?> map1 = StringToMap(value);  
                 map.put(key, map1);  

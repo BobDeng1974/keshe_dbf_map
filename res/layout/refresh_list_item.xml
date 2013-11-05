@@ -14,12 +14,12 @@
         android:text="未找到"
         android:visibility="gone" />
 
-    <TextView 
+    <TextView
         android:id="@+id/item_save_map"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/categories_00"
         android:layout_width="fill_parent"
@@ -185,27 +185,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-
-                <TextView
-                    style="@android:style/TextAppearance.Medium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dip"
-                    android:text="@string/refresh_item7" />
-
-                <TextView
-                    android:id="@+id/item_subs_name"
-                    style="@android:style/TextAppearance.Medium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dip"
-                    android:text="item描述..." />
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"

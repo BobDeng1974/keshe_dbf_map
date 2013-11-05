@@ -66,6 +66,7 @@ public class RefreshableListViewActivity extends Fragment {
 	@Override
 	protected Map<String, String> doInBackground(Void... params) {
 	    Map<String, String> map = new HashMap<String, String>();
+	    // map.put("ZC_ID", "121212");
 	    map.put("CONTACT", "李狗蛋");
 	    try {
 		Thread.sleep(2000);
@@ -77,7 +78,7 @@ public class RefreshableListViewActivity extends Fragment {
 
 	@Override
 	protected void onPostExecute(Map<String, String> result) {
-//	    mItems.add(result);
+	    mItems.add(result);
 	    // This should be called after refreshing finished
 	    mListView.completeRefreshing();
 
@@ -91,20 +92,27 @@ public class RefreshableListViewActivity extends Fragment {
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 		long id) {
 	    // TODO Auto-generated method stub
-//	    HashMap<String, String> map = (HashMap<String, String>) parent
-//		    .getItemAtPosition(position + 1);
-	    TextView savedMapTextView = (TextView) view.findViewById(R.id.item_save_map);
+	    // HashMap<String, String> map = (HashMap<String, String>) parent
+	    // .getItemAtPosition(position + 1);
+	    TextView not_find = (TextView)view.findViewById(R.id.item_not_find);
+	    TextView savedMapTextView = (TextView) view
+		    .findViewById(R.id.item_save_map);
 	    TextView cate = (TextView) view.findViewById(R.id.item_categories);
 	    TextView cont = (TextView) view.findViewById(R.id.item_contact);
 	    TextView pho = (TextView) view.findViewById(R.id.item_phone);
-	    
+
 	    Intent intent = new Intent();
-	    if (cate.getText().toString().equals("01") ) {
+	    if (not_find.getVisibility() == View.VISIBLE) {
+		Toast.makeText(getActivity(), "未找到,请检查数据库..", Toast.LENGTH_SHORT).show();
+		return;
+	    }
+	    if (cate.getText().toString().equals("01")) {
 		System.out.println("this is categories 01 in RefreshList");
 		intent.putExtra(CONTACT, cont.getText().toString());
 		intent.putExtra(PHONE, pho.getText().toString());
 	    }
-	    intent.putExtra(MISSION_DETAIL, savedMapTextView.getText().toString());
+	    intent.putExtra(MISSION_DETAIL, savedMapTextView.getText()
+		    .toString());
 	    intent.setClass(getActivity(), DetailActivity.class);
 	    startActivity(intent);
 	}
@@ -123,29 +131,39 @@ public class RefreshableListViewActivity extends Fragment {
 	return items;
     }
 
-    // //DBF文件的数据添加
-    // public void addItem() throws Exception {
-    // DBFWriter dbfwriter = new DBFWriter(new File(rwPath));
-    // Object[] obj=new Object[3];
-    // // obj[0]="442899999811111111";
-    // // obj[1]="123";
-    // // obj[2]="广州软件";
-    // dbfwriter.addRecord(obj);
-    // }
+//     //DBF文件的数据添加
+//     public void addItem() throws Exception {
+//     DBFWriter dbfwriter = new DBFWriter(new File(rwPath));
+//     Object[] obj=new Object[3];
+//     // obj[0]="442899999811111111";
+//     // obj[1]="123";
+//     // obj[2]="广州软件";
+//     dbfwriter.addRecord(obj);
+//     }
 
     private void creatDataBase() {
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
 	DataBaseService service = new MyData(getActivity());
-	Object[] params = new Object[DNBXX.length];
-	List<Map<String, String>> testItems = parseDbf2Map
+	Object[] params = new Object[DNBXX_ITEM.length];
+	// 创建table —— dnbxx
+	List<Map<String, String>> dnbxxItems = parseDbf2Map
 		.getListMapFromDbf(dnbxxPath);
-	for (int i = 0; i < testItems.size(); i++) {
-	    Map<String, String> map = testItems.get(i);
-	    for (int y = 0; y < DNBXX.length; y++) {
-		params[y] = map.get(DNBXX[y]);
+	for (int i = 0; i < dnbxxItems.size(); i++) {
+	    Map<String, String> map = dnbxxItems.get(i);
+	    for (int y = 0; y < DNBXX_ITEM.length; y++) {
+		params[y] = map.get(DNBXX_ITEM[y]);
 	    }
-	    boolean flag = service.addMyData(params);
-	    Log.i("fuck", "--->" + flag);
+	    boolean flag = service.addMyData(DNBXX, params);
+	    Log.i("dnbxx add item", "--->" + flag);
+	}
+	// 创建table —— dnbxysj
+	List<Map<String, String>> dnbxysjItems = parseDbf2Map
+		.getListMapFromDbf(dnbxxPath);
+	for (int i = 0; i < dnbxysjItems.size(); i++) {
+	    Map<String, String> map = dnbxysjItems.get(i);
+	    params[0] = map.get(METER_ID);
+	    boolean flag = service.addMyData(DNBXX, params);
+	    Log.i("dnbxysj add items", "--->" + flag);
 	}
 
     }

@@ -19,14 +19,41 @@
             android:text="@string/change_contact"
             android:textColor="#000000" />
 
-        <TextView
-            android:id="@+id/change_contact_text"
-            style="?android:attr/textAppearanceMedium"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="点击更改联系人"
-            android:textColor="#000000" />
+            android:orientation="horizontal" >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="联系人:" />
+
+            <TextView
+                android:id="@+id/change_contact_person"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="点击更改联系人.."
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 号码:   " />
+
+            <TextView
+                android:id="@+id/change_contact_phone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="点击更改号码.."
+                android:textColor="#000000" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -46,13 +73,12 @@
 
         <TextView
             android:id="@+id/get_position_text"
-            style="?android:attr/textAppearanceMedium"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="点击获取当前位置信息"
             android:textColor="#000000" />
-
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/set_navigation"
         android:layout_width="fill_parent"
@@ -70,10 +96,9 @@
 
         <TextView
             android:id="@+id/set_navigation_text"
-            style="?android:attr/textAppearanceMedium"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="点击开始导航"
+            android:hint="点击开始导航"
             android:textColor="#000000" />
     </LinearLayout>
 

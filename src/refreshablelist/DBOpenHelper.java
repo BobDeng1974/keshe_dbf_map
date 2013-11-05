@@ -24,15 +24,20 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 	// TODO Auto-generated method stub
 	//获取dnbxx的列名
-	String myString = "";
-	for (int i = 0; i < DNBXX.length; i++) {
-	    myString = myString + ","+DNBXX[i] + " TEXT";
+	String dnbxx_col_string = "";
+	for (int i = 0; i < DNBXX_ITEM.length; i++) {
+	    dnbxx_col_string = dnbxx_col_string + ","+DNBXX_ITEM[i] + " TEXT";
 	}
+	//获取dnvxysj的列名
+	String dnbxysj_col_string = ",METER_ID char(16)";
+
 //	System.out.println(myString);
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
 	// 数据库这边有一个特点，就是SQLite数据库中文本类型没有过多的约束，也就是可以把布尔类型的数据存储到文本类型中，这样也是可以的
-	String sql = "create table dnbxx(id integer primary key autoincrement"+myString+")";
-	db.execSQL(sql); // 完成数据库的创建
+	String sql_dnb = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
+	String sql_dnbxysj = "create table dnbxx(id integer primary key autoincrement"+dnbxysj_col_string+")";
+	db.execSQL(sql_dnb); // 完成数据库的创建
+	db.execSQL(sql_dnbxysj);
     }
 
     @Override

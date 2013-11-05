@@ -1,28 +1,28 @@
 package refreshablelist;
 
-import java.io.Console;
-import java.util.HashMap;
+import static refreshablelist.StringConstant.*;
 import java.util.List;
 import java.util.Map;
 
-import details.StringToMap;
-import static refreshablelist.StringConstant.*;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import badgeview.BadgeView;
 import baidumapsdk.demo.R;
+import details.StringToMap;
 
 public class MyBaseAdapter extends BaseAdapter {
     private int[] colors = new int[] { 0xff3cb371, 0xffa0a0a0 };
     private Context mContext;
     private List<Map<String, String>> dataList;
+    private Boolean isFirstNotFound = true;
 
     public MyBaseAdapter(Context context, List<Map<String, String>> dataList) {
 	this.mContext = context;
@@ -80,8 +80,6 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.contact = (TextView) convertView
 		    .findViewById(R.id.item_contact);
 	    holder.phone = (TextView) convertView.findViewById(R.id.item_phone);
-	    holder.subs_name = (TextView) convertView
-		    .findViewById(R.id.item_subs_name);
 	    holder.substation = (TextView) convertView
 		    .findViewById(R.id.item_substation);
 	    holder.line_name = (TextView) convertView
@@ -101,8 +99,13 @@ public class MyBaseAdapter extends BaseAdapter {
 	}
 
 	DataBaseService service = new MyData(mContext);
-	String[] seleStrings = { getItem(position).get(ZC_ID) };
-	Map<String, String> searchMap = service.viewMyData(METER_ID,
+	String[] seleStrings = new String[1];
+	if (getItem(position).get(ZC_ID) != null) {
+	    seleStrings[0] = getItem(position).get(ZC_ID);
+	} else {
+	    seleStrings[0] = "";
+	}
+	Map<String, String> searchMap = service.viewMyData(DNBXX, METER_ID,
 		seleStrings);
 	// System.out.println("------查询单条记录--> " + searchMap.toString());
 
@@ -121,10 +124,10 @@ public class MyBaseAdapter extends BaseAdapter {
 
 	    holder.cons_name.setText(searchMap.get(CONS_NAME).trim());
 	    holder.elec_address.setText(searchMap.get(ELEC_ADDR).trim());
-	    holder.subs_name.setText(searchMap.get(SUBS_NAME).trim());
 	    holder.substation.setText(searchMap.get(SUBSTATION).trim());
 	    holder.line_name.setText(searchMap.get(LINE_NAME).trim());
 	    holder.made_number.setText(searchMap.get(MADE_NO).trim());
+	    // 将被点击的任务的详细信息传递到任务信息界面以显示
 	    StringToMap stringToMap = new StringToMap();
 	    String stringMap = stringToMap.MapToString(searchMap);
 	    holder.save_map.setText(stringMap);
@@ -139,15 +142,48 @@ public class MyBaseAdapter extends BaseAdapter {
 		    : View.VISIBLE);
 
 	    // 设置badgeView
-	    holder.badgeView_complete.setText("完成");
-	    holder.badgeView_complete.setBadgeMargin(5, 50);
-	    holder.badgeView_complete.show();
-	    holder.badgeView_categories.setText("客户1");
-	    holder.badgeView_categories.show();
+	    if (getItem(position).get(WCZT).trim().equals("未完成")) {
+		holder.badgeView_complete.setText("新");
+		holder.badgeView_complete.show();
+	    }else {
+		holder.badgeView_complete.hide();
+	    }
+	    if (!IsCategoriesOne) {
+		holder.badgeView_categories.setText("2");
+		holder.badgeView_complete.setBadgeMargin(5, 50);
+		holder.badgeView_categories.show();
+	    }else {
+		holder.badgeView_categories.hide();
+	    }
 	} else {
 	    holder.save_map.setText("");
 	    holder.categoriesZero.setVisibility(View.GONE);
 	    holder.not_find.setVisibility(View.VISIBLE);
+	    holder.badgeView_complete.hide();
+	    holder.badgeView_categories.hide();
+	    if (isFirstNotFound) {
+		new AlertDialog.Builder(mContext)
+			.setTitle("退出确认")
+			.setMessage("无法打开电表信息数据库，请检查数据库是否存在!")
+			.setNegativeButton("取消",
+				new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog,
+					    int which) {
+				    }
+				})
+			.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog,
+					    int whichButton) {
+					ActivityManager actMgr = (ActivityManager) mContext
+						.getSystemService(mContext.ACTIVITY_SERVICE);
+					actMgr.restartPackage(mContext
+						.getPackageName());
+				    }
+				}).show();
+		isFirstNotFound = false;
+	    }
 	}
 	return convertView;
     }
@@ -171,7 +207,6 @@ public class MyBaseAdapter extends BaseAdapter {
 	TextView contact;
 	TextView phone;
 	// categories=02
-	TextView subs_name;
 	TextView substation;
 	TextView line_name;
 	TextView made_number;

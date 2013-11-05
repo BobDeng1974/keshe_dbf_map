@@ -12,7 +12,8 @@
         android:name="baidumapsdk.demo.DemoApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/ExampleTheme" >
+        >
+        <!-- android:theme="@style/ExampleTheme"  -->
         <activity
             android:name="baidumapsdk.demo.BMapApiDemoMain"
             android:configChanges="orientation"
@@ -138,20 +139,19 @@
             android:name="baidumapsdk.demo.ShareDemoActivity"
             android:label="@string/demo_name_share" >
         </activity>
-        <activity android:name="slidingmenu.LeftAndRightActivity" >
+        <activity android:name="slidingmenu.LeftAndRightActivity" 
+            android:theme="@style/ExampleTheme"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
->
-        <activity
+        </activity>        <activity
             android:name="details.DetailActivity"
             android:theme="@style/iTitleTheme" >
         </activity>
     </application>
-
+<uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />

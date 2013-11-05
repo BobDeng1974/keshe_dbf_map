@@ -141,7 +141,7 @@ public class GPSManager {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	    System.out.println("result size------->"+result.size());
+//	    System.out.println("result size------->"+result.size());
 	    return result;
 	
     }

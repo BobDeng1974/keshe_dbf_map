@@ -1,12 +1,18 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Light" />
-
     <style name="ExampleTheme" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="homeAsUpIndicator">@drawable/new_indicator</item>
         <item name="android:homeAsUpIndicator">@drawable/new_indicator</item>
     </style>
 
+    	<style name="iTitleTheme" parent="android:Theme.Holo">
+		<item name="android:windowTitleSize">50dip</item>
+		<item name="android:windowTitleBackgroundStyle">@style/iWindowTitleBackground</item> 
+		<item name="android:windowContentOverlay">@android:color/transparent</item>
+		<item name="android:windowActionBar">false</item>
+	</style>
+    
     <style name="iBtn">
         <item name="android:background">@drawable/title_btn</item>
         <item name="android:paddingLeft">16dip</item>
@@ -36,7 +42,7 @@
         <item name="android:windowIsFloating">true</item> <!-- 是否浮现在activity之上 -->
         <item name="android:windowIsTranslucent">true</item> <!-- 半透明 -->
         <item name="android:windowNoTitle">true</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">#262626</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item><!-- 模糊 -->
         <item name="android:backgroundDimAmount">0.6</item>
