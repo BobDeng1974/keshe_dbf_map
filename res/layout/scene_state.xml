@@ -59,4 +59,10 @@
         android:focusable="true" 
         />
 
+    <Button 
+        android:id="@+id/scene_event_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="事件"
+        />
 </LinearLayout>

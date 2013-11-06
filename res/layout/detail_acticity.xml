@@ -5,8 +5,7 @@
     android:background="#eee"
     android:orientation="vertical"
     android:paddingLeft="4dip"
-    android:paddingRight="4dip"
-     >
+    android:paddingRight="4dip" >
 
     <ViewAnimator
         android:id="@+id/animator"
@@ -14,9 +13,30 @@
         android:layout_height="fill_parent"
         android:paddingTop="16dip" >
 
-        <include android:id="@+id/v0" layout="@layout/mission_info"/>
-        <include android:id="@+id/v1" layout="@layout/seal_info"/>
-        <include android:id="@+id/v2" layout="@layout/mission_status"/>
+        <include
+            android:id="@+id/v0"
+            layout="@layout/mission_info" />
+
+        <include
+            android:id="@+id/v1"
+            layout="@layout/seal_info" />
+
+        <include
+            android:id="@+id/v2"
+            layout="@layout/mission_status" />
+
+        <include
+            android:id="@+id/v3"
+            layout="@layout/scene_state" />
+
+        <include
+            android:id="@+id/v4"
+            layout="@layout/electri_clock" />
+        <include 
+            android:id="@+id/v5"
+            layout="@layout/scene_verify"
+            />
+        <!-- <include android:id="@+id/v5" layout="@layout/result_confirm"/> -->
     </ViewAnimator>
 
 </LinearLayout>

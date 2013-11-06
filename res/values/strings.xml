@@ -14,12 +14,18 @@
     <string name="refresh_item9">供电所:</string>
     <!-- detailActivity title -->
     <string name="mission_info">任务信息</string>
-    <string name="fengkou_info">封口信息</string>
+    <string name="seal_info">封口信息</string>
     <string name="mission_status">任务状态</string>
+    <string name="scene_state">现场情况</string>
+    <string name="electric_clock">电能表止码</string>
+    <string name="scene_verify">现场校验</string>
+    <string name="result_confirm">结果确认</string>
+    <string name="new_seal_info">新封口</string>
     <string name="title_back">返回</string>
     <string name="title_next">继续</string>
     <string name="confirm">确定</string>
     <string name="cancle">取消</string>
+    <string name="exit">退出</string>
     <!-- detailActivity MissionInfo -->
     <string name="set_navigation">设置导航</string>
     <string name="change_contact">更改联系人</string>
@@ -36,6 +42,30 @@
     <string name="clock_mistake_conclusion">时钟误差结论:</string>
     <string name="ammeter_date">电表日期:</string>
     <string name="date_conclusion">日期结论:</string>
+    <!-- detailActivity Electirc Clock -->
+    <string name="positive_active">正向有功</string>
+    <string name="negative_active">反向有功</string>
+    <string name="positive_reactive">正向无功:</string>
+    <string name="negative_reactive">反向无功:</string>
+    <string name="total_power">总电量:</string>
+    <string name="maximum_active_demand">最大有功需量:</string>
+    <string name="peak">峰:</string>
+    <string name="valley">谷:</string>
+    <string name="average">平:</string>
+    <string name="combination_deviation">组合误差:</string>
+    <string name="other_power">其他电量</string>
+    <string name="vol_phase_sequence">电压相序</string>
+    <string name="test_laps">测试圈数:</string>
+    <string name="exception_error">异常情况</string>
+    <string name="not_meet_verify_requirment">不满足校验条件</string>
+    <string name="can_not_verify">无法校验</string>
+    <!-- detailActivity scene verify -->
+    <string name="check_before_verify">校准前标准器核查</string>
+    <string name="temperature">温度:</string>
+    <string name="humidity">湿度:</string>
+    <string name="check_after_verify">校准后标准器核查</string>
+    <string name="read_from_calibrator">读取校验仪</string>
+    <string name="made_number">生产编号:</string>
     <!-- Baidu -->
     <string name="app_name">DEMO</string>
     <string name="demo_name_basemap">基本地图功能</string>

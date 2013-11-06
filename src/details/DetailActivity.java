@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.location.Address;
 import android.os.Bundle;
 import android.text.InputType;
@@ -34,13 +35,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 import baidumapsdk.demo.R;
 
 public class DetailActivity extends Activity {
+    Resources resources;
     // title
     private TextView title;
     private Button leftBtn;
@@ -51,7 +55,7 @@ public class DetailActivity extends Activity {
     private Animation slideInRight;
     private Animation slideOutLeft;
     private Animation slideOutRight;
-    // mission_info —— first page
+    // mission_info 
     private LinearLayout setNavigation;
     private TextView setNavigationTextView;
     private LinearLayout changeContact;
@@ -64,13 +68,40 @@ public class DetailActivity extends Activity {
     private String[] missionItem2 = MISSION_INFO_ITEM_02;
     private String contactPerson = "";
     private String contactPhone = "";
-    // seal info —— second page
+    // seal info
     private SpinnerEditText cabinetSealOne;
     private SpinnerEditText cabinetSealTwo;
     private SpinnerEditText tableSealOne;
     private SpinnerEditText tableSealTwo;
     private SpinnerEditText boxSealOne;
     private SpinnerEditText boxSealTwo;
+    //mission status
+    private RadioButton missionStatusOne;
+    private RadioButton missionStatusTwo;
+    private RadioButton missionStatusThree;
+    //scene state 
+    private EditText clockDeviation;
+    private SpinnerEditText clockDeviationConclusion;
+    private EditText electriClockDate;
+    private SpinnerEditText electriClockDateConclusion;
+    private Button electriEventButton;
+    //electriClock 
+    private EditText positiveTotalPower;
+    private EditText positivePeak;
+    private EditText positiveValley;
+    private EditText positiveAverage;
+    private TextView combinationDeviation;
+    private Button otherPowerButton;
+    private SpinnerEditText voltPhase;
+    private EditText testLaps;
+    private RadioButton electriClockExceptionErrorOne;
+    private RadioButton electriClockExceptionErrorTwo;    
+    //scene verify
+    private EditText verifyTemperature;
+    private EditText verifyHumidity;
+    private TextView verifyTestTextView;
+    private Button verifyReadMachine;
+    private Spinner verifyMadeNumberSpinner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,13 +110,23 @@ public class DetailActivity extends Activity {
 	setContentView(R.layout.detail_acticity);
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
-	//first page
+	resources = getResources();
+	// first page
 	initViewAnimatior();
 	initTitleListener();
 	initMissionInfo();
-	//second page
+	// second page
 	initSpinnerEdittext();
-	
+	//third page
+	initMissionStatus();
+	//four page
+	initSceneState();
+	//fifth page()
+	initElectriClock();
+	//six page
+	initSceneVerify();
+	//seven page
+	initResultConfirm();
     }
 
     private void initSpinnerEdittext() {
@@ -96,13 +137,13 @@ public class DetailActivity extends Activity {
 	tableSealTwo = (SpinnerEditText) findViewById(R.id.st_table_2);
 	boxSealOne = (SpinnerEditText) findViewById(R.id.st_box_1);
 	boxSealTwo = (SpinnerEditText) findViewById(R.id.st_box_2);
-	List<String > data = new ArrayList<String>();
+	List<String> data = new ArrayList<String>();
 	cabinetSealOne.setTitle("柜封1");
 	cabinetSealOne.setData(data);
 	cabinetSealOne.setOpenDialogListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
-		openClickSealInfoDialog("封口");
+		openClickSealInfoDialog(resources.getString(R.string.seal_info));
 	    }
 	});
     }
@@ -118,7 +159,7 @@ public class DetailActivity extends Activity {
 	changeContactPerson = (TextView) findViewById(R.id.change_contact_person);
 	changeContactPhone = (TextView) findViewById(R.id.change_contact_phone);
 	getPositionTextView = (TextView) findViewById(R.id.get_position_text);
-	
+
 	missionInfoListView = (ListView) findViewById(R.id.mission_info_listview);
 	initMissionInfoListener();
 	initMissionInfoListView();
@@ -129,8 +170,8 @@ public class DetailActivity extends Activity {
 	changeContact.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
-		openChangeContactDialog("联系人", changeContactPerson.getText().toString(),
-			changeContactPhone.getText().toString(),
+		openChangeContactDialog("联系人", changeContactPerson.getText()
+			.toString(), changeContactPhone.getText().toString(),
 			changeContactPerson, changeContactPhone);
 	    }
 	});
@@ -140,7 +181,7 @@ public class DetailActivity extends Activity {
 
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
 		List<Address> gps = gpsManager.getGPS();
-//		System.out.println("GPS------------>" + gps);
+		// System.out.println("GPS------------>" + gps);
 		if (gps == null) {
 		    Toast.makeText(getApplicationContext(), "无法获取,请检查网络状况..",
 			    Toast.LENGTH_LONG).show();
@@ -172,9 +213,12 @@ public class DetailActivity extends Activity {
 		HashMap<String, Object> smallMap = new HashMap<String, Object>();
 		smallMap.put("title", missionItem1[z]);
 		if (missionItem1[z].equals(CONTACT))
-		    smallMap.put("values", contactPerson.trim().equals("")? "无" : contactPerson);
+		    smallMap.put("values",
+			    contactPerson.trim().equals("") ? "无"
+				    : contactPerson);
 		else if (missionItem1[z].equals(PHONE))
-		    smallMap.put("values", contactPhone.trim().equals("")? "无" : contactPhone);
+		    smallMap.put("values", contactPhone.trim().equals("") ? "无"
+			    : contactPhone);
 		else
 		    smallMap.put("values", map.get(missionItem1[z]));
 
@@ -196,6 +240,43 @@ public class DetailActivity extends Activity {
 	missionInfoListView.setAdapter(adapter);
     }
 
+    private void initMissionStatus() {
+	
+    }
+    private void initSceneState() {
+	
+    }
+    
+    private void initElectriClock() {
+	otherPowerButton = (Button) findViewById(R.id.electir_other_power);
+	initElectriClockListener();
+    }
+
+    private void initElectriClockListener() {
+	// TODO Auto-generated method stub
+	otherPowerButton.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View arg0) {
+		openElectriOtherPowerDialog(resources.getString(R.string.electric_clock));
+	    }
+	});
+    }
+
+
+
+    private void initSceneVerify() {
+	verifyTestTextView = (TextView) findViewById(R.id.verify_test_text);
+	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
+	verifyReadMachine.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		//等待界面且更新testTextview
+	    }
+	});
+    }
+    private void initResultConfirm() {
+	
+    }
     /**
      * 初始化titlebar控件
      */
@@ -205,7 +286,7 @@ public class DetailActivity extends Activity {
 	leftBtn = (Button) findViewById(R.id.title_left_btn);
 	rightBtn = (Button) findViewById(R.id.title_right_btn);
 	title.setText(getResources().getString(R.string.mission_info));
-	leftBtn.setText(getResources().getString(R.string.confirm));
+	leftBtn.setText(getResources().getString(R.string.exit));
 	rightBtn.setText(getResources().getString(R.string.title_next));
 	animator = (ViewAnimator) findViewById(R.id.animator);
 	slideInLeft = AnimationUtils
@@ -227,51 +308,117 @@ public class DetailActivity extends Activity {
 	    public void onClick(View v) {
 		switch (animator.getDisplayedChild()) {
 		case 0:
+		    //退出
 		    finish();
 		    break;
 		case 1:
-		    title.setText(getResources().getString(
-			    R.string.mission_info));
-		    leftBtn.setText(getResources().getString(
-			    R.string.title_back));
-		    rightBtn.setText(getResources().getString(
-			    R.string.title_next));
+		    //回到任务信息
+		    ChangeTitleText(resources.getString(R.string.mission_info),
+			    resources.getString(R.string.exit),
+			    resources.getString(R.string.title_next),
+			    false);
 		    break;
 		case 2:
-		    title.setText(getResources().getString(
-			    R.string.fengkou_info));
-		    leftBtn.setText(getResources().getString(
-			    R.string.title_back));
-		    rightBtn.setText(getResources().getString(
-			    R.string.title_next));
+		    //回到封口信息
+		    ChangeTitleText(resources.getString(R.string.seal_info),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
+		    break;
+		case 3:
+		    //回到任务状态
+		    ChangeTitleText(resources.getString(R.string.mission_status),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
+		    break;
+		case 4:
+		    //回到现场情况
+		    ChangeTitleText(resources.getString(R.string.scene_state),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
+		    break;
+		case 5:
+		    //回到电能表止码
+		    ChangeTitleText(resources.getString(R.string.electric_clock),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
+		    break;
+		case 6:
+		    //回到现场检验
+		    ChangeTitleText(resources.getString(R.string.scene_verify),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
+		    break;
+		case 7:
+		    //回到结果确认
+		    ChangeTitleText(resources.getString(R.string.result_confirm),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    false);
 		    break;
 		default:
 		    break;
 		}
-		animator.setInAnimation(slideInRight);
-		animator.setOutAnimation(slideOutRight);
-		animator.showPrevious();
 	    }
 	});
 	rightBtn.setOnClickListener(new OnClickListener() {
 	    public void onClick(View v) {
 		switch (animator.getDisplayedChild()) {
 		case 0:
-		    title.setText(getResources().getString(
-			    R.string.fengkou_info));
-		    leftBtn.setText(getResources().getString(
-			    R.string.title_back));
-		    rightBtn.setText(getResources().getString(
-			    R.string.title_next));
+		    //切换到封口信息
+		    ChangeTitleText(resources.getString(R.string.seal_info),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
 		    break;
 		case 1:
-		    title.setText(getResources().getString(
-			    R.string.mission_status));
-		    leftBtn.setText(getResources().getString(
-			    R.string.title_back));
-		    rightBtn.setText(getResources().getString(R.string.confirm));
+		    //切换到任务状态
+		    ChangeTitleText(resources.getString(R.string.mission_status),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
 		    break;
 		case 2:
+		    //切换到现场情况
+		    ChangeTitleText(resources.getString(R.string.scene_state),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
+		    break;
+		case 3:
+		    //切换到电能表止码
+		    ChangeTitleText(resources.getString(R.string.electric_clock),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
+		    break;
+		case 4:
+		    //切换到现场校验
+		    ChangeTitleText(resources.getString(R.string.scene_verify),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
+		    break;
+		case 5:
+		    //切换到结果确认
+		    ChangeTitleText(resources.getString(R.string.result_confirm),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.title_next),
+			    true);
+		    break;
+		case 6:
+		    //切换到新封口
+		    ChangeTitleText(resources.getString(R.string.new_seal_info),
+			    resources.getString(R.string.title_back),
+			    resources.getString(R.string.confirm),
+			    true);
+		    break;
+		case 7:
+		    //新封口再右点，即提示完成任务
 		    String msg = "任务完成";
 		    new AlertDialog.Builder(DetailActivity.this)
 			    .setMessage(msg).setTitle("hmmm...")
@@ -281,9 +428,6 @@ public class DetailActivity extends Activity {
 		default:
 		    break;
 		}
-		animator.setInAnimation(slideInLeft);
-		animator.setOutAnimation(slideOutLeft);
-		animator.showNext();
 	    }
 	});
     }
@@ -336,6 +480,7 @@ public class DetailActivity extends Activity {
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
     }
+
     private void openClickSealInfoDialog(String title) {
 	// 创建自定义dialog
 	final Dialog dialog = new Dialog(this, R.style.dialog);
@@ -343,9 +488,12 @@ public class DetailActivity extends Activity {
 		R.layout.seal_detail_dailog, null);
 	myView.findFocus();
 	// 获取控件
-	TextView titleTextView = (TextView) myView.findViewById(R.id.seal_dialog_title);
-	Button dialogCancleButton = (Button) myView.findViewById(R.id.seal_dialog_cancle_bt);
-	Button dialogConfirmButton = (Button) myView.findViewById(R.id.seal_dialog_confirm_bt);
+	TextView titleTextView = (TextView) myView
+		.findViewById(R.id.seal_dialog_title);
+	Button dialogCancleButton = (Button) myView
+		.findViewById(R.id.seal_dialog_cancle_bt);
+	Button dialogConfirmButton = (Button) myView
+		.findViewById(R.id.seal_dialog_confirm_bt);
 	titleTextView.setText(title);
 	dialogCancleButton.setOnClickListener(new OnClickListener() {
 	    @Override
@@ -363,23 +511,71 @@ public class DetailActivity extends Activity {
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
     }
+
+    private void openElectriOtherPowerDialog(String title) {
+	// 创建自定义dialog
+	final Dialog dialog = new Dialog(this, R.style.dialog);
+	final View myView = LayoutInflater.from(DetailActivity.this).inflate(
+		R.layout.electir_other_power_dialog, null);
+	myView.findFocus();
+	// 获取控件
+
+//	titleTextView.setText(title);
+//	dialogCancleButton.setOnClickListener(new OnClickListener() {
+//	    @Override
+//	    public void onClick(View v) {
+//		dialog.dismiss();
+//	    }
+//	});
+//	dialogConfirmButton.setOnClickListener(new OnClickListener() {
+//	    @Override
+//	    public void onClick(View v) {
+//		// TODO Auto-generated method stub
+//		dialog.dismiss();
+//	    }
+//	});
+	dialog.getWindow().setContentView(myView);
+	dialog.show();
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK) { //监控/拦截/屏蔽返回键
-            new AlertDialog.Builder(this).setTitle(
-		    "退出确认").setMessage("确认退出任务？").setNegativeButton("取消",
-		    new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		    }
-		    }).setPositiveButton("确定",
-		    new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-			    finish();
-		    }
-		    }).show();
-            return true;
-        } 
-        return super.onKeyDown(keyCode, event);
+	if (keyCode == KeyEvent.KEYCODE_BACK) { // 监控/拦截/屏蔽返回键
+	    new AlertDialog.Builder(this)
+		    .setTitle("退出确认")
+		    .setMessage("确认退出任务？")
+		    .setNegativeButton("取消",
+			    new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog,
+					int which) {
+				}
+			    })
+		    .setPositiveButton("确定",
+			    new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,
+					int whichButton) {
+				    finish();
+				}
+			    }).show();
+	    return true;
+	}
+	return super.onKeyDown(keyCode, event);
+    }
+
+    private void ChangeTitleText(String titleString, String leftButtonString,
+	    String rightButtonString , Boolean isRight) {
+	title.setText(titleString);
+	leftBtn.setText(leftButtonString);
+	rightBtn.setText(rightButtonString);
+	if (isRight) {
+	    animator.setInAnimation(slideInLeft);
+	    animator.setOutAnimation(slideOutLeft);
+	    animator.showNext();
+	}else {
+	    animator.setInAnimation(slideInRight);
+	    animator.setOutAnimation(slideOutRight);
+	    animator.showPrevious();
+	}
     }
 }
