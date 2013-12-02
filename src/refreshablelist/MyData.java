@@ -7,7 +7,7 @@ import java.util.Map;
 
 import baidumapsdk.demo.R.string;
 
-import static refreshablelist.StringConstant.*;
+import static stringconstant.StringConstant.*;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

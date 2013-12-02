@@ -15,7 +15,8 @@
             android:id="@+id/mission_status_radio1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="No.1"
+            android:text="@string/mission_status_1"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
@@ -24,14 +25,16 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
-            android:text="No.2"
+                        android:gravity="center"
+            android:text="@string/mission_status_2"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
             android:id="@+id/mission_status_radio3"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="No.3"
+            android:text="@string/mission_status_3"
+                        android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </RadioGroup>
 

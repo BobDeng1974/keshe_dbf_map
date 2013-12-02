@@ -1,7 +1,7 @@
 package refreshablelist;
 
 import android.content.Context;
-import static refreshablelist.StringConstant.*;
+import static stringconstant.StringConstant.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -35,7 +35,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
 	// 数据库这边有一个特点，就是SQLite数据库中文本类型没有过多的约束，也就是可以把布尔类型的数据存储到文本类型中，这样也是可以的
 	String sql_dnb = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
-	String sql_dnbxysj = "create table dnbxx(id integer primary key autoincrement"+dnbxysj_col_string+")";
+	String sql_dnbxysj = "create table dnbxysj(id integer primary key autoincrement"+dnbxysj_col_string+")";
 	db.execSQL(sql_dnb); // 完成数据库的创建
 	db.execSQL(sql_dnbxysj);
     }

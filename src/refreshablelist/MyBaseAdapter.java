@@ -1,6 +1,7 @@
 package refreshablelist;
 
-import static refreshablelist.StringConstant.*;
+import static stringconstant.StringConstant.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +78,8 @@ public class MyBaseAdapter extends BaseAdapter {
 		    .findViewById(R.id.item_cons_name);
 	    holder.elec_address = (TextView) convertView
 		    .findViewById(R.id.item_address);
+	    holder.contactAndPhone = (TextView) convertView
+		    .findViewById(R.id.item_contact_and_phone);
 	    holder.contact = (TextView) convertView
 		    .findViewById(R.id.item_contact);
 	    holder.phone = (TextView) convertView.findViewById(R.id.item_phone);
@@ -121,6 +124,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.contact.setText((String) getItem(position).get(CONTACT)
 		    .trim());
 	    holder.phone.setText((String) getItem(position).get(PHONE).trim());
+	    holder.contactAndPhone.setText(holder.contact.getText().toString() + "\t" + holder.phone.getText().toString());
 
 	    holder.cons_name.setText(searchMap.get(CONS_NAME).trim());
 	    holder.elec_address.setText(searchMap.get(ELEC_ADDR).trim());
@@ -145,14 +149,14 @@ public class MyBaseAdapter extends BaseAdapter {
 	    if (getItem(position).get(WCZT).trim().equals("未完成")) {
 		holder.badgeView_complete.setText("新");
 		holder.badgeView_complete.show();
-	    }else {
+	    } else {
 		holder.badgeView_complete.hide();
 	    }
 	    if (!IsCategoriesOne) {
 		holder.badgeView_categories.setText("2");
 		holder.badgeView_complete.setBadgeMargin(5, 50);
 		holder.badgeView_categories.show();
-	    }else {
+	    } else {
 		holder.badgeView_categories.hide();
 	    }
 	} else {
@@ -204,6 +208,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	// categories=01
 	TextView cons_name;
 	TextView elec_address;
+	TextView contactAndPhone;
 	TextView contact;
 	TextView phone;
 	// categories=02

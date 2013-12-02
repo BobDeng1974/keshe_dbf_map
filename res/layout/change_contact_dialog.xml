@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#262626"
     android:minWidth="300dip"
     android:orientation="vertical" >
 
@@ -49,9 +48,8 @@
             android:id="@+id/dialog_contact"
             android:layout_width="match_parent"
             android:layout_height="40dip"
-            android:background="@android:color/transparent"
             android:hint="请输入名字.."
-            android:textColor="#ffffff" />
+            android:textColor="@color/text_color_black" />
     </LinearLayout>
 
     <LinearLayout
@@ -77,9 +75,8 @@
             android:id="@+id/dialog_phone"
             android:layout_width="match_parent"
             android:layout_height="40dip"
-            android:background="@android:color/transparent"
             android:hint="请输入号码.."
-            android:textColor="#ffffff" />
+            android:textColor="@color/text_color_black" />
     </LinearLayout>
 
     <LinearLayout

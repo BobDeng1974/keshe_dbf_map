@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true" />
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -43,26 +44,41 @@
             android:text="@string/ammeter_date"
             android:textColor="@android:color/black" />
 
-        <EditText
-            android:id="@+id/clock_mistake_value"
+        <Button
+            android:id="@+id/clock_date_value"
+            style="?android:attr/textAppearanceMedium"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="输入日期.."
-            android:textColor="@android:color/widget_edittext_dark" />
+            android:text="点击输入日期.."
+            android:textColor="@android:color/black" />
     </LinearLayout>
+
     <spinneredittext.SpinnerEditText
-        android:id="@+id/date_conclusion"
+        android:layout_marginTop="5dip"
+        android:id="@+id/clock_date_conclusion"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:clickable="true"
-        android:focusable="true" 
-        />
+        android:focusable="true" />
 
-    <Button 
-        android:id="@+id/scene_event_button"
+    <Button
+        android:id="@+id/clock_event_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="事件"
+        android:text="事件" />
+
+    <EditText
+        android:layout_marginTop="5dip"
+        android:gravity="top"
+        android:id="@+id/clock_event_textview"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:hint="在此添加事件.."
+        android:background="@android:color/darker_gray"
+        android:textColor="@android:color/black"
+        android:visibility="gone"
         />
+
 </LinearLayout>

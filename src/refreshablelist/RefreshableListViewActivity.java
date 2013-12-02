@@ -10,7 +10,7 @@ import com.linuxense.javadbf.DBFWriter;
 import details.DetailActivity;
 
 import refreshablelist.RefreshableListView.OnRefreshListener;
-import static refreshablelist.StringConstant.*;
+import static stringconstant.StringConstant.*;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -78,7 +78,7 @@ public class RefreshableListViewActivity extends Fragment {
 
 	@Override
 	protected void onPostExecute(Map<String, String> result) {
-	    mItems.add(result);
+//	    mItems.add(result);
 	    // This should be called after refreshing finished
 	    mListView.completeRefreshing();
 

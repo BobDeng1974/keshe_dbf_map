@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="12dip" >
+    >
 
     <TextView
         android:id="@+id/mission_info_title"
@@ -20,7 +20,6 @@
         android:ellipsize="marquee"
         android:textColor="#000000"
         android:marqueeRepeatLimit="marquee_forever"
-        android:text="sdsd"
         android:focusable="true"
         android:singleLine="true" />
 

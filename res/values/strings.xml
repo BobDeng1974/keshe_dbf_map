@@ -19,6 +19,7 @@
     <string name="scene_state">现场情况</string>
     <string name="electric_clock">电能表止码</string>
     <string name="scene_verify">现场校验</string>
+    <string name="input_verify_data">输入检验数据</string>
     <string name="result_confirm">结果确认</string>
     <string name="new_seal_info">新封口</string>
     <string name="title_back">返回</string>
@@ -31,9 +32,9 @@
     <string name="change_contact">更改联系人</string>
     <string name="get_position">获取当前GPS信息</string>
     <!-- detailActivity MissionStatus -->
-    <string name="mission_status_1">No1</string>
-    <string name="mission_status_2">No2</string>
-    <string name="mission_status_3">No3</string>
+    <string name="mission_status_1">无电压且无电池或电池不正常</string>
+    <string name="mission_status_2">无电压,电池正常</string>
+    <string name="mission_status_3">有电压</string>
     <!-- detailActivity SealInfo -->
     <string name="invalid">无效</string>
     <string name="damage">损坏</string>
@@ -66,8 +67,18 @@
     <string name="check_after_verify">校准后标准器核查</string>
     <string name="read_from_calibrator">读取校验仪</string>
     <string name="made_number">生产编号:</string>
+    <!-- Result confirm -->
+    <string name="read_time">读取时间:</string>
+    <string name="machine_number">设备编号:</string>
+    <string name="check_people">校验人:</string>
+    <string name="verify_people">审核人:</string>
+    <string name="work_mode">工作方式:</string>
+    <string name="equipment_ratings">设备评级:</string>
+    <string name="seal">封印:</string>
+    <string name="conclusion_secondary_line">二次线结论:</string>
+    <string name="scene_verify_conclusion">现场校验结论:</string>
     <!-- Baidu -->
-    <string name="app_name">DEMO</string>
+    <string name="app_name">电能表校验</string>
     <string name="demo_name_basemap">基本地图功能</string>
     <string name="demo_title_basemap">基本地图功能--BaseMapDemo</string>
     <string name="demo_desc_basemap">创建一张百度地图并管理地图的生命周期</string>

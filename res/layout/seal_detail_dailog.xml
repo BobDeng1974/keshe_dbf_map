@@ -2,15 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#262626"
     android:minWidth="300dip"
-    android:orientation="vertical"
-     >
+    android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="40dip"
-        android:background="#262626" >
+        android:layout_height="40dip" >
 
         <TextView
             android:id="@+id/seal_dialog_title"
@@ -47,36 +44,36 @@
             android:textColor="@color/blue_light" />
 
         <EditText
-            android:id="@+id/dialog_contact"
+            android:id="@+id/dialog_seal_number"
             android:layout_width="match_parent"
             android:layout_height="40dip"
-            android:background="@android:color/transparent"
             android:hint="请输入编号.."
-            android:textColor="#ffffff" />
+            
+            android:textColor="@color/text_color_black" />
     </LinearLayout>
 
-    <RadioGroup
-        android:id="@+id/seal_detail_radio_group"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dip"
         android:paddingLeft="20dip"
         android:paddingRight="20dip" >
 
-        <RadioButton
+        <CheckBox
             android:id="@+id/seal_detail_radio_invalid"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/invalid"
             android:textColor="@color/blue_light" />
 
-        <RadioButton
+        <CheckBox
             android:id="@+id/seal_detail_radio_damage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/damage"
             android:textColor="@color/blue_light" />
-    </RadioGroup>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -32,11 +32,24 @@
         <include
             android:id="@+id/v4"
             layout="@layout/electri_clock" />
-        <include 
+
+        <include
             android:id="@+id/v5"
-            layout="@layout/scene_verify"
+            layout="@layout/scene_verify" />
+
+        <include
+            android:id="@+id/v6"
+            layout="@layout/result_confirm" />
+        
+        <include 
+            android:id="@+id/v7"
+            layout="@layout/new_seal_info"
             />
-        <!-- <include android:id="@+id/v5" layout="@layout/result_confirm"/> -->
+        
+        <include 
+            android:id="@+id/v8"
+            layout = "@layout/input_verify_data"
+            />
     </ViewAnimator>
 
 </LinearLayout>

@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.AvoidXfermode.Mode;
-import android.graphics.drawable.ColorDrawable;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -34,6 +30,7 @@ public class SpinnerEditText extends LinearLayout {
     private List<String> names;
     private PopupWindow pop;
     private ListView listView;
+    private int status = -1;  //1无效  2损坏
 
     public SpinnerEditText(Context context) {
 	super(context);
@@ -86,6 +83,18 @@ public class SpinnerEditText extends LinearLayout {
 	this.mContext = context;
     }
 
+    public void init(String[] dataArray , String title , Boolean isValueVisible) {
+	List<String> myItemData = new ArrayList<String>();
+	for (String sp_item : dataArray) {
+	    myItemData.add(sp_item);
+	}
+	this.setData(myItemData);
+	this.setTitle(title);
+	if (!isValueVisible) {
+	    this.setValueEditTextGone();
+	}
+    }
+    
     private void getViews() {
 	// TODO Auto-generated method stub
 	textView = (TextView) findViewById(R.id.left_text);
@@ -93,11 +102,15 @@ public class SpinnerEditText extends LinearLayout {
 	editText2 = (EditText) findViewById(R.id.edit_text_2);
 	button = (ImageButton) findViewById(R.id.imgbtn);
     }
+    
+    public void setValueEditTextGone() {
+	editText2.setVisibility(View.GONE);
+    }
 
     public List<String> getData() {
-	names.add("电压");
-	names.add("电流");
-	names.add("电阻");
+//	names.add("电压");
+//	names.add("电流");
+//	names.add("电阻");
 	return names;
     }
 
@@ -111,6 +124,14 @@ public class SpinnerEditText extends LinearLayout {
 	textView.setText(title);
 	invalidate();
     }
+    
+    public void setValue(String value) {
+	editText2.setText(value);
+    }
+    
+    public void setStatus(int sealInfoStatus) {
+	this.status = sealInfoStatus;
+    }
 
     public String getType() {
 	return editText1.getText().toString();
@@ -118,6 +139,10 @@ public class SpinnerEditText extends LinearLayout {
     
     public String getValue() {
 	return editText2.getText().toString();
+    }
+    
+    public int getStatus() {
+	return this.status;
     }
     
     public void setOpenDialogListener(View.OnClickListener listener){  

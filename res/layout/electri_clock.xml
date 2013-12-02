@@ -207,14 +207,14 @@
         android:layout_height="1px"
         android:background="@android:color/black" />
 
-    <RadioGroup
+    <LinearLayout
         android:id="@+id/electri_radio_group"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dip"
         android:orientation="horizontal" >
 
-        <RadioButton
+        <CheckBox
             android:id="@+id/electri_radio_bt_one"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -223,7 +223,7 @@
             android:gravity="center"
             android:text="@string/not_meet_verify_requirment" />
 
-        <RadioButton
+        <CheckBox
             android:id="@+id/electri_radio_bt_two"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -231,6 +231,6 @@
                         android:layout_gravity="center_horizontal"
             android:gravity="center"
             android:text="@string/can_not_verify" />
-    </RadioGroup>
+    </LinearLayout>
 </LinearLayout>
 </ScrollView>
