@@ -53,7 +53,7 @@ public class StringConstant {
     public static String LINE_NAME = "LINE_NAME";
     public static String MADE_NO = "MADE_NO";
     public static String MODEL = "MODEL";
-    public static String VOLT_NAME = "VOLT_NAME";
+    public static String VOLT_NAME = "VOLT__NAME";//fuck!!!!!!!!!!
     public static String RATED = "RATED";
     public static String RC_RATIO = "RC_RATIO";
     public static String MULTIRATE = "MULTIRATE";
@@ -61,10 +61,14 @@ public class StringConstant {
     public static String CONST = "CONST";
     public static String MD_TYPE = "MD_TYPE";
 
+    public static String[] RW_ITEM = { WCZT , ZC_ID , PHONE , CONTACT };
+    
     public static String[] DNBXX_ITEM = { METER_ID, CONS_NO , CONS_NAME, SUBS_NAME,
 	    ELEC_ADDR,  LINE_NAME, MADE_NO, MODEL, VOLT_NAME, RATED,
 	    RC_RATIO, MULTIRATE, DEMAND, CONST, MD_TYPE };
 
+    public static String[] DNBXYSJ_ITEM = { METER_ID };
+    
     public static String[] MISSION_INFO_ITEM_01 = { CONS_NO , CONS_NAME, ELEC_ADDR,
 	    CONTACT, PHONE, MODEL, VOLT_NAME, RATED, RC_RATIO, MULTIRATE,
 	    DEMAND, CONST, MD_TYPE };

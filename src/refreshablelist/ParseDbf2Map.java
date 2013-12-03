@@ -29,7 +29,7 @@ public class ParseDbf2Map {
 	InputStream inStream;
 	List<Map<String, String>> map = null;
 	try {
-	    Log.e("fuck", path);
+//	    Log.e("fuck", path);
 	    File file = new File(path);
 	    inStream = new FileInputStream(file);
 	    map = parseDbf2Map(inStream);
@@ -53,7 +53,7 @@ public class ParseDbf2Map {
      */
     public  List<Map<String, String>> parseDbf2Map(InputStream in)
 	    throws Exception {
-	Log.e("fuck", "sssssssssssssss");
+//	Log.e("fuck", "sssssssssssssss");
 	DBFReader dbfreader = new DBFReader(in);
 	dbfreader.setCharactersetName("GB2312");
 

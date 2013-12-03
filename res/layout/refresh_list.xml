@@ -3,6 +3,13 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+    <TextView 
+        android:id="@+id/accomplish_number"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue_light"
+        android:textColor="@color/white"
+        />
 	<refreshablelist.RefreshableListView  
 	    android:layout_width="fill_parent" 
 	    android:layout_height="fill_parent"

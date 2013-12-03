@@ -108,8 +108,9 @@ public class MyBaseAdapter extends BaseAdapter {
 	} else {
 	    seleStrings[0] = "";
 	}
-	Map<String, String> searchMap = service.viewMyData(DNBXX, METER_ID,
+	List<Map<String, String>>  searchMaps = service.viewMyData(DNBXX, METER_ID,
 		seleStrings);
+	Map<String , String> searchMap = searchMaps.get(0);***************//报错可能时viewmydata有问题
 	// System.out.println("------查询单条记录--> " + searchMap.toString());
 
 	if (searchMap.size() != 0) {

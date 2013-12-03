@@ -1,18 +1,24 @@
 package refreshablelist;
 
 import java.io.File;
+import java.text.Format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.platform.comapi.map.u;
 import com.linuxense.javadbf.DBFWriter;
 
 import details.DetailActivity;
 
 import refreshablelist.RefreshableListView.OnRefreshListener;
 import static stringconstant.StringConstant.*;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,11 +33,13 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import baidumapsdk.demo.R;
+import baidumapsdk.demo.R.string;
 
 public class RefreshableListViewActivity extends Fragment {
 
     private List<Map<String, String>> mItems;
     private RefreshableListView mListView;
+    private TextView completeNumber;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,8 +52,11 @@ public class RefreshableListViewActivity extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onViewCreated(view, savedInstanceState);
+	isDirExist("dbf", "", false);
 	mItems = getItems();
 	mListView = (RefreshableListView) view.findViewById(R.id.listview);
+	completeNumber = (TextView) view.findViewById(R.id.accomplish_number);
+	creatDataBase();
 	MyBaseAdapter myBaseAdapter = new MyBaseAdapter(getActivity(), mItems);
 	mListView.setAdapter(myBaseAdapter);
 	// Callback to refresh the list
@@ -57,7 +68,7 @@ public class RefreshableListViewActivity extends Fragment {
 		new NewDataTask().execute();
 	    }
 	});
-	creatDataBase();
+	 updateCompleteNumber();
     }
 
     private class NewDataTask extends
@@ -78,7 +89,7 @@ public class RefreshableListViewActivity extends Fragment {
 
 	@Override
 	protected void onPostExecute(Map<String, String> result) {
-//	    mItems.add(result);
+	    // mItems.add(result);
 	    // This should be called after refreshing finished
 	    mListView.completeRefreshing();
 
@@ -94,7 +105,8 @@ public class RefreshableListViewActivity extends Fragment {
 	    // TODO Auto-generated method stub
 	    // HashMap<String, String> map = (HashMap<String, String>) parent
 	    // .getItemAtPosition(position + 1);
-	    TextView not_find = (TextView)view.findViewById(R.id.item_not_find);
+	    TextView not_find = (TextView) view
+		    .findViewById(R.id.item_not_find);
 	    TextView savedMapTextView = (TextView) view
 		    .findViewById(R.id.item_save_map);
 	    TextView cate = (TextView) view.findViewById(R.id.item_categories);
@@ -103,7 +115,8 @@ public class RefreshableListViewActivity extends Fragment {
 
 	    Intent intent = new Intent();
 	    if (not_find.getVisibility() == View.VISIBLE) {
-		Toast.makeText(getActivity(), "未找到,请检查数据库..", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), "未找到,请检查数据库..",
+			Toast.LENGTH_SHORT).show();
 		return;
 	    }
 	    if (cate.getText().toString().equals("01")) {
@@ -131,40 +144,76 @@ public class RefreshableListViewActivity extends Fragment {
 	return items;
     }
 
-//     //DBF文件的数据添加
-//     public void addItem() throws Exception {
-//     DBFWriter dbfwriter = new DBFWriter(new File(rwPath));
-//     Object[] obj=new Object[3];
-//     // obj[0]="442899999811111111";
-//     // obj[1]="123";
-//     // obj[2]="广州软件";
-//     dbfwriter.addRecord(obj);
-//     }
+    // //DBF文件的数据添加
+    // public void addItem() throws Exception {
+    // DBFWriter dbfwriter = new DBFWriter(new File(rwPath));
+    // Object[] obj=new Object[3];
+    // // obj[0]="442899999811111111";
+    // // obj[1]="123";
+    // // obj[2]="广州软件";
+    // dbfwriter.addRecord(obj);
+    // }
+    private void updateCompleteNumber() {
+	DataBaseService service = new MyData(getActivity());
+	String[] seleStrings = new String[] { "已完成" };
+	List<Map<String, String>> searchMap = service.viewMyData(RW, WCZT,
+		seleStrings);
+	Log.e("updateCompleteNumber----->", searchMap + "");
+	List<Map<String, String>> tableAll = service.listMyDataMaps(RW, null);
+	int length = service.fetchTableLength(RW);
+	// WCZT=未完成 ,
+	completeNumber.setText(String.format("当前已完成 %d 条/共有 %d 条",
+		searchMap.size(), tableAll.size() - 1));
+    }
 
     private void creatDataBase() {
+	creatDBTable(RW, RW_ITEM, rwPath);
+	creatDBTable(DNBXX, DNBXX_ITEM, dnbxxPath);
+	creatDBTable(DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
+    }
+
+    private void creatDBTable(String tableName, String[] tableItem,
+	    String filePath) {
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
 	DataBaseService service = new MyData(getActivity());
-	Object[] params = new Object[DNBXX_ITEM.length];
-	// 创建table —— dnbxx
-	List<Map<String, String>> dnbxxItems = parseDbf2Map
-		.getListMapFromDbf(dnbxxPath);
-	for (int i = 0; i < dnbxxItems.size(); i++) {
-	    Map<String, String> map = dnbxxItems.get(i);
-	    for (int y = 0; y < DNBXX_ITEM.length; y++) {
-		params[y] = map.get(DNBXX_ITEM[y]);
+	String[] params = new String[tableItem.length];
+	// 创建table
+	List<Map<String, String>> Items = parseDbf2Map
+		.getListMapFromDbf(filePath);
+	Items = Items.subList(1, Items.size());
+	Log.e("creatDBTable--------->Paramitems------>", Items+"");
+	for (int i = 0; i < Items.size(); i++) {
+	    Map<String, String> map = Items.get(i);
+	    for (int y = 0; y < tableItem.length; y++) {
+		params[y] = map.get(tableItem[y]).trim();
 	    }
-	    boolean flag = service.addMyData(DNBXX, params);
-	    Log.i("dnbxx add item", "--->" + flag);
+	    boolean flag = service.addMyData(tableName, tableItem, params);
+	    Log.i(tableName + " add item", "--->" + flag);
 	}
-	// 创建table —— dnbxysj
-	List<Map<String, String>> dnbxysjItems = parseDbf2Map
-		.getListMapFromDbf(dnbxxPath);
-	for (int i = 0; i < dnbxysjItems.size(); i++) {
-	    Map<String, String> map = dnbxysjItems.get(i);
-	    params[0] = map.get(METER_ID);
-	    boolean flag = service.addMyData(DNBXX, params);
-	    Log.i("dnbxysj add items", "--->" + flag);
-	}
-
     }
+    /* 
+     * 判断SD卡中目录或文件是否存在 
+     */  
+    public void isDirExist(String dir , String fileName , Boolean isFile){  
+	String SDCardRoot = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;  
+	File file =  null;
+	if (isFile) {
+	    file = new File(SDCardRoot + dir + File.separator + fileName);  
+	}else {
+	    file = new File(SDCardRoot + dir + File.separator);  
+	}
+        if(!file.exists())  {
+            new AlertDialog.Builder(getActivity())
+	    .setTitle("警告")
+	    .setMessage("未发现dbf文件,请检查SDCard!")
+	    .setPositiveButton("确定",
+		    new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,
+				int whichButton) {
+		            getActivity().finish();			
+		            }
+		    }).show();
+        }
+//            file.mkdir();  //如果不存在则创建  
+    }  
 }
