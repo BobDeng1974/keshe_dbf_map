@@ -61,7 +61,7 @@ public class StringConstant {
     public static String CONST = "CONST";
     public static String MD_TYPE = "MD_TYPE";
 
-    public static String[] RW_ITEM = { WCZT , ZC_ID , PHONE , CONTACT };
+    public static String[] RW_ITEM = { WCZT , ZC_ID ,CATEGORIES, BEGIN_DATE, PHONE , CONTACT };
     
     public static String[] DNBXX_ITEM = { METER_ID, CONS_NO , CONS_NAME, SUBS_NAME,
 	    ELEC_ADDR,  LINE_NAME, MADE_NO, MODEL, VOLT_NAME, RATED,

@@ -7,7 +7,9 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -16,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class GPSManager {
@@ -91,6 +94,7 @@ public class GPSManager {
 	System.out.println("provider--------------->" + provider);
     }
 
+    
     // Gps消息监听器
     private final LocationListener locationListener = new LocationListener() {
 	// 位置发生改变后调用

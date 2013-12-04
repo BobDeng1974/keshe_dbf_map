@@ -52,23 +52,26 @@ public class RefreshableListViewActivity extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onViewCreated(view, savedInstanceState);
-	isDirExist("dbf", "", false);
-	mItems = getItems();
-	mListView = (RefreshableListView) view.findViewById(R.id.listview);
-	completeNumber = (TextView) view.findViewById(R.id.accomplish_number);
-	creatDataBase();
-	MyBaseAdapter myBaseAdapter = new MyBaseAdapter(getActivity(), mItems);
-	mListView.setAdapter(myBaseAdapter);
-	// Callback to refresh the list
-	mListView.setOnItemClickListener(new ItemClickListener());
-	mListView.setOnRefreshListener(new OnRefreshListener() {
-	    @Override
-	    public void onRefresh(RefreshableListView listView) {
-		// TODO Auto-generated method stub
-		new NewDataTask().execute();
-	    }
-	});
-	 updateCompleteNumber();
+	//检查dbf文件夹是否存在。不存在则退出
+	if (isDirExist("dbf", null, false)) {
+	    mItems = getItems();
+	    mListView = (RefreshableListView) view.findViewById(R.id.listview);
+	    completeNumber = (TextView) view
+		    .findViewById(R.id.accomplish_number);
+	    MyBaseAdapter myBaseAdapter = new MyBaseAdapter(getActivity(),
+		    mItems);
+	    mListView.setAdapter(myBaseAdapter);
+	    // Callback to refresh the list
+	    mListView.setOnItemClickListener(new ItemClickListener());
+	    mListView.setOnRefreshListener(new OnRefreshListener() {
+		@Override
+		public void onRefresh(RefreshableListView listView) {
+		    // TODO Auto-generated method stub
+		    new NewDataTask().execute();
+		}
+	    });
+	    updateCompleteNumber();
+	}
     }
 
     private class NewDataTask extends
@@ -138,9 +141,8 @@ public class RefreshableListViewActivity extends Fragment {
      */
     private List<Map<String, String>> getItems() {
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	List<Map<String, String>> items = parseDbf2Map
-		.getListMapFromDbf(rwPath);
-	items = items.subList(1, items.size());
+	DataBaseService service = new MyData(getActivity());
+	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
 	return items;
     }
 
@@ -166,54 +168,34 @@ public class RefreshableListViewActivity extends Fragment {
 		searchMap.size(), tableAll.size() - 1));
     }
 
-    private void creatDataBase() {
-	creatDBTable(RW, RW_ITEM, rwPath);
-	creatDBTable(DNBXX, DNBXX_ITEM, dnbxxPath);
-	creatDBTable(DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
-    }
-
-    private void creatDBTable(String tableName, String[] tableItem,
-	    String filePath) {
-	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	DataBaseService service = new MyData(getActivity());
-	String[] params = new String[tableItem.length];
-	// 创建table
-	List<Map<String, String>> Items = parseDbf2Map
-		.getListMapFromDbf(filePath);
-	Items = Items.subList(1, Items.size());
-	Log.e("creatDBTable--------->Paramitems------>", Items+"");
-	for (int i = 0; i < Items.size(); i++) {
-	    Map<String, String> map = Items.get(i);
-	    for (int y = 0; y < tableItem.length; y++) {
-		params[y] = map.get(tableItem[y]).trim();
-	    }
-	    boolean flag = service.addMyData(tableName, tableItem, params);
-	    Log.i(tableName + " add item", "--->" + flag);
-	}
-    }
-    /* 
-     * 判断SD卡中目录或文件是否存在 
-     */  
-    public void isDirExist(String dir , String fileName , Boolean isFile){  
-	String SDCardRoot = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;  
-	File file =  null;
+    /*
+     * 判断SD卡中目录或文件是否存在
+     */
+    public boolean isDirExist(String dir, String fileName, Boolean isFile) {
+	System.out.println("isDirExist--------------->");
+	String SDCardRoot = Environment.getExternalStorageDirectory()
+		.getAbsolutePath() + File.separator;
+	File file = null;
 	if (isFile) {
-	    file = new File(SDCardRoot + dir + File.separator + fileName);  
-	}else {
-	    file = new File(SDCardRoot + dir + File.separator);  
+	    file = new File(SDCardRoot + dir + File.separator + fileName);
+	} else {
+	    file = new File(SDCardRoot + dir + File.separator);
 	}
-        if(!file.exists())  {
-            new AlertDialog.Builder(getActivity())
-	    .setTitle("警告")
-	    .setMessage("未发现dbf文件,请检查SDCard!")
-	    .setPositiveButton("确定",
-		    new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,
-				int whichButton) {
-		            getActivity().finish();			
-		            }
-		    }).show();
-        }
-//            file.mkdir();  //如果不存在则创建  
-    }  
+	if (!file.exists()) {
+	     new AlertDialog.Builder(getActivity())
+	     .setTitle("警告")
+	     .setMessage("未发现dbf文件,请检查SDCard!")
+	     .setPositiveButton("确定",
+	     new DialogInterface.OnClickListener() {
+	     public void onClick(DialogInterface dialog,
+	     int whichButton) {
+	     getActivity().finish();
+	     }
+	     }).show();
+	    return false;
+	} else {
+	    return true;
+	}
+	// file.mkdir(); //如果不存在则创建
+    }
 }

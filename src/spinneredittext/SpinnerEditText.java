@@ -145,8 +145,8 @@ public class SpinnerEditText extends LinearLayout {
 	return this.status;
     }
     
-    public void setOpenDialogListener(View.OnClickListener listener){  
-	editText2.setOnClickListener(listener);
+    public void setOpenDialogListener(View.OnFocusChangeListener listener){  
+	editText2.setOnFocusChangeListener(listener);
     }
 
     /** 用于显示popupWindow内容的适配器 */

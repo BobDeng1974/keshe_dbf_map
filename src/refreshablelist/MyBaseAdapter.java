@@ -5,6 +5,7 @@ import static stringconstant.StringConstant.*;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -102,18 +103,20 @@ public class MyBaseAdapter extends BaseAdapter {
 	}
 
 	DataBaseService service = new MyData(mContext);
+	List<Map<String, String>>  searchMaps = null;
+	Map<String , String> searchMap = null;
 	String[] seleStrings = new String[1];
 	if (getItem(position).get(ZC_ID) != null) {
-	    seleStrings[0] = getItem(position).get(ZC_ID);
+	    seleStrings[0] = getItem(position).get(ZC_ID).trim();
+	    searchMaps = service.viewMyData(DNBXX, METER_ID,
+		    seleStrings);
 	} else {
 	    seleStrings[0] = "";
 	}
-	List<Map<String, String>>  searchMaps = service.viewMyData(DNBXX, METER_ID,
-		seleStrings);
-	Map<String , String> searchMap = searchMaps.get(0);***************//报错可能时viewmydata有问题
 	// System.out.println("------查询单条记录--> " + searchMap.toString());
 
-	if (searchMap.size() != 0) {
+	if (searchMaps.size() != 0) {
+	    searchMap = searchMaps.get(0);
 	    holder.categoriesZero.setVisibility(View.VISIBLE);
 	    holder.not_find.setVisibility(View.GONE);
 	    // 向ViewHolder中填入的数据
@@ -170,21 +173,11 @@ public class MyBaseAdapter extends BaseAdapter {
 		new AlertDialog.Builder(mContext)
 			.setTitle("退出确认")
 			.setMessage("无法打开电表信息数据库，请检查数据库是否存在!")
-			.setNegativeButton("取消",
-				new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog,
-					    int which) {
-				    }
-				})
 			.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 				    public void onClick(DialogInterface dialog,
 					    int whichButton) {
-					ActivityManager actMgr = (ActivityManager) mContext
-						.getSystemService(mContext.ACTIVITY_SERVICE);
-					actMgr.restartPackage(mContext
-						.getPackageName());
+					((Activity)mContext).finish();
 				    }
 				}).show();
 		isFirstNotFound = false;

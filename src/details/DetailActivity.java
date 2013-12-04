@@ -31,15 +31,20 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -195,7 +200,7 @@ public class DetailActivity extends Activity {
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
 	boxSealOne.init(TABLE_SEAL_ARRAY, "盒封1:", true);
 	boxSealTwo.init(TABLE_SEAL_ARRAY, "盒封2:", true);
-	cabinetSealOne.setOnClickListener(new myOpenSealInfoDialog(
+	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
 		cabinetSealOne));
 	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
 		cabinetSealTwo));
@@ -207,7 +212,7 @@ public class DetailActivity extends Activity {
 	boxSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(boxSealTwo));
     }
 
-    class myOpenSealInfoDialog implements OnClickListener {
+    class myOpenSealInfoDialog implements OnFocusChangeListener {
 	private SpinnerEditText spinnerEditText;
 
 	public myOpenSealInfoDialog(SpinnerEditText spinnerEditText) {
@@ -216,10 +221,12 @@ public class DetailActivity extends Activity {
 	}
 
 	@Override
-	public void onClick(View arg0) {
+	public void onFocusChange(View v, boolean hasFocus) {
 	    // TODO Auto-generated method stub
-	    openClickSealInfoDialog(resources.getString(R.string.seal_info),
-		    spinnerEditText);
+	    if (hasFocus)
+		openClickSealInfoDialog(
+			resources.getString(R.string.seal_info),
+			spinnerEditText);
 	}
     }
 
@@ -390,31 +397,44 @@ public class DetailActivity extends Activity {
     }
 
     private void initElectriClockListener() {
-	//textview listener
-	class myTextWatcher implements TextWatcher{
+	// textview listener
+	class myTextWatcher implements TextWatcher {
 	    @Override
 	    public void afterTextChanged(Editable s) {
 	    }
+
 	    @Override
 	    public void beforeTextChanged(CharSequence s, int start, int count,
 		    int after) {
 	    }
+
 	    @Override
 	    public void onTextChanged(CharSequence s, int start, int before,
 		    int count) {
-		boolean isTotalHave = !positiveTotalPower.getText().toString().equals("");
-		boolean isPeakHave = !positivePeak.getText().toString().equals("");
-		boolean isValleyHave = !positiveValley.getText().toString().equals("");
-		boolean isAverageHave = !positiveAverage.getText().toString().equals("");
+		boolean isTotalHave = !positiveTotalPower.getText().toString()
+			.equals("");
+		boolean isPeakHave = !positivePeak.getText().toString()
+			.equals("");
+		boolean isValleyHave = !positiveValley.getText().toString()
+			.equals("");
+		boolean isAverageHave = !positiveAverage.getText().toString()
+			.equals("");
 		if (isTotalHave && isPeakHave && isValleyHave && isAverageHave) {
-		    int total = Integer.parseInt(positiveTotalPower.getText().toString());
-		    int peak = Integer.parseInt(positivePeak.getText().toString());
-		    int valley = Integer.parseInt(positiveValley.getText().toString());
-		    int average = Integer.parseInt(positiveAverage.getText().toString());
-		    combinationDeviation.setText((total - peak - valley - average) / total + "");
-		}		
+		    int total = Integer.parseInt(positiveTotalPower.getText()
+			    .toString());
+		    int peak = Integer.parseInt(positivePeak.getText()
+			    .toString());
+		    int valley = Integer.parseInt(positiveValley.getText()
+			    .toString());
+		    int average = Integer.parseInt(positiveAverage.getText()
+			    .toString());
+		    combinationDeviation
+			    .setText((total - peak - valley - average) / total
+				    + "");
+		}
 	    }
-	};
+	}
+	;
 	positiveTotalPower.setInputType(InputType.TYPE_CLASS_PHONE);
 	positivePeak.setInputType(InputType.TYPE_CLASS_PHONE);
 	positiveAverage.setInputType(InputType.TYPE_CLASS_PHONE);
@@ -795,6 +815,11 @@ public class DetailActivity extends Activity {
 		resources.getString(R.string.title_next), true, false);
     }
 
+    /**
+     * 打开datepicker选择日期
+     * 
+     * @param dateButton
+     */
     private void openDatePickerDialog(final Button dateButton) {
 	// 创建自定义dialog
 	final Dialog dialog = new Dialog(this, R.style.dialog);
@@ -825,10 +850,14 @@ public class DetailActivity extends Activity {
 		dialog.dismiss();
 	    }
 	});
+	dialog.setCancelable(false);
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
     }
 
+    /**
+     * 修改联系人的对话框
+     */
     private void openChangeContactDialog(String title, String personTextString,
 	    String phoneTextString, final TextView personText,
 	    final TextView phoneText) {
@@ -854,6 +883,7 @@ public class DetailActivity extends Activity {
 	dialogPhoneEditText.setText(phoneTextString);
 	dialogContactEditText.selectAll();
 	dialogPhoneEditText.selectAll();
+	dialog.setCancelable(false);
 	dialogCancleButton.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
@@ -878,6 +908,12 @@ public class DetailActivity extends Activity {
 	dialog.show();
     }
 
+    /**
+     * 封口信息处， 点击输入的dialog
+     * 
+     * @param title
+     * @param spinnerEditText
+     */
     private void openClickSealInfoDialog(String title,
 	    final SpinnerEditText spinnerEditText) {
 	// 创建自定义dialog
@@ -945,10 +981,16 @@ public class DetailActivity extends Activity {
 		dialog.dismiss();
 	    }
 	});
+	dialog.setCancelable(false);
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
     }
 
+    /**
+     * 打开输入电能表电压的dialog
+     * 
+     * @param title
+     */
     private void openElectriOtherPowerDialog(String title) {
 	// 创建自定义dialog
 	final Dialog dialog = new Dialog(this, R.style.dialog);
@@ -969,10 +1011,16 @@ public class DetailActivity extends Activity {
 		dialog.dismiss();
 	    }
 	});
+	dialog.setCancelable(false);
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
     }
 
+    /*
+     * 显示等待的dialog
+     * 
+     * @param testTextView
+     */
     private void readMachineWaitDialog(TextView testTextView) {
 	// 创建自定义dialog
 	testTextView.setText("校验成功....数据...");
@@ -981,10 +1029,43 @@ public class DetailActivity extends Activity {
 		R.layout.read_machine_wait_dialog, null);
 	myView.findFocus();
 	// 获取控件
+	dialog.setCancelable(false);
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
+	//启动线程，连接失败时中断。
+	Thread thread = new Thread(new Runnable() {
+	    @Override
+	    public void run() {
+		try {
+		    Thread.sleep(5000);
+			dialog.dismiss();
+			DetailActivity.this.mhandler.sendEmptyMessage(0);
+		} catch (InterruptedException e) {
+		    e.printStackTrace();
+		}
+	    }
+	});
+	thread.start();
     }
-
+    Handler mhandler = new Handler() {
+	@Override
+	public void handleMessage(Message msg) {
+	    // TODO Auto-generated method stub
+	    super.handleMessage(msg);
+	    switch (msg.what) {
+	    case 0:
+		//与机器校验过程中出错时，弹出提示dialog
+		new AlertDialog.Builder(DetailActivity.this).setTitle("Error")
+			.setMessage("校验出错，请检查!").setCancelable(false)
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.dismiss();
+			    }
+			}).show();
+		break;
+	    }
+	}
+    };
     // 打开导航
     public void startNavi() {
 	// 天安门坐标
@@ -1012,18 +1093,20 @@ public class DetailActivity extends Activity {
 	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	    builder.setMessage("您尚未安装百度地图app或app版本过低");
 	    builder.setTitle("提示");
-	    builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-		    dialog.dismiss();
-		}
-	    });
-	    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-		    dialog.dismiss();
-		}
-	    });
+	    builder.setPositiveButton("确认",
+		    new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			    dialog.dismiss();
+			}
+		    });
+	    builder.setNegativeButton("取消",
+		    new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			    dialog.dismiss();
+			}
+		    });
 	    builder.create().show();
 	}
     }
@@ -1034,6 +1117,7 @@ public class DetailActivity extends Activity {
 	    new AlertDialog.Builder(this)
 		    .setTitle("退出确认")
 		    .setMessage("确认退出任务？")
+		    .setCancelable(false)
 		    .setNegativeButton("取消",
 			    new DialogInterface.OnClickListener() {
 				@Override

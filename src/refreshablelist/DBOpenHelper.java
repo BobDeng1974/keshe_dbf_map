@@ -19,7 +19,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public DBOpenHelper(Context context) {
 	super(context, name, null, version);
 	this.mContext = context;
-	System.out.println("DBOpenHelper构造函数");  
 	// TODO Auto-generated constructor stub
     }
 
@@ -45,12 +44,15 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
 	// 数据库这边有一个特点，就是SQLite数据库中文本类型没有过多的约束，也就是可以把布尔类型的数据存储到文本类型中，这样也是可以的
 	String sql_rw = "create table rw(id integer primary key autoincrement"+rw_col_string+")";
-	String sql_dnb = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
+	String sql_dnbxx = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
 	String sql_dnbxysj = "create table dnbxysj(id integer primary key autoincrement"+dnbxysj_col_string+")";
+	db.execSQL("drop table if exists " + RW);
 	db.execSQL(sql_rw);
-	db.execSQL(sql_dnb); // 完成数据库的创建
+	db.execSQL("drop table if exists " + DNBXX);
+	db.execSQL(sql_dnbxx); 
+	db.execSQL("drop table if exists " + DNBXYSJ);
 	db.execSQL(sql_dnbxysj);
-//	creatDataBase();
+	creatTable(db);
     }
 
     @Override
@@ -59,26 +61,54 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	System.out.println("onUpgrade删除表");  
     }
     
-//    private void creatDataBase() {
-//	creatDBTable(RW, RW_ITEM, rwPath);
-//	creatDBTable(DNBXX, DNBXX_ITEM, dnbxxPath);
-//	creatDBTable(DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
-//    }
-//
-//    private void creatDBTable(String tableName , String[] tableItem , String filePath) {
-//	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-//	DataBaseService service = new MyData(mContext);
-//	String[] params = new String[tableItem.length];
-//	// 创建table
-//	List<Map<String, String>> Items = parseDbf2Map
-//		.getListMapFromDbf(filePath);
-//	for (int i = 0; i < Items.size(); i++) {
-//	    Map<String, String> map = Items.get(i);
-//	    for (int y = 0; y < tableItem.length; y++) {
-//		params[y] = map.get(tableItem[y]);
-//	    }
-//	    boolean flag = service.addMyData(tableName, tableItem , params);
-//	    Log.i(tableName + " add item", "--->" + flag);
-//	}
-//    }
+    private void creatTable(SQLiteDatabase db) {
+	creatDBTable(db ,RW, RW_ITEM, rwPath);
+	creatDBTable(db ,DNBXX, DNBXX_ITEM, dnbxxPath);
+	creatDBTable(db ,DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
+    }
+
+    private void creatDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
+	    String filePath) {
+	Boolean flag = false;
+	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+	String[] params = new String[tableItem.length];
+	// 创建table
+	List<Map<String, String>> Items = parseDbf2Map
+		.getListMapFromDbf(filePath);
+	Items = Items.subList(1, Items.size());
+//	Log.e("creatDBTable--------->Paramitems------>", Items + "");
+	for (int i = 0; i < Items.size(); i++) {
+	    Map<String, String> map = Items.get(i);
+	    for (int y = 0; y < tableItem.length; y++) {
+		if (map.get(tableItem[y]) != null)
+		    params[y] = map.get(tableItem[y]).trim();
+		else
+		    params[y] = "";
+	    }
+	    try {
+		insertTableValue(db ,tableName, tableItem, params);
+		flag = true;
+	    } catch (Exception e) {
+		// TODO: handle exception
+	    }
+	    Log.i(tableName + " add item", "--->" + flag);
+	}
+    }
+    
+    private void insertTableValue(SQLiteDatabase db , String tableName , String[] tableItems , String[] params) {
+	String key = "";
+	String value = "";
+	for (int i = 0; i < tableItems.length; i++) {
+	    key =key + ","  + tableItems[i];
+	    value = value + ","  + "?" ;  
+	}
+	key = key.substring(1, key.length());
+	value = value.substring(1, value.length());
+	String sql = "INSERT INTO " + tableName 
+			    + " ("+ key +")"
+			    + " VALUES (" + value + ");";
+//	Log.e("insertTableValues------------>", sql);
+	db.execSQL(sql, params);
+    }
+    
 }
