@@ -16,6 +16,8 @@ import static stringconstant.StringConstant.MISSION_INFO_ITEM_02;
 import static stringconstant.StringConstant.MISSION_INFO_ITEM_02_CHINESE;
 import static stringconstant.StringConstant.PHONE;
 
+import gps.GPSManager;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import spinneredittext.SpinnerEditText;
-import GPS.GPSManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,6 +34,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -262,7 +264,8 @@ public class DetailActivity extends Activity {
 	    public void onClick(View v) {
 
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		List<Address> gps = gpsManager.getGPS();
+		Location location = gpsManager.getMyLastKnownLocation();
+		List<Address> gps = gpsManager.getAddresses(location);
 		// System.out.println("GPS------------>" + gps);
 		if (gps == null) {
 		    Toast.makeText(getApplicationContext(), "无法获取,请检查网络状况..",

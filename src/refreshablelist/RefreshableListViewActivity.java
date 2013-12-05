@@ -1,5 +1,7 @@
 package refreshablelist;
 
+import gps.GPSService;
+
 import java.io.File;
 import java.text.Format;
 import java.util.HashMap;
@@ -71,6 +73,8 @@ public class RefreshableListViewActivity extends Fragment {
 		}
 	    });
 	    updateCompleteNumber();
+	    Intent intent = new Intent(getActivity(), GPSService.class);
+	    getActivity().startService(intent);
 	}
     }
 

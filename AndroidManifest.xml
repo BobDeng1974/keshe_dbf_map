@@ -130,7 +130,10 @@
             android:enabled="true"
             android:process=":remote" >
         </service>
-
+        <service 
+            android:name="gps.GPSService"
+            android:process=":remote">
+            </service>
         <activity
             android:name="baidumapsdk.demo.ShareDemo"
             android:label="@string/demo_name_share" >
@@ -169,8 +172,7 @@
     </uses-permission>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" >
     </uses-permission>
-    <uses-permission android:name="android.permission.INTERNET" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" >
     </uses-permission>
     <!-- <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"></uses-permission> -->
