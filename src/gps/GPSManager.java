@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,12 +22,15 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -34,6 +40,7 @@ public class GPSManager {
     private String provider;
     private Address address;
     private Context mContext;
+    private Boolean isFirstIn = true;
 
     public GPSManager(Context context) {
 	this.mContext = context;
@@ -44,15 +51,17 @@ public class GPSManager {
 	getProvider();
 	// 如果未设置位置源，打开GPS设置界面
 	openGPS();
-	locationManager.addGpsStatusListener(new Listener() {
+	this.locationManager.addGpsStatusListener(new Listener() {
 	    @Override
 	    public void onGpsStatusChanged(int event) {
 		switch (event) {
 		case GpsStatus.GPS_EVENT_STARTED:
 		    System.out.println("GpsStatus-------->GPS_EVENT_STARTED");
+		    provider = LocationManager.GPS_PROVIDER;
 		    break;
 
 		case GpsStatus.GPS_EVENT_STOPPED:
+		    provider = LocationManager.NETWORK_PROVIDER;
 		    System.out.println("GpsStatus-------->GPS_EVENT_STOPPED");
 		    break;
 
@@ -71,16 +80,17 @@ public class GPSManager {
 	// // 注册监听器locationListener，第2、3个参数可以控制接收gps消息的频度以节省电力。第2个参数为毫秒，
 	// // 表示调用listener的周期，第3个参数为米,表示位置移动指定距离后就调用listener
 	if (isGPSEnabled()) {
-	    System.out.println("setRequestLocationUpdates------------------->GPS");
-	    locationManager.requestLocationUpdates(
+	    System.out
+		    .println("setRequestLocationUpdates------------------->GPS");
+	    this.locationManager.requestLocationUpdates(
 		    LocationManager.GPS_PROVIDER, 1500, 0, myLocationListener);
-	}
-	else if (isNetworkEnabled()) {
-	    System.out.println("setRequestLocationUpdates------------------->Network");
-	    locationManager.requestLocationUpdates(
-		    LocationManager.NETWORK_PROVIDER, 500, 0,
+	} else if (isNetworkEnabled()) {
+	    System.out
+		    .println("setRequestLocationUpdates------------------->Network");
+	    this.locationManager.requestLocationUpdates(
+		    LocationManager.NETWORK_PROVIDER, 1500, 0,
 		    myLocationListener);
-	}else {
+	} else {
 	    Log.e("GPSManager", "noProviderIsEnable");
 	}
     }
@@ -89,7 +99,7 @@ public class GPSManager {
 	if (locationManager != null) {
 	    System.out
 		    .println("removeLocationListener------------------->true");
-	    locationManager.removeUpdates(locationListener);
+	    this.locationManager.removeUpdates(locationListener);
 	}
     }
 
@@ -112,28 +122,15 @@ public class GPSManager {
 
     // 判断是否开启GPS，若未开启，打开GPS设置界面
     private void openGPS() {
-	if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-		|| locationManager
-			.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+	if (isNetworkEnabled()) {
 	    Toast.makeText(mContext, "获取GPS中..", Toast.LENGTH_SHORT).show();
 	    return;
 	}
-	Toast.makeText(mContext, "位置源未设置,请开启GPS！", Toast.LENGTH_SHORT).show();
-	// // 强制帮用户打开GPS
-	// Intent settingsIntent = new Intent(
-	// Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	// mContext.startActivity(settingsIntent);
-//	 locationManager.setTestProviderEnabled("gps", true);
-	 Intent GPSIntent = new Intent();
-	 GPSIntent.setClassName("com.android.settings",
-	 "com.android.settings.widget.SettingsAppWidgetProvider");
-	 GPSIntent.addCategory("android.intent.category.ALTERNATIVE");
-	 GPSIntent.setData(Uri.parse("custom:3"));
-	 try {
-	 PendingIntent.getBroadcast(mContext, 0, GPSIntent, 0).send();
-	 } catch (CanceledException e) {
-	 e.printStackTrace();
-	 }
+	Toast.makeText(mContext, "位置源未设置,请开启网络！", Toast.LENGTH_SHORT).show();
+	if(isFirstIn) {
+	    CheckNetwork();
+	    isFirstIn = false;
+	}
     }
 
     // 获取Location Provider
@@ -222,18 +219,28 @@ public class GPSManager {
      * @return
      */
     public boolean isTelephonyEnabled() {
-	boolean enable = false;
-	TelephonyManager telephonyManager = (TelephonyManager) mContext
-		.getSystemService(Context.TELEPHONY_SERVICE);
-	if (telephonyManager != null) {
-	    if (telephonyManager.getNetworkType() != TelephonyManager.NETWORK_TYPE_UNKNOWN) {
-		enable = true;
-		    Log.e("GPSManager", "isTelephonyEnabled");
-	    }
-	}
+	try {
+	    ConnectivityManager connectivity = (ConnectivityManager) mContext
+		    .getSystemService(Context.CONNECTIVITY_SERVICE);
+	    if (connectivity != null) {
 
-	return enable;
+		NetworkInfo info = connectivity.getActiveNetworkInfo();
+		if (info != null && info.isConnected()) {
+
+		    if (info.getState() == NetworkInfo.State.CONNECTED) {
+			Log.e("GPSManager", "isTelephonyEnabled");
+			return true;
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	    return false;
+	}
+	return false;
     }
+
+    // return enable;
+    // }
 
     /**
      * 判断wifi是否开启
@@ -247,5 +254,38 @@ public class GPSManager {
 	    Log.e("GPSManager", "isWIFIEnabled");
 	}
 	return enable;
+    }
+
+    // 没有网络的时候跳转到设置界面
+    public boolean CheckNetwork() {
+	boolean flag = false;
+	ConnectivityManager cwjManager = (ConnectivityManager) mContext
+		.getSystemService(Context.CONNECTIVITY_SERVICE);
+	if (cwjManager.getActiveNetworkInfo() != null)
+	    flag = cwjManager.getActiveNetworkInfo().isAvailable();// 如果得到的network可用
+	else {
+	    Builder b = new AlertDialog.Builder(mContext).setTitle("没有可用的网络")
+		    .setMessage("请开启GPRS或WIFI");
+	    b.setPositiveButton("设置", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    Intent mIntent = new Intent();;
+		    if( android.os.Build.VERSION.SDK_INT > 13 ){    
+			mIntent.setAction(android.provider.Settings.ACTION_SETTINGS);}
+		    else {
+			mIntent.setAction(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+			}
+		    mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
+		    mContext.startActivity(mIntent);
+		}
+	    }).setNeutralButton("取消", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    dialog.cancel();
+		}
+	    });
+	    AlertDialog mDialog=b.create();  
+	    mDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+	    mDialog.show();
+	}
+	return flag;
     }
 }

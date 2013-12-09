@@ -101,19 +101,28 @@ public class GPSService extends Service {
 	    Log.e("json----------->", requestParams+"");
 	    LocationHttpClient.post("geodata/v2/poi/create", requestParams,
 		    new JsonHttpResponseHandler() {
+			/* (non-Javadoc)
+			 * @see com.loopj.android.http.JsonHttpResponseHandler#onFailure(java.lang.Throwable, org.json.JSONObject)
+			 */
 			@Override
 			public void onFailure(Throwable e,
-				JSONArray errorResponse) {
-			    Log.e("json-------------->", "onFailure");
+				JSONObject errorResponse) {
+			    Log.e("json-------------->", "onFailure"+"-->"+errorResponse);
 			    super.onFailure(e, errorResponse);
 			}
 
 			@Override
-			public void onSuccess(JSONArray timeline) {
-			    Log.e("json-------------->", "onSuccess" + "-->"
-				    + requestParams);
+		        public void onSuccess(int statusCode, Header[] headers,
+		                org.json.JSONObject response) {
+			    if (statusCode == 200) {
+				Log.e("json-------------->", "onSuccess" + "-->"
+					+ response);
+				Toast.makeText(gpsService, "成功上传一个坐标..", Toast.LENGTH_SHORT).show();
+			    }
 			}
+			
 		    });
+	    
 	}
 
 	@Override
@@ -121,14 +130,13 @@ public class GPSService extends Service {
 	    System.out.println("GpsService---------->onProviderDisabled");
 	    Toast.makeText(gpsService, "获GPS失败，请打开网络连接..", Toast.LENGTH_LONG)
 		    .show();
-	    // gpsManager.getNewLocation(null);
-	    // gpsManager.removeLocationListener(locationListener);
-	    // gpsManager.setRequestLocationUpdates(locationListener);
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
 	    System.out.println("GpsService---------->onProviderEnabled");
+	    // gpsManager.removeLocationListener(locationListener);
+	    // gpsManager.setRequestLocationUpdates(locationListener);
 	}
 
 	@Override

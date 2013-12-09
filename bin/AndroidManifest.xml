@@ -156,7 +156,7 @@
             android:theme="@style/iTitleTheme" >
         </activity>
     </application>
-
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />

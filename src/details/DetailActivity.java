@@ -267,10 +267,11 @@ public class DetailActivity extends Activity {
 		Location location = gpsManager.getMyLastKnownLocation();
 		List<Address> gps = gpsManager.getAddresses(location);
 		// System.out.println("GPS------------>" + gps);
-		if (gps == null) {
+		if (gps == null || gps.size() == 0) {
 		    Toast.makeText(getApplicationContext(), "无法获取,请检查网络状况..",
 			    Toast.LENGTH_LONG).show();
 		} else {
+		    Log.e("GPS--------->Address----->", gps.size()+"");
 		    Address address = gps.get(0);
 		    getPositionTextView.setText(address.getAddressLine(0));
 		}
