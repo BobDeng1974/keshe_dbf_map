@@ -1,5 +1,16 @@
 package gps;
 
+import java.util.HashMap;
+
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import httpclient.LocationHttpClient;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,17 +19,27 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GPSService extends Service {
     private GPSService gpsService = null;
     private GPSManager gpsManager = null;
     private LocationListener locationListener = null;
+    private HashMap<String, String> paramMap = null;
+    private RequestParams requestParams = null;
 
     @Override
     public void onCreate() {
 	super.onCreate();
 	this.gpsService = this;
 	System.out.println("GpsService---------->onCreat");
+	paramMap = new HashMap<String, String>();
+	// 创建表传递的参数
+	// paramMap.put("ak", "DD1580bc446609f4dcfb2d20728b681a");
+	// paramMap.put("name", "staff_15527597559");
+	// paramMap.put("geotype", "1");
+	// paramMap.put("is_published", "1");
+
     }
 
     @Override
@@ -27,6 +48,21 @@ public class GPSService extends Service {
 	locationListener = new myLocationListener();
 	gpsManager.setRequestLocationUpdates(locationListener);
 	System.out.println("GpsService---------->onStart");
+	// //创建表table
+	// LocationHttpClient.post("geodata/v2/geotable/create", requestParams,
+	// new JsonHttpResponseHandler() {
+	// @Override
+	// public void onSuccess(JSONArray response) {
+	// super.onSuccess(response);
+	// JSONObject jsonObject;
+	// try {
+	// jsonObject = response.getJSONObject(0);
+	// Log.e("json-response------------>", jsonObject.getString("id"));
+	// } catch (JSONException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// });
 	return super.onStartCommand(intent, flags, startId);
     }
 
@@ -53,14 +89,41 @@ public class GPSService extends Service {
 	public void onLocationChanged(Location location) {
 	    System.out.println("GpsService---------->onLocationChanged");
 	    gpsManager.getNewLocation(location);
+	    paramMap.put("ak", "DD1580bc446609f4dcfb2d20728b681a");
+	    paramMap.put("geotable_id", "45290");
+	    paramMap.put("time", System.currentTimeMillis() + "");
+	    paramMap.put("coord_type", "1");
+	    if (location != null) {
+		paramMap.put("longitude", location.getLongitude() + "");
+		paramMap.put("latitude", location.getLatitude() + "");
+	    }
+	    requestParams = new RequestParams(paramMap);
+	    Log.e("json----------->", requestParams+"");
+	    LocationHttpClient.post("geodata/v2/poi/create", requestParams,
+		    new JsonHttpResponseHandler() {
+			@Override
+			public void onFailure(Throwable e,
+				JSONArray errorResponse) {
+			    Log.e("json-------------->", "onFailure");
+			    super.onFailure(e, errorResponse);
+			}
+
+			@Override
+			public void onSuccess(JSONArray timeline) {
+			    Log.e("json-------------->", "onSuccess" + "-->"
+				    + requestParams);
+			}
+		    });
 	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
 	    System.out.println("GpsService---------->onProviderDisabled");
-//	    gpsManager.getNewLocation(null);
-	    gpsManager.removeLocationListener(locationListener);
-	    gpsManager.setRequestLocationUpdates(locationListener);
+	    Toast.makeText(gpsService, "获GPS失败，请打开网络连接..", Toast.LENGTH_LONG)
+		    .show();
+	    // gpsManager.getNewLocation(null);
+	    // gpsManager.removeLocationListener(locationListener);
+	    // gpsManager.setRequestLocationUpdates(locationListener);
 	}
 
 	@Override

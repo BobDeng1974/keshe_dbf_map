@@ -73,7 +73,7 @@ public class GPSManager {
 	if (isGPSEnabled()) {
 	    System.out.println("setRequestLocationUpdates------------------->GPS");
 	    locationManager.requestLocationUpdates(
-		    LocationManager.GPS_PROVIDER, 500, 0, myLocationListener);
+		    LocationManager.GPS_PROVIDER, 1500, 0, myLocationListener);
 	}
 	else if (isNetworkEnabled()) {
 	    System.out.println("setRequestLocationUpdates------------------->Network");
@@ -104,8 +104,8 @@ public class GPSManager {
     }
 
     public Location getMyLastKnownLocation() {
-	if (locationManager != null && provider != null)
-	    return locationManager.getLastKnownLocation(provider);
+	if (this.locationManager != null && this.provider != null)
+	    return locationManager.getLastKnownLocation(this.provider);
 	else
 	    return null;
     }
@@ -151,8 +151,8 @@ public class GPSManager {
 	// 电量要求：低
 	criteria.setPowerRequirement(Criteria.POWER_LOW);
 	// 返回最合适的符合条件的provider，第2个参数为true说明,如果只有一个provider是有效的,则返回当前provider
-	provider = locationManager.getBestProvider(criteria, true);
-	System.out.println("provider--------------->" + provider);
+	this.provider = locationManager.getBestProvider(criteria, true);
+	System.out.println("provider--------------->" + this.provider);
     }
 
     // Gps监听器调用，处理位置信息
