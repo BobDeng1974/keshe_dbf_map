@@ -29,6 +29,8 @@ import spinneredittext.SpinnerEditText;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -56,6 +58,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -69,6 +72,9 @@ import android.widget.Toast;
 import android.widget.ViewAnimator;
 import baidumapsdk.demo.NaviDemo;
 import baidumapsdk.demo.R;
+import bluetooth.BluetoothChatService;
+import bluetooth.DeviceListActivity;
+import bluetooth.DiscoveryDevicesActivity;
 
 import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
@@ -76,6 +82,10 @@ import com.baidu.mapapi.navi.NaviPara;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
 public class DetailActivity extends Activity {
+    // Debugging
+    private static final String TAG = "DetailActivity";
+    private static final boolean D = true;
+
     Resources resources;
     // title
     private TextView title;
@@ -144,9 +154,28 @@ public class DetailActivity extends Activity {
     private static final int sceneVerifyID = 5;
     private EditText verifyTemperature;
     private EditText verifyHumidity;
-    private TextView verifyTestTextView;
+    private ListView verifyTestTextView;
     private Button verifyReadMachine;
     private Spinner verifyMadeNumberSpinner;
+    // Name of the connected device
+    private String mConnectedDeviceName = null;
+    // Array adapter for the conversation thread
+    private ArrayAdapter<String> mConversationArrayAdapter;
+    // String buffer for outgoing messages
+    private StringBuffer mOutStringBuffer;
+    // Local Bluetooth adapter
+    private BluetoothAdapter mBluetoothAdapter = null;
+    // Member object for the chat services
+    private BluetoothChatService mChatService = null;
+    // Message types sent from the BluetoothChatService Handler
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
+    public static final String DEVICE_NAME = "device_name";
+    public static final String TOAST = "toast";
+    
     // result confirm
     private static final int resultConfirmID = 6;
     private TextView confirmDateTime;
@@ -162,6 +191,11 @@ public class DetailActivity extends Activity {
     private static final int newSealID = 7;
     private static final int inputVerifyDataID = 8;
 
+    // Intent request codes
+    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+    private static final int REQUEST_ENABLE_BT = 3;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
@@ -477,19 +511,152 @@ public class DetailActivity extends Activity {
 		});
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         initSceneVerify           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneVerify() {
-	verifyTestTextView = (TextView) findViewById(R.id.verify_test_text);
+	verifyTestTextView = (ListView) findViewById(R.id.machine_data_list);
 	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
 	verifyReadMachine.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
 		// 等待界面且更新testTextview
-		readMachineWaitDialog(verifyTestTextView);
-		verifyTestTextView.setText("检验中...");
+//		readMachineWaitDialog(verifyTestTextView);
+//		verifyTestTextView.setText("检验中...");
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		if (mBluetoothAdapter == null) {
+		    Toast.makeText(DetailActivity.this, "蓝牙不可用..", Toast.LENGTH_LONG).show();
+		}else {
+		if (!mBluetoothAdapter.isEnabled()) {
+	            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+	            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+	            }else {
+	        	if (mChatService == null) setupChat();
+		    }
+		}
 	    }
+
 	});
     }
+    private void setupChat() {
+	mConversationArrayAdapter = new ArrayAdapter<String>(DetailActivity.this, R.layout.bluetooth_message_item);
+	verifyTestTextView.setAdapter(mConversationArrayAdapter);
+	// Initialize the BluetoothChatService to perform bluetooth connections
+	mChatService = new BluetoothChatService(this, mHandler);
+	// Initialize the buffer for outgoing messages
+	mOutStringBuffer = new StringBuffer("");
+	Intent serverIntent = null;
+	serverIntent = new Intent(this, DiscoveryDevicesActivity.class);
+        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+    }
+    private void sendMessage(String message) {
+        // Check that we're actually connected before trying anything
+        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = message.getBytes();
+            mChatService.write(send);
+
+            // Reset out string buffer to zero and clear the edit text field
+            mOutStringBuffer.setLength(0);
+        }
+    }
+    // The Handler that gets information back from the BluetoothChatService
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case MESSAGE_STATE_CHANGE:
+                if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                switch (msg.arg1) {
+                case BluetoothChatService.STATE_CONNECTED:
+//                    mTitle.setText(R.string.title_connected_to);
+//                    mTitle.append(mConnectedDeviceName);
+                    mConversationArrayAdapter.clear();
+                    break;
+                case BluetoothChatService.STATE_CONNECTING:
+//                    mTitle.setText(R.string.title_connecting);
+                    break;
+                case BluetoothChatService.STATE_LISTEN:
+                case BluetoothChatService.STATE_NONE:
+//                    mTitle.setText(R.string.title_not_connected);
+                    break;
+                }
+                break;
+            case MESSAGE_WRITE:
+                byte[] writeBuf = (byte[]) msg.obj;
+                // construct a string from the buffer
+                String writeMessage = new String(writeBuf);
+                mConversationArrayAdapter.add("Me:  " + writeMessage);
+                break;
+            case MESSAGE_READ:
+                byte[] readBuf = (byte[]) msg.obj;
+                // construct a string from the valid bytes in the buffer
+                String readMessage = new String(readBuf, 0, msg.arg1);
+                mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                break;
+            case MESSAGE_DEVICE_NAME:
+                // save the connected device's name
+                mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+                Toast.makeText(getApplicationContext(), "Connected to "
+                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                break;
+            case MESSAGE_TOAST:
+                Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+                               Toast.LENGTH_SHORT).show();
+                break;
+            }
+        }
+    };
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(D) Log.d(TAG, "onActivityResult " + resultCode);
+        switch (requestCode) {
+        case REQUEST_CONNECT_DEVICE_SECURE:
+            // When DeviceListActivity returns with a device to connect
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, true);
+            }
+            break;
+        case REQUEST_CONNECT_DEVICE_INSECURE:
+            // When DeviceListActivity returns with a device to connect
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, false);
+            }
+            break;
+        case REQUEST_ENABLE_BT:
+            // When the request to enable Bluetooth returns
+            if (resultCode == Activity.RESULT_OK) {
+                // Bluetooth is now enabled, so set up a chat session
+                setupChat();
+            } else {
+                // User did not enable Bluetooth or an error occured
+                Log.d(TAG, "BT not enabled");
+                Toast.makeText(this, R.string.bt_not_enabled, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void connectDevice(Intent data, boolean secure) {
+        // Get the device MAC address
+        String address = data.getExtras()
+            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        // Get the BLuetoothDevice object
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        // Attempt to connect to the device
+        mChatService.connect(device, secure);
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         initSceneVerify           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         initResultConfirm           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initResultConfirm() {
 	confirmDateTime = (TextView) findViewById(R.id.confirm_date_textview);
 	confirmMachineNumber = (TextView) findViewById(R.id.confirm_machine_number);
@@ -1191,5 +1358,11 @@ public class DetailActivity extends Activity {
 	public void onAnimationStart(Animation animation) {
 	    isAnimating = true;
 	}
+    }
+    @Override
+    protected void onDestroy() {
+	// TODO Auto-generated method stub
+	super.onDestroy();
+	if (mChatService != null) mChatService.stop();
     }
 }

@@ -95,16 +95,14 @@
             android:layout_below="@id/view2"
             android:layout_marginBottom="5dip" >
 
-            <TextView
+            <ListView
                 android:layout_above="@+id/linear2"
-                android:id="@+id/verify_test_text"
+                android:id="@+id/machine_data_list"
                 android:layout_width="fill_parent"
-                android:layout_height="match_parent"
+                android:layout_height="fill_parent"
                 android:layout_marginTop="5dip"
                 android:background="@android:color/darker_gray"
-                android:gravity="center"
-                android:text="sdasdas"
-                android:textColor="#ffffff" />
+                />
             <!--
             <TextView
                 style="?android:attr/textAppearanceMedium"
