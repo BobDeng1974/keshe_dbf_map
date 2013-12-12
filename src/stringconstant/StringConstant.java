@@ -86,4 +86,18 @@ public class StringConstant {
     public static String[] MISSION_INFO_ITEM_02_CHINESE = { "变电所名称" ,"电压等级", "线路名称","TA变比","型号" };
     // intent
     public static String MISSION_DETAIL = "mission_detail";
+    
+    // Message types sent from the BluetoothChatService Handler
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
+    public static final String DEVICE_NAME = "device_name";
+    public static final String TOAST = "toast";
+    // Intent request codes
+    public static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    public static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+    public static final int REQUEST_ENABLE_BT = 3;
+    public static String EXTRA_DEVICE_ADDRESS = "MAC";
 }

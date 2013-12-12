@@ -19,7 +19,10 @@ package bluetooth;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.UUID;
+
+import stringconstant.StringConstant;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -47,6 +50,8 @@ public class BluetoothChatService {
     private static final String NAME_SECURE = "BluetoothChatSecure";
     private static final String NAME_INSECURE = "BluetoothChatInsecure";
 
+    /**常量:SPP的Service UUID*/
+	public static final UUID UUID_SPP = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =
         UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
@@ -88,7 +93,7 @@ public class BluetoothChatService {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(BluetoothChat.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(StringConstant.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     /**
@@ -174,9 +179,9 @@ public class BluetoothChatService {
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_DEVICE_NAME);
+        Message msg = mHandler.obtainMessage(StringConstant.MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChat.DEVICE_NAME, device.getName());
+        bundle.putString(StringConstant.DEVICE_NAME, device.getName());
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
@@ -233,14 +238,14 @@ public class BluetoothChatService {
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(StringConstant.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChat.TOAST, "Unable to connect device");
+        bundle.putString(StringConstant.TOAST, "Unable to connect device");
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothChatService.this.start();
+        BluetoothChatService.this.stop();
     }
 
     /**
@@ -248,9 +253,9 @@ public class BluetoothChatService {
      */
     private void connectionLost() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(BluetoothChat.MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(StringConstant.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChat.TOAST, "Device connection was lost");
+        bundle.putString(StringConstant.TOAST, "Device connection was lost");
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
@@ -276,10 +281,10 @@ public class BluetoothChatService {
             try {
                 if (secure) {
                     tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
-                        MY_UUID_SECURE);
+                	    UUID_SPP);
                 } else {
                     tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
-                            NAME_INSECURE, MY_UUID_INSECURE);
+                            NAME_INSECURE, UUID_SPP);
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
@@ -357,18 +362,31 @@ public class BluetoothChatService {
             mmDevice = device;
             BluetoothSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
-            int sdk_int = Build.VERSION.SDK_INT;
+            int sdk = Integer.parseInt(Build.VERSION.SDK);
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
-            try {
-        	//2.3.3以上的设备需要用这个方式创建通信连接
-                if (sdk_int >= 10) 
-                    tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
-                 else 
-                    tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
-            }
+            Method m;
+	    try {
+		m = device.getClass().getMethod("createRfcommSocket",
+		    new Class[] { int.class });
+		tmp = (BluetoothSocket)m.invoke(device, Integer.valueOf(1));
+	    } catch (Exception e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	    }
+//            try {
+//        	//2.3.3以上的设备需要用这个方式创建通信连接
+//                if (sdk >= 10) {
+//                    tmp = device.createInsecureRfcommSocketToServiceRecord(UUID_SPP);
+//                    System.out.println("createInsecureRfcommSocketToServiceRecord----->");
+//                }
+//                 else {
+//                     tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
+//                     System.out.println("createRfcommSocketToServiceRecord----->");
+//                 }
+//            } catch (IOException e) {
+//                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+//            }
             mmSocket = tmp;
         }
 
@@ -384,10 +402,12 @@ public class BluetoothChatService {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
                 mmSocket.connect();
+                System.out.println("ConnectThread-----> Connect");
             } catch (IOException e) {
                 // Close the socket
                 try {
                     mmSocket.close();
+                    System.out.println("ConnectThread-----> Failure");
                 } catch (IOException e2) {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
@@ -444,17 +464,18 @@ public class BluetoothChatService {
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            int bytes = 0;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
+                    if(mmInStream.available() > 0){
                     bytes = mmInStream.read(buffer);
-
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
+                    mHandler.obtainMessage(StringConstant.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -469,10 +490,17 @@ public class BluetoothChatService {
          */
         public void write(byte[] buffer) {
             try {
-                mmOutStream.write(buffer);
+        	for (byte b : buffer) {
+        	    mmOutStream.write(b);
+        	     try {
+			Thread.sleep(10);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+        	 }
 
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(BluetoothChat.MESSAGE_WRITE, -1, -1, buffer)
+                mHandler.obtainMessage(StringConstant.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);

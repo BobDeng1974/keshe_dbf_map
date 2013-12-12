@@ -1,20 +1,7 @@
 package details;
 
-import static stringconstant.SpinnerString.CLOCK_DATE_CONCLUSION;
-import static stringconstant.SpinnerString.CLOCK_MISTAKE_CONCLUSION;
-import static stringconstant.SpinnerString.SCENE_VERIFY_ARRAY;
-import static stringconstant.SpinnerString.SEAL_ARRAY;
-import static stringconstant.SpinnerString.SECONDARY_LINE_CONCLUSION_ARRAY;
-import static stringconstant.SpinnerString.TABLE_SEAL_ARRAY;
-import static stringconstant.SpinnerString.VOLT_PHASE_ARRAY;
-import static stringconstant.SpinnerString.WORK_MODE_ARRAY;
-import static stringconstant.StringConstant.CONTACT;
-import static stringconstant.StringConstant.MISSION_DETAIL;
-import static stringconstant.StringConstant.MISSION_INFO_ITEM_01_CHINESE;
-import static stringconstant.StringConstant.MISSION_INFO_ITEM_01_noCONTACTandPHONE;
-import static stringconstant.StringConstant.MISSION_INFO_ITEM_02;
-import static stringconstant.StringConstant.MISSION_INFO_ITEM_02_CHINESE;
-import static stringconstant.StringConstant.PHONE;
+import static stringconstant.SpinnerString.*;
+import static stringconstant.StringConstant.*;
 
 import gps.GPSManager;
 
@@ -26,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import spinneredittext.SpinnerEditText;
+import stringconstant.StringConstant;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -73,7 +61,7 @@ import android.widget.ViewAnimator;
 import baidumapsdk.demo.NaviDemo;
 import baidumapsdk.demo.R;
 import bluetooth.BluetoothChatService;
-import bluetooth.DeviceListActivity;
+import bluetooth.CHexConver;
 import bluetooth.DiscoveryDevicesActivity;
 
 import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
@@ -167,14 +155,6 @@ public class DetailActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
     private BluetoothChatService mChatService = null;
-    // Message types sent from the BluetoothChatService Handler
-    public static final int MESSAGE_STATE_CHANGE = 1;
-    public static final int MESSAGE_READ = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final int MESSAGE_DEVICE_NAME = 4;
-    public static final int MESSAGE_TOAST = 5;
-    public static final String DEVICE_NAME = "device_name";
-    public static final String TOAST = "toast";
     
     // result confirm
     private static final int resultConfirmID = 6;
@@ -191,10 +171,6 @@ public class DetailActivity extends Activity {
     private static final int newSealID = 7;
     private static final int inputVerifyDataID = 8;
 
-    // Intent request codes
-    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-    private static final int REQUEST_ENABLE_BT = 3;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -539,6 +515,7 @@ public class DetailActivity extends Activity {
 	});
     }
     private void setupChat() {
+        System.out.println("setupChat---------->");
 	mConversationArrayAdapter = new ArrayAdapter<String>(DetailActivity.this, R.layout.bluetooth_message_item);
 	verifyTestTextView.setAdapter(mConversationArrayAdapter);
 	// Initialize the BluetoothChatService to perform bluetooth connections
@@ -549,23 +526,7 @@ public class DetailActivity extends Activity {
 	serverIntent = new Intent(this, DiscoveryDevicesActivity.class);
         startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
     }
-    private void sendMessage(String message) {
-        // Check that we're actually connected before trying anything
-        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        // Check that there's actually something to send
-        if (message.length() > 0) {
-            // Get the message bytes and tell the BluetoothChatService to write
-            byte[] send = message.getBytes();
-            mChatService.write(send);
-
-            // Reset out string buffer to zero and clear the edit text field
-            mOutStringBuffer.setLength(0);
-        }
-    }
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {
         @Override
@@ -577,24 +538,33 @@ public class DetailActivity extends Activity {
                 case BluetoothChatService.STATE_CONNECTED:
 //                    mTitle.setText(R.string.title_connected_to);
 //                    mTitle.append(mConnectedDeviceName);
+                    System.out.println("hanlder---------->STATE_CONNECTED");
                     mConversationArrayAdapter.clear();
+                    sendMyMessage(new byte[]{(byte) 0xAA,(byte)0xAA,(byte)0x03});
+                    sendMyMessage(new String("FLRD").getBytes());
+                    sendMyMessage(new byte[]{(byte)0x00,(byte)0x00});
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
 //                    mTitle.setText(R.string.title_connecting);
+
                     break;
                 case BluetoothChatService.STATE_LISTEN:
                 case BluetoothChatService.STATE_NONE:
+                    System.out.println("hanlder---------->STATE_LISTEN or STATE_NONE");
 //                    mTitle.setText(R.string.title_not_connected);
+                    if(mChatService != null ) mChatService =null;
                     break;
                 }
                 break;
             case MESSAGE_WRITE:
+                System.out.println("MESSAGE_WRITE---------->");
                 byte[] writeBuf = (byte[]) msg.obj;
                 // construct a string from the buffer
                 String writeMessage = new String(writeBuf);
                 mConversationArrayAdapter.add("Me:  " + writeMessage);
                 break;
             case MESSAGE_READ:
+                System.out.println("MESSAGE_READ---------->");
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
@@ -603,16 +573,36 @@ public class DetailActivity extends Activity {
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
                 mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                Toast.makeText(getApplicationContext(), "Connected to "
+                System.out.println("MESSAGE_DEVICE_NAME---------->"+mConnectedDeviceName);
+                Toast.makeText(DetailActivity.this, "Connected to "
                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-                Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+                Toast.makeText(DetailActivity.this, msg.getData().getString(TOAST),
                                Toast.LENGTH_SHORT).show();
+                System.out.println("MESSAGE_DEVICE_NAME---------->"+ msg.getData().getString(TOAST));
                 break;
             }
         }
     };
+    private void sendMyMessage(byte[] message) {
+        // Check that we're actually connected before trying anything
+        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (message.length > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+//            byte[] send = message.getBytes();
+//            byte[] send = CHexConver.getHexBytes(message);
+            mChatService.write(message);
+            
+            // Reset out string buffer to zero and clear the edit text field
+            mOutStringBuffer.setLength(0);
+        }
+    }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(D) Log.d(TAG, "onActivityResult " + resultCode);
         switch (requestCode) {
@@ -620,13 +610,21 @@ public class DetailActivity extends Activity {
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
                 connectDevice(data, true);
-            }
+                System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>OK");
+            }else {
+                System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>CANCLE");
+		mChatService.stop();
+		mChatService = null;
+	    }
             break;
         case REQUEST_CONNECT_DEVICE_INSECURE:
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
                 connectDevice(data, false);
-            }
+        	System.out.println("REQUEST_CONNECT_DEVICE_INSECURE------>OK");
+            }else {
+        	System.out.println("REQUEST_CONNECT_DEVICE_INSECURE------>CANCLE");
+	    }
             break;
         case REQUEST_ENABLE_BT:
             // When the request to enable Bluetooth returns
@@ -644,7 +642,7 @@ public class DetailActivity extends Activity {
     private void connectDevice(Intent data, boolean secure) {
         // Get the device MAC address
         String address = data.getExtras()
-            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+            .getString(EXTRA_DEVICE_ADDRESS);
         // Get the BLuetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device

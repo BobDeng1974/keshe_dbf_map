@@ -134,6 +134,10 @@
             android:name="gps.GPSService"
             android:process=":remote">
             </service>
+            <service 
+                android:name="bluetooth.BluetoothChatService"
+                android:process=":remote"
+                ></service>
         <activity
             android:name="baidumapsdk.demo.ShareDemo"
             android:label="@string/demo_name_share" >
@@ -155,6 +159,11 @@
             android:name="details.DetailActivity"
             android:theme="@style/iTitleTheme" >
         </activity>
+        <activity 
+            android:name="bluetooth.DiscoveryDevicesActivity"
+            android:label="@string/actDiscovery_name"
+			android:screenOrientation="portrait"
+            ></activity>
     </application>
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
@@ -163,24 +172,20 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
-    <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
-    </permission>
+    <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    	<uses-permission android:name="android.permission.BLUETOOTH"/>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+	<uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
 
-    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
     <!-- <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"></uses-permission> -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_GPS" />
@@ -191,18 +196,14 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.CAMERA" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.RECORD_AUDIO" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <!-- 来电消音 -->
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
