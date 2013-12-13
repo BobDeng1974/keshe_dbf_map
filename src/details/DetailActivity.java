@@ -527,7 +527,7 @@ public class DetailActivity extends Activity {
         startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
     }
 
-    //here today
+    
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {
         @Override
