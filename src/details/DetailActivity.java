@@ -197,7 +197,7 @@ public class DetailActivity extends Activity {
 	// seven page
 	initResultConfirm();
     }
-
+//
     private void initSpinnerEdittext() {
 	// TODO Auto-generated method stub
 	cabinetSealOne = (SpinnerEditText) findViewById(R.id.st_cabinet_1);
