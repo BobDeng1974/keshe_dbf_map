@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * This class does all the work for setting up and managing Bluetooth
@@ -66,6 +67,7 @@ public class BluetoothChatService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+    private Context mContext;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -82,6 +84,7 @@ public class BluetoothChatService {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
+        mContext = context;
     }
 
     /**
@@ -367,6 +370,7 @@ public class BluetoothChatService {
             // given BluetoothDevice
             Method m;
 	    try {
+//		tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
 		m = device.getClass().getMethod("createRfcommSocket",
 		    new Class[] { int.class });
 		tmp = (BluetoothSocket)m.invoke(device, Integer.valueOf(1));
@@ -408,6 +412,11 @@ public class BluetoothChatService {
                 try {
                     mmSocket.close();
                     System.out.println("ConnectThread-----> Failure");
+                    Message msg = mHandler.obtainMessage(StringConstant.MESSAGE_TOAST);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(StringConstant.TOAST, "连接失败...");
+                    msg.setData(bundle);
+                    mHandler.sendMessage(msg);
                 } catch (IOException e2) {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
@@ -463,7 +472,7 @@ public class BluetoothChatService {
 
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[128];
             int bytes = 0;
 
             // Keep listening to the InputStream while connected
@@ -472,6 +481,7 @@ public class BluetoothChatService {
                     // Read from the InputStream
                     if(mmInStream.available() > 0){
                     bytes = mmInStream.read(buffer);
+            	CHexConver.printHexString("reader------->", buffer);
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(StringConstant.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
@@ -490,6 +500,7 @@ public class BluetoothChatService {
          */
         public void write(byte[] buffer) {
             try {
+        	CHexConver.printHexString("buffer------->", buffer);
         	for (byte b : buffer) {
         	    mmOutStream.write(b);
         	     try {

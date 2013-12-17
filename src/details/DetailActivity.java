@@ -14,6 +14,8 @@ import java.util.Map;
 
 import spinneredittext.SpinnerEditText;
 import stringconstant.StringConstant;
+import android.R.integer;
+import android.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -541,9 +543,36 @@ public class DetailActivity extends Activity {
 //                    mTitle.append(mConnectedDeviceName);
                     System.out.println("hanlder---------->STATE_CONNECTED");
                     mConversationArrayAdapter.clear();
-                    sendMyMessage(new byte[]{(byte) 0xAA,(byte)0xAA,(byte)0x03});
-                    sendMyMessage(new String("FLRD").getBytes());
-                    sendMyMessage(new byte[]{(byte)0x00,(byte)0x00});
+                    byte[] bytes = new byte[] {(byte) 0xaa,
+                	    					(byte) 0xaa,
+                	    					(byte) 0x14,
+                	    					(byte) 0x46,
+                	    					(byte) 0x4c,
+                	    					(byte) 0x52,
+                	    					(byte) 0x44,
+                	    					(byte) 0x65,
+                	    					(byte) 0x3a,
+                	    					(byte) 0x5c,
+                	    					(byte) 0x70,
+                	    					(byte) 0x65,
+                	    					(byte) 0x63,
+                	    					(byte) 0x66,
+                	    					(byte) 0x69,
+                	    					(byte) 0x6c,
+                	    					(byte) 0x65,
+                	    					(byte) 0x2e,
+                	    					(byte) 0x64,
+                	    					(byte) 0x61,
+                	    					(byte) 0x74,
+                	    					(byte) 0xf2,
+                	    					(byte) 0x3b,
+                    						};
+                    sendMyMessage(bytes);
+//                    byte[] bytess = CHexConver.getHexBytes("FLRD");
+//                    System.out.println(bytess[0]);
+//                    sendMyMessage(new byte[]{(byte) 0xAA,(byte)0xAA,(byte)0x03});
+//                    sendMyMessage(new String("FLRD").getBytes());(byte) 
+//                    sendMyMessage(new byte[]{(byte)0x00,(byte)0x00});
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
 //                    mTitle.setText(R.string.title_connecting);
@@ -570,6 +599,7 @@ public class DetailActivity extends Activity {
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                sendMyMessage("");
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
@@ -586,6 +616,40 @@ public class DetailActivity extends Activity {
             }
         }
     };
+    
+    private byte[] buildMyMessage(int type , String fileName , int lowFrame , int highFrame) {
+	String string = "";
+	switch (type) {
+	case TYPE_GETFI_FLRD:
+	    string = "FLRD" + fileName;
+	    break;
+	case TYPE_SndFlNm_YFLSDOK:
+	    string = "YFLSDOK";
+	    break;
+	case TYPE_SndData_YFD:
+	    string = "YFD" + lowFrame + highFrame + "OK";
+	    break;
+	case TYPE_SndFlEnd_FLRE:
+	    string = "FLRE";
+	    break;
+	default:
+	    break;
+	}
+	String ascii = CHexConver.parseAscii(string);
+	System.out.println(ascii);
+	byte[] asciiByte = new byte[ascii.length()/2];
+	for (int i = 0 ; i < ascii.length()/2 ; i++) {
+	    int asciiInt = Integer.parseInt(ascii.substring(2*i, 2*(i+1)), 16);
+	    System.out.println(asciiInt);
+	    asciiByte[i] =(byte) asciiInt;
+	}
+	return asciiByte;
+    }
+    
+    private void sendMyMessage(String message) {
+	sendMyMessage(message.getBytes());
+	return;
+    }
     private void sendMyMessage(byte[] message) {
         // Check that we're actually connected before trying anything
         if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
