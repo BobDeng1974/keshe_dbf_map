@@ -39,6 +39,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	}
 	//获取dnvxysj的列名
 	String dnbxysj_col_string = ",METER_ID char(16)";
+	//获取bzqj的列名
+	String dnbbzqj_col_string = ",MADE_NO char(16)";
 
 //	System.out.println(myString);
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型

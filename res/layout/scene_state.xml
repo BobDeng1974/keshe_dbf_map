@@ -54,10 +54,10 @@
     </LinearLayout>
 
     <spinneredittext.SpinnerEditText
-        android:layout_marginTop="5dip"
         android:id="@+id/clock_date_conclusion"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
         android:background="@android:color/transparent"
         android:clickable="true"
         android:focusable="true" />
@@ -68,17 +68,15 @@
         android:layout_height="wrap_content"
         android:text="事件" />
 
-    <EditText
+    <AutoCompleteTextView
+        android:id="@+id/clock_event_textview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dip"
         android:gravity="top"
-        android:id="@+id/clock_event_textview"
-        style="?android:attr/textAppearanceMedium"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
         android:hint="在此添加事件.."
-        android:background="@android:color/darker_gray"
         android:textColor="@android:color/black"
         android:visibility="gone"
-        />
+         />
 
 </LinearLayout>

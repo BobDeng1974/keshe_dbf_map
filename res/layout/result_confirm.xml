@@ -107,6 +107,16 @@
             android:layout_width="wrap_content"
             android:text="事件"
             />
+        <AutoCompleteTextView
+        android:id="@+id/confirm_event_textview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
+        android:gravity="top"
+        android:hint="在此添加事件.."
+        android:textColor="@android:color/black"
+        android:visibility="gone"
+         />
     </LinearLayout>
 
 </ScrollView>

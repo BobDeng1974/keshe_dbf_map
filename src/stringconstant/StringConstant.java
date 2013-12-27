@@ -27,15 +27,16 @@ public class StringConstant {
     public static String DNBXYSJ = "dnbxysj";
 
     public static String GPS = "gps";
+    
+    public static String BZQJ = "bzqj";
 
-    public static String rwPath = Environment.getExternalStorageDirectory()
-	    + "/dbf/" + RW + ".dbf";
-    public static String dnbxxPath = Environment.getExternalStorageDirectory()
-	    + "/dbf/" + DNBXX + ".dbf";
-    public static String gpsPath = Environment.getExternalStorageDirectory()
-	    + "/dbf/" + GPS + ".dbf";
-    public static String dnbxysjPath = Environment
-	    .getExternalStorageDirectory() + "/dbf/" + DNBXYSJ + ".dbf";
+    public static String root = Environment.getExternalStorageDirectory() + "/dbf/";
+    
+    public static String rwPath = root + RW + ".dbf";
+    public static String dnbxxPath = root + DNBXX + ".dbf";
+    public static String gpsPath = root + GPS + ".dbf";
+    public static String dnbxysjPath = root + DNBXYSJ + ".dbf";
+    public static String bzqjPath = root + BZQJ +".dbf";
     // rw.dbf
     public static String WCZT = "WCZT";
     public static String ZC_ID = "ZC_ID";

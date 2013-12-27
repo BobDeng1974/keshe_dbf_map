@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnFocusChangeListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,7 +19,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import baidumapsdk.demo.R;
 
-public class SpinnerEditText extends LinearLayout {
+public class SpinnerEditText extends LinearLayout{
 
     private Context mContext;
     private LayoutInflater layoutInflater;
@@ -88,7 +89,11 @@ public class SpinnerEditText extends LinearLayout {
 	for (String sp_item : dataArray) {
 	    myItemData.add(sp_item);
 	}
-	this.setData(myItemData);
+	this.init(myItemData, title, isValueVisible);
+    }
+    
+    public void init(List<String > data , String title , Boolean isValueVisible) {
+	this.setData(data);
 	this.setTitle(title);
 	if (!isValueVisible) {
 	    this.setValueEditTextGone();
@@ -108,9 +113,6 @@ public class SpinnerEditText extends LinearLayout {
     }
 
     public List<String> getData() {
-//	names.add("电压");
-//	names.add("电流");
-//	names.add("电阻");
 	return names;
     }
 
@@ -194,7 +196,6 @@ public class SpinnerEditText extends LinearLayout {
 		holder = (ViewHolder) convertView.getTag();
 	    }
 	    final String editContent = list.get(position);
-	    System.out.println( "fuck -->" + editContent);
 	    holder.content.setText(editContent);
 	    holder.content.setOnClickListener(new OnClickListener() {
 
@@ -205,13 +206,6 @@ public class SpinnerEditText extends LinearLayout {
 		    pop.dismiss();
 		}
 	    });
-
-	    // close.setOnClickListener(new OnClickListener() {
-	    // public void onClick(View v) {
-	    // names.remove(position);
-	    // adapter.notifyDataSetChanged();
-	    // }
-	    // });
 	    return convertView;
 	}
 
@@ -220,5 +214,4 @@ public class SpinnerEditText extends LinearLayout {
 	}
 
     }
-
 }

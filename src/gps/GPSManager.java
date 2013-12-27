@@ -41,6 +41,8 @@ public class GPSManager {
     private Address address;
     private Context mContext;
     private Boolean isFirstIn = true;
+    private int minTime = 0;
+    private int minMeters = 100;
 
     public GPSManager(Context context) {
 	this.mContext = context;
@@ -83,12 +85,12 @@ public class GPSManager {
 	    System.out
 		    .println("setRequestLocationUpdates------------------->GPS");
 	    this.locationManager.requestLocationUpdates(
-		    LocationManager.GPS_PROVIDER, 1500, 0, myLocationListener);
+		    LocationManager.GPS_PROVIDER, minTime, minMeters, myLocationListener);
 	} else if (isNetworkEnabled()) {
 	    System.out
 		    .println("setRequestLocationUpdates------------------->Network");
 	    this.locationManager.requestLocationUpdates(
-		    LocationManager.NETWORK_PROVIDER, 1500, 0,
+		    LocationManager.NETWORK_PROVIDER, minTime, minMeters,
 		    myLocationListener);
 	} else {
 	    Log.e("GPSManager", "noProviderIsEnable");

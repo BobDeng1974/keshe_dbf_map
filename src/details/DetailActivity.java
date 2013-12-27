@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import refreshablelist.ParseDbf2Map;
 import spinneredittext.SpinnerEditText;
 import stringconstant.StringConstant;
+import AnalyseTxt.AnalyseTxtUtil;
 import android.R.integer;
 import android.R.string;
 import android.app.Activity;
@@ -43,6 +45,9 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -77,6 +82,7 @@ public class DetailActivity extends Activity {
     private static final boolean D = true;
 
     Resources resources;
+    HashMap<String, List<String>> configTxtData ;
     // title
     private TextView title;
     private Button leftBtn;
@@ -126,7 +132,7 @@ public class DetailActivity extends Activity {
     private Button electriClockDate;
     private SpinnerEditText electriClockDateConclusion;
     private Button electriClockEventButton;
-    private EditText electirClockEvent;
+    private AutoCompleteTextView electirClockEvent;
     // electriClock
     private static final int electriClockID = 4;
     private EditText positiveTotalPower;
@@ -170,6 +176,7 @@ public class DetailActivity extends Activity {
     private SpinnerEditText confirmSecondaryLineConclusion;
     private SpinnerEditText confirmSceneVerifyConclusion;
     private Button confirmAddEventButton;
+    private AutoCompleteTextView confirmAddEvenTextView;
     private static final int newSealID = 7;
     private static final int inputVerifyDataID = 8;
 
@@ -182,6 +189,7 @@ public class DetailActivity extends Activity {
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
 	resources = getResources();
+	configTxtData = AnalyseTxtUtil.getDataFromConfigTXT(configTXTPath);
 	// first page
 	initViewAnimatior();
 	initTitleListener();
@@ -199,7 +207,9 @@ public class DetailActivity extends Activity {
 	// seven page
 	initResultConfirm();
     }
-//
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MySpinner	           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSpinnerEdittext() {
 	// TODO Auto-generated method stub
 	cabinetSealOne = (SpinnerEditText) findViewById(R.id.st_cabinet_1);
@@ -208,12 +218,12 @@ public class DetailActivity extends Activity {
 	tableSealTwo = (SpinnerEditText) findViewById(R.id.st_table_2);
 	boxSealOne = (SpinnerEditText) findViewById(R.id.st_box_1);
 	boxSealTwo = (SpinnerEditText) findViewById(R.id.st_box_2);
-	cabinetSealOne.init(TABLE_SEAL_ARRAY, "柜封1:", true);
-	cabinetSealTwo.init(TABLE_SEAL_ARRAY, "柜封2:", true);
+	cabinetSealOne.init(configTxtData.get("计量柜旧封类型"), "柜封1:",true);
+	cabinetSealTwo.init(configTxtData.get("计量柜旧封类型"), "柜封2:", true);
 	tableSealOne.init(TABLE_SEAL_ARRAY, "表封1:", true);
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
-	boxSealOne.init(TABLE_SEAL_ARRAY, "盒封1:", true);
-	boxSealTwo.init(TABLE_SEAL_ARRAY, "盒封2:", true);
+	boxSealOne.init(configTxtData.get("端子盒旧封类型"), "盒封1:", true);
+	boxSealTwo.init(configTxtData.get("端子盒旧封类型"), "盒封2:", true);
 	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
 		cabinetSealOne));
 	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
@@ -243,7 +253,13 @@ public class DetailActivity extends Activity {
 			spinnerEditText);
 	}
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MySpinner	           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MissionInfo	           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 初始化任务信息界面
      */
@@ -344,7 +360,13 @@ public class DetailActivity extends Activity {
 			R.id.mission_info_values });
 	missionInfoListView.setAdapter(adapter);
     }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MissionInfo	           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MissionState           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initMissionStatus() {
 	missionStatusGroup = (RadioGroup) findViewById(R.id.mission_status_radio_group);
 	missionStatusOne = (RadioButton) findViewById(R.id.mission_status_radio1);
@@ -363,14 +385,24 @@ public class DetailActivity extends Activity {
 		    }
 		});
     }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init MissionState           //////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init SceneState           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneState() {
 	clockDeviation = (EditText) findViewById(R.id.clock_mistake_value);
 	clockDeviationConclusion = (SpinnerEditText) findViewById(R.id.clock_mistake_conclusion);
 	electriClockDate = (Button) findViewById(R.id.clock_date_value);
 	electriClockDateConclusion = (SpinnerEditText) findViewById(R.id.clock_date_conclusion);
 	electriClockEventButton = (Button) findViewById(R.id.clock_event_button);
-	electirClockEvent = (EditText) findViewById(R.id.clock_event_textview);
+	electirClockEvent = (AutoCompleteTextView) findViewById(R.id.clock_event_textview);
+	//创建一个ArrayAdapter  
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,configTxtData.get("常用备注"));  
+        electirClockEvent.setAdapter(adapter);
+	electirClockEvent.setOnFocusChangeListener(new showDropDownListener());  
 	clockDeviationConclusion.init(CLOCK_MISTAKE_CONCLUSION,
 		resources.getString(R.string.clock_mistake_conclusion), false);
 	electriClockDateConclusion.init(CLOCK_DATE_CONCLUSION,
@@ -392,7 +424,22 @@ public class DetailActivity extends Activity {
 	    }
 	});
     }
-
+    class showDropDownListener implements OnFocusChangeListener{
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+            AutoCompleteTextView view = (AutoCompleteTextView) v;  
+            if (hasFocus) {  
+                view.showDropDown();  
+            }  
+	}
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         init SceneState           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         initElectriClock           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initElectriClock() { // electriClock
 	positiveTotalPower = (EditText) findViewById(R.id.electri_total_power);
 	positivePeak = (EditText) findViewById(R.id.electri_peak);
@@ -488,13 +535,45 @@ public class DetailActivity extends Activity {
 		    }
 		});
     }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////                         initElectriClock           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////                         initSceneVerify           /////////////////////////////////////////////////////////////    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneVerify() {
+	verifyHumidity = (EditText) findViewById(R.id.verify_humidity);
+	verifyTemperature = (EditText) findViewById(R.id.verify_temperature);
 	verifyTestTextView = (ListView) findViewById(R.id.machine_data_list);
 	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
+	verifyMadeNumberSpinner = (Spinner) findViewById(R.id.verify_made_number);
+	//将可选内容与ArrayAdapter连接起来  
+	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+	List<Map<String, String>> listMap = parseDbf2Map.getListMapFromDbf(bzqjPath);
+	final List<String> list= new ArrayList<String>();
+	if (listMap.size() != 0) {
+	        for (int i = 1; i < listMap.size(); i++) {
+	            String string= listMap.get(i).get("MADE_NO");
+	            list.add(string);
+	        }
+	    }
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,list);  
+        //设置下拉列表的风格  
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);  
+        //将adapter 添加到spinner中  
+        verifyMadeNumberSpinner.setAdapter(adapter);  
+        //添加事件Spinner事件监听    
+        verifyMadeNumberSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+	    @Override
+	    public void onItemSelected(AdapterView<?> arg0, View view,
+		    int position, long arg3) {
+		((TextView) view).setText(list.get(position));  
+	    }
+	    @Override
+	    public void onNothingSelected(AdapterView<?> arg0) {
+	    }
+	});  
 	verifyReadMachine.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
@@ -509,210 +588,14 @@ public class DetailActivity extends Activity {
 	            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 	            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 	            }else {
-	        	if (mChatService == null) setupChat();
+//	        	if (mChatService == null) setupChat();
 		    }
 		}
 	    }
 
 	});
     }
-    private void setupChat() {
-        System.out.println("setupChat---------->");
-	mConversationArrayAdapter = new ArrayAdapter<String>(DetailActivity.this, R.layout.bluetooth_message_item);
-	verifyTestTextView.setAdapter(mConversationArrayAdapter);
-	// Initialize the BluetoothChatService to perform bluetooth connections
-	mChatService = new BluetoothChatService(this, mHandler);
-	// Initialize the buffer for outgoing messages
-	mOutStringBuffer = new StringBuffer("");
-	Intent serverIntent = null;
-	serverIntent = new Intent(this, DiscoveryDevicesActivity.class);
-        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-    }
 
-    
-    // The Handler that gets information back from the BluetoothChatService
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            case MESSAGE_STATE_CHANGE:
-                if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                switch (msg.arg1) {
-                case BluetoothChatService.STATE_CONNECTED:
-//                    mTitle.setText(R.string.title_connected_to);
-//                    mTitle.append(mConnectedDeviceName);
-                    System.out.println("hanlder---------->STATE_CONNECTED");
-                    mConversationArrayAdapter.clear();
-                    byte[] bytes = new byte[] {(byte) 0xaa,
-                	    					(byte) 0xaa,
-                	    					(byte) 0x14,
-                	    					(byte) 0x46,
-                	    					(byte) 0x4c,
-                	    					(byte) 0x52,
-                	    					(byte) 0x44,
-                	    					(byte) 0x65,
-                	    					(byte) 0x3a,
-                	    					(byte) 0x5c,
-                	    					(byte) 0x70,
-                	    					(byte) 0x65,
-                	    					(byte) 0x63,
-                	    					(byte) 0x66,
-                	    					(byte) 0x69,
-                	    					(byte) 0x6c,
-                	    					(byte) 0x65,
-                	    					(byte) 0x2e,
-                	    					(byte) 0x64,
-                	    					(byte) 0x61,
-                	    					(byte) 0x74,
-                	    					(byte) 0xf2,
-                	    					(byte) 0x3b,
-                    						};
-                    sendMyMessage(bytes);
-//                    byte[] bytess = CHexConver.getHexBytes("FLRD");
-//                    System.out.println(bytess[0]);
-//                    sendMyMessage(new byte[]{(byte) 0xAA,(byte)0xAA,(byte)0x03});
-//                    sendMyMessage(new String("FLRD").getBytes());(byte) 
-//                    sendMyMessage(new byte[]{(byte)0x00,(byte)0x00});
-                    break;
-                case BluetoothChatService.STATE_CONNECTING:
-//                    mTitle.setText(R.string.title_connecting);
-
-                    break;
-                case BluetoothChatService.STATE_LISTEN:
-                case BluetoothChatService.STATE_NONE:
-                    System.out.println("hanlder---------->STATE_LISTEN or STATE_NONE");
-//                    mTitle.setText(R.string.title_not_connected);
-                    if(mChatService != null ) mChatService =null;
-                    break;
-                }
-                break;
-            case MESSAGE_WRITE:
-                System.out.println("MESSAGE_WRITE---------->");
-                byte[] writeBuf = (byte[]) msg.obj;
-                // construct a string from the buffer
-                String writeMessage = new String(writeBuf);
-                mConversationArrayAdapter.add("Me:  " + writeMessage);
-                break;
-            case MESSAGE_READ:
-                System.out.println("MESSAGE_READ---------->");
-                byte[] readBuf = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
-                String readMessage = new String(readBuf, 0, msg.arg1);
-                mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
-                sendMyMessage("");
-                break;
-            case MESSAGE_DEVICE_NAME:
-                // save the connected device's name
-                mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                System.out.println("MESSAGE_DEVICE_NAME---------->"+mConnectedDeviceName);
-                Toast.makeText(DetailActivity.this, "Connected to "
-                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                break;
-            case MESSAGE_TOAST:
-                Toast.makeText(DetailActivity.this, msg.getData().getString(TOAST),
-                               Toast.LENGTH_SHORT).show();
-                System.out.println("MESSAGE_DEVICE_NAME---------->"+ msg.getData().getString(TOAST));
-                break;
-            }
-        }
-    };
-    
-    private byte[] buildMyMessage(int type , String fileName , int lowFrame , int highFrame) {
-	String string = "";
-	switch (type) {
-	case TYPE_GETFI_FLRD:
-	    string = "FLRD" + fileName;
-	    break;
-	case TYPE_SndFlNm_YFLSDOK:
-	    string = "YFLSDOK";
-	    break;
-	case TYPE_SndData_YFD:
-	    string = "YFD" + lowFrame + highFrame + "OK";
-	    break;
-	case TYPE_SndFlEnd_FLRE:
-	    string = "FLRE";
-	    break;
-	default:
-	    break;
-	}
-	String ascii = CHexConver.parseAscii(string);
-	System.out.println(ascii);
-	byte[] asciiByte = new byte[ascii.length()/2];
-	for (int i = 0 ; i < ascii.length()/2 ; i++) {
-	    int asciiInt = Integer.parseInt(ascii.substring(2*i, 2*(i+1)), 16);
-	    System.out.println(asciiInt);
-	    asciiByte[i] =(byte) asciiInt;
-	}
-	return asciiByte;
-    }
-    
-    private void sendMyMessage(String message) {
-	sendMyMessage(message.getBytes());
-	return;
-    }
-    private void sendMyMessage(byte[] message) {
-        // Check that we're actually connected before trying anything
-        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check that there's actually something to send
-        if (message.length > 0) {
-            // Get the message bytes and tell the BluetoothChatService to write
-//            byte[] send = message.getBytes();
-//            byte[] send = CHexConver.getHexBytes(message);
-            mChatService.write(message);
-            
-            // Reset out string buffer to zero and clear the edit text field
-            mOutStringBuffer.setLength(0);
-        }
-    }
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(D) Log.d(TAG, "onActivityResult " + resultCode);
-        switch (requestCode) {
-        case REQUEST_CONNECT_DEVICE_SECURE:
-            // When DeviceListActivity returns with a device to connect
-            if (resultCode == Activity.RESULT_OK) {
-                connectDevice(data, true);
-                System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>OK");
-            }else {
-                System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>CANCLE");
-		mChatService.stop();
-		mChatService = null;
-	    }
-            break;
-        case REQUEST_CONNECT_DEVICE_INSECURE:
-            // When DeviceListActivity returns with a device to connect
-            if (resultCode == Activity.RESULT_OK) {
-                connectDevice(data, false);
-        	System.out.println("REQUEST_CONNECT_DEVICE_INSECURE------>OK");
-            }else {
-        	System.out.println("REQUEST_CONNECT_DEVICE_INSECURE------>CANCLE");
-	    }
-            break;
-        case REQUEST_ENABLE_BT:
-            // When the request to enable Bluetooth returns
-            if (resultCode == Activity.RESULT_OK) {
-                // Bluetooth is now enabled, so set up a chat session
-                setupChat();
-            } else {
-                // User did not enable Bluetooth or an error occured
-                Log.d(TAG, "BT not enabled");
-                Toast.makeText(this, R.string.bt_not_enabled, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void connectDevice(Intent data, boolean secure) {
-        // Get the device MAC address
-        String address = data.getExtras()
-            .getString(EXTRA_DEVICE_ADDRESS);
-        // Get the BLuetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        mChatService.connect(device, secure);
-    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////                         initSceneVerify           ////////////////////////////////////////////////////////////   
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -730,18 +613,22 @@ public class DetailActivity extends Activity {
 	confirmSeal = (SpinnerEditText) findViewById(R.id.confirm_seal);
 	confirmSecondaryLineConclusion = (SpinnerEditText) findViewById(R.id.confirm_conclusion_secondary_line);
 	confirmSceneVerifyConclusion = (SpinnerEditText) findViewById(R.id.confirm_scene_verify_conclusion);
+	confirmAddEventButton = (Button) findViewById(R.id.confirm_add_event);
+	confirmAddEvenTextView = (AutoCompleteTextView) findViewById(R.id.confirm_event_textview);
+	//创建一个ArrayAdapter  
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,configTxtData.get("常用备注"));  
+        confirmAddEvenTextView.setAdapter(adapter);
+        confirmAddEvenTextView.setOnFocusChangeListener(new showDropDownListener());  
 	// 显示当前日期
 	SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	String currentDate = sDateFormat.format(new java.util.Date());
 	confirmDateTime.setText(currentDate);
 	// 校验人 审核人 设备评级 解析TXT
-	confirmCheckPeople.init(SEAL_ARRAY,
+	confirmCheckPeople.init(configTxtData.get("校验人"),
 		resources.getString(R.string.check_people), false);
-	confirmVerifyPeople.init(SEAL_ARRAY,
+	confirmVerifyPeople.init(configTxtData.get("审核人"),
 		resources.getString(R.string.verify_people), false);
-	confirmCheckPeople.init(SEAL_ARRAY,
-		resources.getString(R.string.check_people), false);
-	confirmEquipmentRating.init(SEAL_ARRAY,
+	confirmEquipmentRating.init(configTxtData.get("设备评级"),
 		resources.getString(R.string.equipment_ratings), false);
 	// 事件点击
 	confirmSceneVerifyConclusion.init(SCENE_VERIFY_ARRAY,
@@ -751,8 +638,24 @@ public class DetailActivity extends Activity {
 	confirmSeal.init(SEAL_ARRAY, resources.getString(R.string.seal), false);
 	confirmSecondaryLineConclusion.init(SECONDARY_LINE_CONCLUSION_ARRAY,
 		resources.getString(R.string.conclusion_secondary_line), false);
+	confirmAddEventButton.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View arg0) {
+		if (confirmAddEvenTextView.getVisibility() == View.VISIBLE) {
+		    confirmAddEvenTextView.setVisibility(View.GONE);
+		} else {
+		    confirmAddEvenTextView.setVisibility(View.VISIBLE);
+		}	    
+		}
+	});
     }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         initResultConfirm           /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         init titlebar          		 /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 初始化titlebar控件
      */
@@ -1048,7 +951,64 @@ public class DetailActivity extends Activity {
 	ChangeTitleText(titleString, resources.getString(R.string.title_back),
 		resources.getString(R.string.title_next), true, false);
     }
+    private void ChangeTitleText(String titleString, String leftButtonString,
+	    String rightButtonString, Boolean isRight, Boolean isNeedAnimation) {
+	title.setText(titleString);
+	leftBtn.setText(leftButtonString);
+	rightBtn.setText(rightButtonString);
+	if (isNeedAnimation) {
+	    if (isRight) {
+		showNextWithAnimation(slideInLeft, slideOutLeft);
+	    } else {
+		showPreviousWithAnimation(slideInRight, slideOutRight);
+	    }
+	}
+    }
 
+    private void showNextNoAnimation() {
+	animator.clearAnimation();
+	animator.showNext();
+    }
+
+    private void showNextWithAnimation(Animation slideIn, Animation slideOut) {
+	animator.setInAnimation(slideIn);
+	animator.setOutAnimation(slideOut);
+	animator.showNext();
+    }
+
+    private void showPreviousNoAnimation() {
+	animator.clearAnimation();
+	animator.showPrevious();
+    }
+
+    private void showPreviousWithAnimation(Animation slideIn, Animation slideOut) {
+	animator.setInAnimation(slideIn);
+	animator.setOutAnimation(slideOut);
+	animator.showPrevious();
+    }
+
+    class myAnimationListener implements AnimationListener {
+	@Override
+	public void onAnimationEnd(Animation animation) {
+	    isAnimating = false;
+	}
+
+	@Override
+	public void onAnimationRepeat(Animation animation) {
+	}
+
+	@Override
+	public void onAnimationStart(Animation animation) {
+	    isAnimating = true;
+	}
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         init titlebar          		 /////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         init openDialogMethod          		 /////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 打开datepicker选择日期
      * 
@@ -1300,6 +1260,10 @@ public class DetailActivity extends Activity {
 	    }
 	}
     };
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////                         init openDialogMethod          		 /////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 打开导航
     public void startNavi() {
 	// 天安门坐标
@@ -1371,57 +1335,7 @@ public class DetailActivity extends Activity {
 	return super.onKeyDown(keyCode, event);
     }
 
-    private void ChangeTitleText(String titleString, String leftButtonString,
-	    String rightButtonString, Boolean isRight, Boolean isNeedAnimation) {
-	title.setText(titleString);
-	leftBtn.setText(leftButtonString);
-	rightBtn.setText(rightButtonString);
-	if (isNeedAnimation) {
-	    if (isRight) {
-		showNextWithAnimation(slideInLeft, slideOutLeft);
-	    } else {
-		showPreviousWithAnimation(slideInRight, slideOutRight);
-	    }
-	}
-    }
 
-    private void showNextNoAnimation() {
-	animator.clearAnimation();
-	animator.showNext();
-    }
-
-    private void showNextWithAnimation(Animation slideIn, Animation slideOut) {
-	animator.setInAnimation(slideIn);
-	animator.setOutAnimation(slideOut);
-	animator.showNext();
-    }
-
-    private void showPreviousNoAnimation() {
-	animator.clearAnimation();
-	animator.showPrevious();
-    }
-
-    private void showPreviousWithAnimation(Animation slideIn, Animation slideOut) {
-	animator.setInAnimation(slideIn);
-	animator.setOutAnimation(slideOut);
-	animator.showPrevious();
-    }
-
-    class myAnimationListener implements AnimationListener {
-	@Override
-	public void onAnimationEnd(Animation animation) {
-	    isAnimating = false;
-	}
-
-	@Override
-	public void onAnimationRepeat(Animation animation) {
-	}
-
-	@Override
-	public void onAnimationStart(Animation animation) {
-	    isAnimating = true;
-	}
-    }
     @Override
     protected void onDestroy() {
 	// TODO Auto-generated method stub
