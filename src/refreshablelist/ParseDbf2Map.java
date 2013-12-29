@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.linuxense.javadbf.DBFBase;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFReader;
+import com.linuxense.javadbf.DBFWriter;
 
 import android.util.Log;
 
@@ -53,10 +55,9 @@ public class ParseDbf2Map {
      */
     public  List<Map<String, String>> parseDbf2Map(InputStream in)
 	    throws Exception {
-//	Log.e("fuck", "sssssssssssssss");
 	DBFReader dbfreader = new DBFReader(in);
 	dbfreader.setCharactersetName("GB2312");
-
+	
 	List<Map<String, String>> columns = new ArrayList<Map<String, String>>();
 	Map<String, String> head = new HashMap<String, String>();
 	// 解析DBF表头的信息

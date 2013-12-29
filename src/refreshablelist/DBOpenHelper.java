@@ -37,10 +37,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	for (int i = 0; i < DNBXX_ITEM.length; i++) {
 	    dnbxx_col_string = dnbxx_col_string + ","+DNBXX_ITEM[i] + " TEXT";
 	}
-	//获取dnvxysj的列名
+	//获取dnbxysj的列名
 	String dnbxysj_col_string = ",METER_ID char(16)";
-	//获取bzqj的列名
-	String dnbbzqj_col_string = ",MADE_NO char(16)";
+	//获取gps的列名
+	String dnbgps_col_string = ",CONS_NO char(16),LATITUDE char(16),LONGITUDE char(16)";
 
 //	System.out.println(myString);
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
@@ -48,12 +48,15 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	String sql_rw = "create table rw(id integer primary key autoincrement"+rw_col_string+")";
 	String sql_dnbxx = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
 	String sql_dnbxysj = "create table dnbxysj(id integer primary key autoincrement"+dnbxysj_col_string+")";
+	String sql_dnbgps = "create table dnbxysj(id integer primary key autoincrement"+dnbgps_col_string+")";
 	db.execSQL("drop table if exists " + RW);
 	db.execSQL(sql_rw);
 	db.execSQL("drop table if exists " + DNBXX);
 	db.execSQL(sql_dnbxx); 
 	db.execSQL("drop table if exists " + DNBXYSJ);
 	db.execSQL(sql_dnbxysj);
+	db.execSQL("drop table if exists " + GPS);
+	db.execSQL(sql_dnbgps);
 	creatTable(db);
     }
 
@@ -67,6 +70,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	creatDBTable(db ,RW, RW_ITEM, rwPath);
 	creatDBTable(db ,DNBXX, DNBXX_ITEM, dnbxxPath);
 	creatDBTable(db ,DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
+	creatDBTable(db ,GPS, GPS_ITEM, gpsPath);
     }
 
     private void creatDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
@@ -77,7 +81,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	// 创建table
 	List<Map<String, String>> Items = parseDbf2Map
 		.getListMapFromDbf(filePath);
-	Items = Items.subList(1, Items.size());
+	if (Items.size() <= 1) 
+	    return;
 //	Log.e("creatDBTable--------->Paramitems------>", Items + "");
 	for (int i = 0; i < Items.size(); i++) {
 	    Map<String, String> map = Items.get(i);

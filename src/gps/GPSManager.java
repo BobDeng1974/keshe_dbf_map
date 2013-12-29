@@ -3,6 +3,14 @@ package gps;
 import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.baidu.platform.comapi.basestruct.GeoPoint;
+
+import details.DetailActivity;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -191,7 +199,40 @@ public class GPSManager {
 	return result;
 
     }
-
+    /**	由GPS定位坐标获取地址
+     * @return	转换后的地址
+     */
+    public String getNowPosition() {
+	String nowPosition = "";
+	Location location = this.getMyLastKnownLocation();
+	List<Address> gps = this.getAddresses(location);
+	// System.out.println("GPS------------>" + gps);
+	if (gps == null || gps.size() == 0) {
+	    Toast.makeText(mContext, "无法获取,请检查网络状况..",
+		    Toast.LENGTH_LONG).show();
+	} else {
+	    Log.e("GPS--------->Address----->", gps.size()+"");
+	    Address address = gps.get(0);
+	    nowPosition = address.getAddressLine(0);
+	}
+	return nowPosition;
+    }
+    
+    public GeoPoint getGeoPoint(JSONObject jsonObject) {
+        Double lon = new Double(0);
+        Double lat = new Double(0);
+        try {
+            lon = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+                    .getJSONObject("geometry").getJSONObject("location")
+                    .getDouble("lng");
+            lat = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+                    .getJSONObject("geometry").getJSONObject("location")
+                    .getDouble("lat");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
+    }
     /**
      * 判断GPS是否开启
      * 

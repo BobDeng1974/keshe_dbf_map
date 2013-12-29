@@ -101,7 +101,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	} else {
 	    holder = (ViewHolder) convertView.getTag();
 	}
-
+	//　　根据RW.DBF中的ZC_ID索引dnbxx.dbf中的METER_ID查找对应的信息
 	DataBaseService service = new MyData(mContext);
 	List<Map<String, String>>  searchMaps = null;
 	Map<String , String> searchMap = null;

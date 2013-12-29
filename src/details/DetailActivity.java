@@ -4,6 +4,7 @@ import static stringconstant.SpinnerString.*;
 import static stringconstant.StringConstant.*;
 
 import gps.GPSManager;
+import httpclient.LocationHttpClient;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
 
 import refreshablelist.ParseDbf2Map;
 import spinneredittext.SpinnerEditText;
@@ -75,6 +78,8 @@ import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviPara;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class DetailActivity extends Activity {
     // Debugging
@@ -97,7 +102,6 @@ public class DetailActivity extends Activity {
     // mission_info
     private static final int missionInfoID = 0;
     private Button setNavigation;
-    private TextView setNavigationTextView;
     private LinearLayout changeContact;
     private TextView changeContactPerson;
     private TextView changeContactPhone;
@@ -290,26 +294,16 @@ public class DetailActivity extends Activity {
 	getPosition.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		Location location = gpsManager.getMyLastKnownLocation();
-		List<Address> gps = gpsManager.getAddresses(location);
-		// System.out.println("GPS------------>" + gps);
-		if (gps == null || gps.size() == 0) {
-		    Toast.makeText(getApplicationContext(), "无法获取,请检查网络状况..",
-			    Toast.LENGTH_LONG).show();
-		} else {
-		    Log.e("GPS--------->Address----->", gps.size()+"");
-		    Address address = gps.get(0);
-		    getPositionTextView.setText(address.getAddressLine(0));
-		}
+		    getPositionTextView.setText(gpsManager.getNowPosition());
 	    }
 	});
 	setNavigation.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
+		//检查dbf里有无gps，无的话弹出框输入，有的话直接开启导航
 		// 开启百度导航
-		startNavi();
+//		startNavi();
 	    }
 	});
     }
@@ -1241,6 +1235,9 @@ public class DetailActivity extends Activity {
 	});
 	thread.start();
     }
+    /**	处理与仪器校验时的等待工作
+     * 
+     */
     Handler mhandler = new Handler() {
 	@Override
 	public void handleMessage(Message msg) {
@@ -1264,51 +1261,65 @@ public class DetailActivity extends Activity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////                         init openDialogMethod          		 /////////////////////////////////////////    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 打开导航
-    public void startNavi() {
-	// 天安门坐标
-	double mLat1 = 39.915291;
-	double mLon1 = 116.403857;
-	// 百度大厦坐标
-	double mLat2 = 40.056858;
-	double mLon2 = 116.308194;
-	int lat = (int) (mLat1 * 1E6);
-	int lon = (int) (mLon1 * 1E6);
+    
+   public void  startNaviFromAddress(String address) {
+       AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+       asyncHttpClient.get("http://maps.google."
+	       + "com/maps/api/geocode/json?address=" 
+	       + address + "&sensor=false", new JsonHttpResponseHandler() {
+		@Override
+		public void onFailure(Throwable e, JSONObject errorResponse) {
+		    // TODO Auto-generated method stub
+		    super.onFailure(e, errorResponse);
+		    Toast.makeText(getApplicationContext(), "请检查网络..", Toast.LENGTH_LONG).show();
+		}
+		@Override
+		public void onSuccess(int statusCode, JSONObject response) {
+		    // TODO Auto-generated method stub
+		    super.onSuccess(statusCode, response);
+		    GPSManager gpsManager = new GPSManager(getApplicationContext());
+		    startNavi(gpsManager.getGeoPoint(response));
+		}
+		   
+	       });
+   }
+    /**	打开导航
+     * @param startLatitude
+     * @param startLongtitude
+     * @param destLatitude
+     * @param destLongtitude
+     */
+    public void startNavi(GeoPoint deskPoint) {
+	GPSManager gpsManager = new GPSManager(getApplicationContext());
+	Location location = gpsManager.getMyLastKnownLocation();
+	if(location == null ) {
+	    Toast.makeText(getApplicationContext(), "定位失败,请检查网络..", Toast.LENGTH_SHORT).show();
+	    return;
+	}
+	if (deskPoint.getLatitudeE6() == 0 && deskPoint.getLongitudeE6() == 0 ) {
+	    Toast.makeText(getApplicationContext(), "查找不到终点坐标..", Toast.LENGTH_SHORT).show();
+	    return;
+	}
+	int lat = (int) (location.getLatitude() * 1E6);
+	int lon = (int) (location.getLongitude() * 1E6);
 	GeoPoint pt1 = new GeoPoint(lat, lon);
-	lat = (int) (mLat2 * 1E6);
-	lon = (int) (mLon2 * 1E6);
-	GeoPoint pt2 = new GeoPoint(lat, lon);
 	// 构建 导航参数
 	NaviPara para = new NaviPara();
 	para.startPoint = pt1;
 	para.startName = "从这里开始";
-	para.endPoint = pt2;
+	para.endPoint = deskPoint;
 	para.endName = "到这里结束";
 	try {
 	    BaiduMapNavigation.openBaiduMapNavi(para, this);
 	} catch (BaiduMapAppNotSupportNaviException e) {
 	    e.printStackTrace();
-	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    builder.setMessage("您尚未安装百度地图app或app版本过低");
-	    builder.setTitle("提示");
-	    builder.setPositiveButton("确认",
-		    new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			    dialog.dismiss();
-			}
-		    });
-	    builder.setNegativeButton("取消",
-		    new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			    dialog.dismiss();
-			}
-		    });
-	    builder.create().show();
+	    Toast.makeText(getApplicationContext(), "您尚未安装百度地图..", Toast.LENGTH_LONG).show();
 	}
     }
 
+    /* (non-Javadoc)	拦截返回键
+     * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 	if (keyCode == KeyEvent.KEYCODE_BACK) { // 监控/拦截/屏蔽返回键

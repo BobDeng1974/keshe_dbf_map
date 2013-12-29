@@ -209,15 +209,15 @@ public class GPSService extends Service {
 
     /**Timer
      * @author luo
-     *记录两次上传直接的间隔，如果超过十分钟，则手动上传
+     *记录两次上传直接的间隔，如果超过5分钟，则手动上传
      */
     public class TimerThread implements Runnable{
 	@Override
 	public void run() {
 	    while(true) {
 		try {
-		    Thread.sleep(2*60*1000);
-		    if((System.currentTimeMillis() - lastTimer) > 10*60*1000)
+		    Thread.sleep(1*60*1000);
+		    if((System.currentTimeMillis() - lastTimer) > 5*60*1000)
 			handler.sendEmptyMessage(1);
 		    Log.e("TimerThread---->", lastTimer+"");
 		} catch (InterruptedException e) {

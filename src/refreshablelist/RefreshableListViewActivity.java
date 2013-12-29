@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baidu.platform.comapi.map.u;
+import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFWriter;
 
 import details.DetailActivity;
@@ -144,21 +145,23 @@ public class RefreshableListViewActivity extends Fragment {
      * @return
      */
     private List<Map<String, String>> getItems() {
-	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+//	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+//	List<Map<String, String>> list = parseDbf2Map.getListMapFromDbf(gpsPath);
+//	System.out.println(list);
 	DataBaseService service = new MyData(getActivity());
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
 	return items;
     }
 
-    // //DBF文件的数据添加
-    // public void addItem() throws Exception {
-    // DBFWriter dbfwriter = new DBFWriter(new File(rwPath));
-    // Object[] obj=new Object[3];
-    // // obj[0]="442899999811111111";
-    // // obj[1]="123";
-    // // obj[2]="广州软件";
-    // dbfwriter.addRecord(obj);
-    // }
+//    // //DBF文件的数据添加
+//     public void addItem() throws Exception {
+//     DBFWriter dbfwriter = new DBFWriter(new File(gpsPath));
+//     Object[] obj=new Object[15];
+//      obj[11]="442899999811111111";
+//      obj[10]="123";
+//      obj[0]="广州软件";
+//     dbfwriter.addRecord(obj);
+//     }
     private void updateCompleteNumber() {
 	DataBaseService service = new MyData(getActivity());
 	String[] seleStrings = new String[] { "已完成" };

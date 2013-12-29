@@ -61,6 +61,9 @@ public class StringConstant {
     public static String DEMAND = "DEMAND";
     public static String CONST = "CONST";
     public static String MD_TYPE = "MD_TYPE";
+    //gps
+    public static String LONGITUDE = "LONGITUDE";
+    public static String LATITUDE = "LATITUDE";
 
     public static String[] RW_ITEM = { WCZT , ZC_ID ,CATEGORIES, BEGIN_DATE, PHONE , CONTACT };
     
@@ -69,6 +72,8 @@ public class StringConstant {
 	    RC_RATIO, MULTIRATE, DEMAND, CONST, MD_TYPE };
 
     public static String[] DNBXYSJ_ITEM = { METER_ID };
+    
+    public static String[] GPS_ITEM = { CONS_NO , LATITUDE , LONGITUDE };
     
     public static String[] MISSION_INFO_ITEM_01 = { CONS_NO , CONS_NAME, ELEC_ADDR,
 	    CONTACT, PHONE, MODEL, VOLT_NAME, RATED, RC_RATIO, MULTIRATE,
