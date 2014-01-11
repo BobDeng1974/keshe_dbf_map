@@ -2,6 +2,7 @@ package details;
 
 import static stringconstant.SpinnerString.*;
 import static stringconstant.StringConstant.*;
+import static bluetooth.BluetoothConstant.*;
 
 import gps.GPSManager;
 import httpclient.LocationHttpClient;
@@ -71,8 +72,10 @@ import android.widget.ViewAnimator;
 import baidumapsdk.demo.NaviDemo;
 import baidumapsdk.demo.R;
 import bluetooth.BluetoothChatService;
+import bluetooth.BluetoothSppClient;
 import bluetooth.CHexConver;
 import bluetooth.DiscoveryDevicesActivity;
+import bluetooth.PecData;
 
 import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
@@ -157,6 +160,9 @@ public class DetailActivity extends Activity {
     private ListView verifyTestTextView;
     private Button verifyReadMachine;
     private Spinner verifyMadeNumberSpinner;
+    private BluetoothSppClient bluetoothSppClient;
+    private Dialog waitReadMachineDialog;
+    private Thread readMachineThread ;
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Array adapter for the conversation thread
@@ -571,25 +577,64 @@ public class DetailActivity extends Activity {
 	verifyReadMachine.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-		// 等待界面且更新testTextview
-//		readMachineWaitDialog(verifyTestTextView);
-//		verifyTestTextView.setText("检验中...");
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
-		    Toast.makeText(DetailActivity.this, "蓝牙不可用..", Toast.LENGTH_LONG).show();
-		}else {
-		if (!mBluetoothAdapter.isEnabled()) {
-	            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-	            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-	            }else {
-//	        	if (mChatService == null) setupChat();
+		    Toast.makeText(getApplicationContext(), "蓝牙不可用..",
+			    Toast.LENGTH_LONG).show();
+		} else {
+		    if (!mBluetoothAdapter.isEnabled()) {
+			Intent enableIntent = new Intent(
+				BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+		    } else {
+			    searchDevice();
 		    }
+		    verifyReadMachine.setEnabled(false);
 		}
 	    }
-
 	});
     }
+    
+    /**
+     * 打开搜索蓝牙设备界面
+     */
+    private void searchDevice() {
+	System.out.println("setupChat---------->");
+//	mConversationArrayAdapter = new ArrayAdapter<String>(this,
+//		R.layout.bluetooth_message_item);
+	// Initialize the buffer for outgoing messages
+	Intent serverIntent = null;
+	serverIntent = new Intent(this, DiscoveryDevicesActivity.class);
+	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+    }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	if (D)
+	    Log.d(TAG, "onActivityResult " + resultCode);
+	switch (requestCode) {
+	case REQUEST_CONNECT_DEVICE_SECURE:
+	    // When DeviceListActivity returns with a device to connect
+	    if (resultCode == Activity.RESULT_OK) {
+		String address = data.getExtras().getString(EXTRA_DEVICE_ADDRESS);
+		//新线程与蓝牙通信
+		bluetoothSppClient = new BluetoothSppClient(DetailActivity.this, address , mreadMachineHandler);
+		//打开等待框
+		readMachineWaitDialog();
+		System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>OK");
+	    } else {
+		System.out
+			.println("REQUEST_CONNECT_DEVICE_SECURE------>CANCLE");
+	    }
+	    break;
+	case REQUEST_ENABLE_BT:
+	    // When the request to enable Bluetooth returns
+	    if (resultCode == Activity.RESULT_OK) 
+		searchDevice();
+	    else 
+		Toast.makeText(this, "无法打开蓝牙", Toast.LENGTH_SHORT).show();
+		// User did not enable Bluetooth or an error occured
+	}
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////                         initSceneVerify           ////////////////////////////////////////////////////////////   
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1209,50 +1254,71 @@ public class DetailActivity extends Activity {
      * 
      * @param testTextView
      */
-    private void readMachineWaitDialog(TextView testTextView) {
+    private void readMachineWaitDialog() {
 	// 创建自定义dialog
-	testTextView.setText("校验成功....数据...");
-	final Dialog dialog = new Dialog(this, R.style.dialog);
+	waitReadMachineDialog = new Dialog(this, R.style.dialog);
 	final View myView = LayoutInflater.from(DetailActivity.this).inflate(
 		R.layout.read_machine_wait_dialog, null);
 	myView.findFocus();
 	// 获取控件
-	dialog.setCancelable(false);
-	dialog.getWindow().setContentView(myView);
-	dialog.show();
+	waitReadMachineDialog.setCancelable(false);
+	waitReadMachineDialog.getWindow().setContentView(myView);
+	waitReadMachineDialog.show();
 	//启动线程，连接失败时中断。
-	Thread thread = new Thread(new Runnable() {
+	readMachineThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
 		try {
-		    Thread.sleep(5000);
-			dialog.dismiss();
-			DetailActivity.this.mhandler.sendEmptyMessage(0);
+		    Thread.sleep(20*1000);
+			waitReadMachineDialog.dismiss();
+			DetailActivity.this.mreadMachineHandler.sendEmptyMessage(0);
 		} catch (InterruptedException e) {
 		    e.printStackTrace();
 		}
 	    }
 	});
-	thread.start();
+	readMachineThread.start();
     }
     /**	处理与仪器校验时的等待工作
      * 
      */
-    Handler mhandler = new Handler() {
+    Handler mreadMachineHandler = new Handler() {
 	@Override
 	public void handleMessage(Message msg) {
 	    // TODO Auto-generated method stub
 	    super.handleMessage(msg);
 	    switch (msg.what) {
 	    case 0:
+		System.out.println("mreadMachineHandler---0");
 		//与机器校验过程中出错时，弹出提示dialog
 		new AlertDialog.Builder(DetailActivity.this).setTitle("Error")
-			.setMessage("校验出错，请检查!").setCancelable(false)
+			.setMessage("校验出错，请关闭蓝牙重试!").setCancelable(false)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int whichButton) {
 				dialog.dismiss();
 			    }
 			}).show();
+		verifyReadMachine.setEnabled(true);
+		break;
+	    case 1:
+		//接收完了
+		System.out.println("mreadMachineHandler---1");
+		verifyReadMachine.setText("读取完成");
+		waitReadMachineDialog.dismiss();
+		readMachineThread.interrupt();
+		PecData pecData = bluetoothSppClient.getPecData();
+		pecData.printer();
+		bluetoothSppClient.close();
+		bluetoothSppClient = null;
+		break;
+	    case 2:
+		//error
+		System.out.println("mreadMachineHandler---2");
+		waitReadMachineDialog.dismiss();
+		readMachineThread.interrupt();
+		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG).show();
+		bluetoothSppClient.close();
+		bluetoothSppClient = null;
 		break;
 	    }
 	}

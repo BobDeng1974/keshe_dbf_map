@@ -30,7 +30,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class GPSService extends Service {
-    private String number = "-1";
+    private String imei = "-1";
     private int geoTableID = -1;
     private long lastTimer = 0;
     private GPSService gpsService = null;
@@ -55,13 +55,12 @@ public class GPSService extends Service {
 	System.out.println("GpsService---------->onCreat");
 	TelephonyManager telephonyManager = (TelephonyManager) this
 		.getSystemService(Context.TELEPHONY_SERVICE);
-	String imei = telephonyManager.getDeviceId();
+	imei = telephonyManager.getDeviceId();
 	System.out.println(imei);
 	paramMap = new HashMap<String, String>();
 	// 创建表传递的参数
-	number = "15527597559";
 	paramMap.put("ak", "DD1580bc446609f4dcfb2d20728b681a");
-	paramMap.put("name", "staff_" + number);
+	paramMap.put("name", "staff_" + imei);
 	requestParams = new RequestParams(paramMap);
 	LocationHttpClient.get("geodata/v2/geotable/list", requestParams,
 		new JsonHttpResponseHandler() {
@@ -77,7 +76,7 @@ public class GPSService extends Service {
 					    .getJSONObject(i);
 				    String name = jsonObject.getString("name");
 					System.out.println("name------->"+name);
-				    if (name.equals("staff_"+number)) {
+				    if (name.equals("staff_"+imei)) {
 					geoTableID = (Integer) jsonObject
 						.get("id");
 					System.out.println("id------->"+geoTableID);
