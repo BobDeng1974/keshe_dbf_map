@@ -10,7 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import refreshablelist.RefreshableListViewActivity;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.util.Log;
 
 public class AnalyseTxtUtil {
     
@@ -19,8 +24,7 @@ public class AnalyseTxtUtil {
 	String line;
 	InputStreamReader inputStreamReader = null;
 	HashMap<String, List<String>> hmOne = new HashMap<String, List<String>>();
-	File file = new File(filePath);
-	if (!file.exists()) {
+	if (!isDirExist(filePath)) {
 	    List<String> defaultList  = new ArrayList<String>();
 	    defaultList.add("/");
 	    hmOne.put("计量柜旧封类型", defaultList);
@@ -62,5 +66,19 @@ public class AnalyseTxtUtil {
 	}
 	return hmOne;
 }
+    
+    
+    private  static  boolean isDirExist(String path) {
+	// 如果不存在的话，则创建存储目录
+	File mediaStorageDir = new File(path);
+	if (!mediaStorageDir.exists()) {
+	    if (!mediaStorageDir.mkdirs()) {
+		Log.d("MyCameraApp", "failed to create directory");
+	    }
+	    return false;
+	} else {
+	    return true;
+	}
+    }
 }
 

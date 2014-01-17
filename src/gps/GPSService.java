@@ -13,6 +13,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import httpclient.LocationHttpClient;
+import android.R.string;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class GPSService extends Service {
+    private String myAK = "3323e0313fc29a0263ba3f50fc28791c";
     private String imei = "-1";
     private int geoTableID = -1;
     private long lastTimer = 0;
@@ -59,7 +61,7 @@ public class GPSService extends Service {
 	System.out.println(imei);
 	paramMap = new HashMap<String, String>();
 	// 创建表传递的参数
-	paramMap.put("ak", "DD1580bc446609f4dcfb2d20728b681a");
+	paramMap.put("ak", myAK);
 	paramMap.put("name", "staff_" + imei);
 	requestParams = new RequestParams(paramMap);
 	LocationHttpClient.get("geodata/v2/geotable/list", requestParams,
@@ -161,7 +163,7 @@ public class GPSService extends Service {
 	    if (geoTableID != -1) {
 		Log.e("httpPostToUpdateMyLocation", "上传");
 		paramMap = new HashMap<String, String>();
-		paramMap.put("ak", "DD1580bc446609f4dcfb2d20728b681a");
+		paramMap.put("ak", myAK);
 		paramMap.put("geotable_id", geoTableID+"");
 		paramMap.put("time", System.currentTimeMillis()+"");
 		paramMap.put("coord_type", 1+"");
@@ -215,7 +217,7 @@ public class GPSService extends Service {
 	public void run() {
 	    while(true) {
 		try {
-		    Thread.sleep(1*60*1000);
+		    Thread.sleep(2*60*1000);
 		    if((System.currentTimeMillis() - lastTimer) > 5*60*1000)
 			handler.sendEmptyMessage(1);
 		    Log.e("TimerThread---->", lastTimer+"");

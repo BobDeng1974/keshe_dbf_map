@@ -1,21 +1,5 @@
 package stringconstant;
 
-import static stringconstant.StringConstant.CONST;
-import static stringconstant.StringConstant.CONS_NAME;
-import static stringconstant.StringConstant.DEMAND;
-import static stringconstant.StringConstant.ELEC_ADDR;
-import static stringconstant.StringConstant.LINE_NAME;
-import static stringconstant.StringConstant.MADE_NO;
-import static stringconstant.StringConstant.MD_TYPE;
-import static stringconstant.StringConstant.METER_ID;
-import static stringconstant.StringConstant.MODEL;
-import static stringconstant.StringConstant.MULTIRATE;
-import static stringconstant.StringConstant.RATED;
-import static stringconstant.StringConstant.RC_RATIO;
-import static stringconstant.StringConstant.SUBSTATION;
-import static stringconstant.StringConstant.SUBS_NAME;
-import static stringconstant.StringConstant.VOLT_NAME;
-import baidumapsdk.demo.R.string;
 import android.os.Environment;
 
 public class StringConstant {
@@ -30,13 +14,15 @@ public class StringConstant {
     
     public static String BZQJ = "bzqj";
 
-    public static String root = Environment.getExternalStorageDirectory() + "/dbf/";
+    public static String root = Environment.getExternalStorageDirectory()
+		.getAbsolutePath() + "/Android/data/uniquestudio.Electric";
+    public static String dbfPath = root + "/dbf/";
     
-    public static String rwPath = root + RW + ".dbf";
-    public static String dnbxxPath = root + DNBXX + ".dbf";
-    public static String gpsPath = root + GPS + ".dbf";
-    public static String dnbxysjPath = root + DNBXYSJ + ".dbf";
-    public static String bzqjPath = root + BZQJ +".dbf";
+    public static String rwPath = dbfPath + RW + ".dbf";
+    public static String dnbxxPath = dbfPath + DNBXX + ".dbf";
+    public static String gpsPath = dbfPath + GPS + ".dbf";
+    public static String dnbxysjPath = dbfPath + DNBXYSJ + ".dbf";
+    public static String bzqjPath = dbfPath + BZQJ +".dbf";
     // rw.dbf
     public static String WCZT = "WCZT";
     public static String ZC_ID = "ZC_ID";

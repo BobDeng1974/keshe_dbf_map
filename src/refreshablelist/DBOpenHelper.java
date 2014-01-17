@@ -48,7 +48,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	String sql_rw = "create table rw(id integer primary key autoincrement"+rw_col_string+")";
 	String sql_dnbxx = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
 	String sql_dnbxysj = "create table dnbxysj(id integer primary key autoincrement"+dnbxysj_col_string+")";
-	String sql_dnbgps = "create table dnbxysj(id integer primary key autoincrement"+dnbgps_col_string+")";
+	String sql_dnbgps = "create table gps(id integer primary key autoincrement"+dnbgps_col_string+")";
 	db.execSQL("drop table if exists " + RW);
 	db.execSQL(sql_rw);
 	db.execSQL("drop table if exists " + DNBXX);
@@ -83,9 +83,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		.getListMapFromDbf(filePath);
 	if (Items.size() <= 1) 
 	    return;
+	List<Map<String, String>> myItems = Items.subList(1, Items.size());//去掉头部
 //	Log.e("creatDBTable--------->Paramitems------>", Items + "");
-	for (int i = 0; i < Items.size(); i++) {
-	    Map<String, String> map = Items.get(i);
+	for (int i = 0; i < myItems.size(); i++) {
+	    Map<String, String> map = myItems.get(i);
 	    for (int y = 0; y < tableItem.length; y++) {
 		if (map.get(tableItem[y]) != null)
 		    params[y] = map.get(tableItem[y]).trim();

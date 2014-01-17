@@ -50,7 +50,7 @@ public class GPSManager {
     private Context mContext;
     private Boolean isFirstIn = true;
     private int minTime = 0;
-    private int minMeters = 100;
+    private int minMeters = 200;
 
     public GPSManager(Context context) {
 	this.mContext = context;

@@ -5,8 +5,6 @@ import static stringconstant.StringConstant.*;
 import static bluetooth.BluetoothConstant.*;
 
 import gps.GPSManager;
-import httpclient.LocationHttpClient;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,23 +14,19 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import refreshablelist.DataBaseService;
+import refreshablelist.MyData;
 import refreshablelist.ParseDbf2Map;
 import spinneredittext.SpinnerEditText;
-import stringconstant.StringConstant;
 import AnalyseTxt.AnalyseTxtUtil;
-import android.R.integer;
-import android.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.location.Address;
-import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -69,18 +63,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
-import baidumapsdk.demo.NaviDemo;
 import baidumapsdk.demo.R;
 import bluetooth.BluetoothChatService;
 import bluetooth.BluetoothSppClient;
-import bluetooth.CHexConver;
 import bluetooth.DiscoveryDevicesActivity;
 import bluetooth.PecData;
 
-import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
-import com.baidu.mapapi.navi.BaiduMapNavigation;
-import com.baidu.mapapi.navi.NaviPara;
-import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -90,7 +78,8 @@ public class DetailActivity extends Activity {
     private static final boolean D = true;
 
     Resources resources;
-    HashMap<String, List<String>> configTxtData ;
+    HashMap<String, List<String>> configTxtData;
+    private String Cons_No = "";//是CONS_NO的detail
     // title
     private TextView title;
     private Button leftBtn;
@@ -162,7 +151,7 @@ public class DetailActivity extends Activity {
     private Spinner verifyMadeNumberSpinner;
     private BluetoothSppClient bluetoothSppClient;
     private Dialog waitReadMachineDialog;
-    private Thread readMachineThread ;
+    private Thread readMachineThread;
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Array adapter for the conversation thread
@@ -173,7 +162,7 @@ public class DetailActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
     private BluetoothChatService mChatService = null;
-    
+
     // result confirm
     private static final int resultConfirmID = 6;
     private TextView confirmDateTime;
@@ -190,7 +179,6 @@ public class DetailActivity extends Activity {
     private static final int newSealID = 7;
     private static final int inputVerifyDataID = 8;
 
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
@@ -217,9 +205,14 @@ public class DetailActivity extends Activity {
 	// seven page
 	initResultConfirm();
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MySpinner	           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MySpinner
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 初始化展开选择EditText ，名字，展开的数据，点击的监听器
+     */
     private void initSpinnerEdittext() {
 	// TODO Auto-generated method stub
 	cabinetSealOne = (SpinnerEditText) findViewById(R.id.st_cabinet_1);
@@ -228,7 +221,7 @@ public class DetailActivity extends Activity {
 	tableSealTwo = (SpinnerEditText) findViewById(R.id.st_table_2);
 	boxSealOne = (SpinnerEditText) findViewById(R.id.st_box_1);
 	boxSealTwo = (SpinnerEditText) findViewById(R.id.st_box_2);
-	cabinetSealOne.init(configTxtData.get("计量柜旧封类型"), "柜封1:",true);
+	cabinetSealOne.init(configTxtData.get("计量柜旧封类型"), "柜封1:", true);
 	cabinetSealTwo.init(configTxtData.get("计量柜旧封类型"), "柜封2:", true);
 	tableSealOne.init(TABLE_SEAL_ARRAY, "表封1:", true);
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
@@ -246,12 +239,15 @@ public class DetailActivity extends Activity {
 	boxSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(boxSealTwo));
     }
 
+    /**
+     * @author luo
+     *封口信息界面 点击可展开选择EditText时的监听器
+     */
     class myOpenSealInfoDialog implements OnFocusChangeListener {
 	private SpinnerEditText spinnerEditText;
 
 	public myOpenSealInfoDialog(SpinnerEditText spinnerEditText) {
 	    this.spinnerEditText = spinnerEditText;
-	    // title
 	}
 
 	@Override
@@ -263,13 +259,16 @@ public class DetailActivity extends Activity {
 			spinnerEditText);
 	}
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MySpinner	           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MissionInfo	           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MySpinner
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MissionInfo
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 初始化任务信息界面
      */
@@ -283,10 +282,13 @@ public class DetailActivity extends Activity {
 	getPositionTextView = (TextView) findViewById(R.id.get_position_text);
 
 	missionInfoListView = (ListView) findViewById(R.id.mission_info_listview);
-	initMissionInfoListener();
 	initMissionInfoListView();
+	initMissionInfoListener();
     }
 
+    /**
+     * 任务信息界面中更改联系人，获取地理位置，启动导航的监听器
+     */
     private void initMissionInfoListener() {
 	// TODO Auto-generated method stub
 	changeContact.setOnClickListener(new OnClickListener() {
@@ -301,15 +303,30 @@ public class DetailActivity extends Activity {
 	    @Override
 	    public void onClick(View v) {
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		    getPositionTextView.setText(gpsManager.getNowPosition());
+		getPositionTextView.setText(gpsManager.getNowPosition());
 	    }
 	});
 	setNavigation.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
-		//检查dbf里有无gps，无的话弹出框输入，有的话直接开启导航
+		// 检查gpsdbf里有无数据，无的话输入起点，有的话输入终点
 		// 开启百度导航
-//		startNavi();
+		//默认天安门坐标
+		String mLat1 = "39.915291"; 
+	   	String mLon1 = "116.403857"; 
+	   	String message = "请手动搜索终点位置..";
+		DataBaseService service = new MyData(getApplicationContext());
+		System.out.println("---------"+Cons_No);
+		List<Map<String, String>> searchMap = service.viewMyData(GPS, CONS_NO,
+			new String[] { Cons_No });
+		if (searchMap.size() != 0) {
+		    mLat1 = searchMap.get(0).get(LATITUDE);
+		    mLon1 = searchMap.get(0).get(LONGITUDE);
+		    message = "点击‘到这去’..";
+		}
+		Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+message);
+		Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
+		startActivity(mIntent);
 	    }
 	});
     }
@@ -325,9 +342,10 @@ public class DetailActivity extends Activity {
 	contactPhone = intent.getStringExtra(PHONE);
 	changeContactPerson.setText(contactPerson);
 	changeContactPhone.setText(contactPhone);
-	StringToMap stringToMap = new StringToMap();
-	Map<String, Object> map = stringToMap.StringToMap(missionInfoString);
-	System.out.println(map);
+	//获取从任务列表传过来的详细任务信息,改为list，用于再listview中显示
+	Map<String, Object> map = StringToMap.StringToMap(missionInfoString);
+	Cons_No = (String) map.get(CONS_NO);
+//	System.out.println(map);
 	List<HashMap<String, Object>> maps = new ArrayList<HashMap<String, Object>>();
 	if (intent.hasExtra(CONTACT)) {
 	    for (int z = 0; z < missionItem1.length; z++) {
@@ -360,13 +378,16 @@ public class DetailActivity extends Activity {
 			R.id.mission_info_values });
 	missionInfoListView.setAdapter(adapter);
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MissionInfo	           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MissionState           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MissionInfo
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MissionState
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initMissionStatus() {
 	missionStatusGroup = (RadioGroup) findViewById(R.id.mission_status_radio_group);
 	missionStatusOne = (RadioButton) findViewById(R.id.mission_status_radio1);
@@ -385,13 +406,16 @@ public class DetailActivity extends Activity {
 		    }
 		});
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init MissionState           //////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init SceneState           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init MissionState
+    // //////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init SceneState
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneState() {
 	clockDeviation = (EditText) findViewById(R.id.clock_mistake_value);
 	clockDeviationConclusion = (SpinnerEditText) findViewById(R.id.clock_mistake_conclusion);
@@ -399,10 +423,12 @@ public class DetailActivity extends Activity {
 	electriClockDateConclusion = (SpinnerEditText) findViewById(R.id.clock_date_conclusion);
 	electriClockEventButton = (Button) findViewById(R.id.clock_event_button);
 	electirClockEvent = (AutoCompleteTextView) findViewById(R.id.clock_event_textview);
-	//创建一个ArrayAdapter  
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,configTxtData.get("常用备注"));  
-        electirClockEvent.setAdapter(adapter);
-	electirClockEvent.setOnFocusChangeListener(new showDropDownListener());  
+	// 创建一个ArrayAdapter
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		android.R.layout.simple_dropdown_item_1line,
+		configTxtData.get("常用备注"));
+	electirClockEvent.setAdapter(adapter);
+	electirClockEvent.setOnFocusChangeListener(new showDropDownListener());
 	clockDeviationConclusion.init(CLOCK_MISTAKE_CONCLUSION,
 		resources.getString(R.string.clock_mistake_conclusion), false);
 	electriClockDateConclusion.init(CLOCK_DATE_CONCLUSION,
@@ -424,22 +450,26 @@ public class DetailActivity extends Activity {
 	    }
 	});
     }
-    class showDropDownListener implements OnFocusChangeListener{
+
+    class showDropDownListener implements OnFocusChangeListener {
 	@Override
 	public void onFocusChange(View v, boolean hasFocus) {
-            AutoCompleteTextView view = (AutoCompleteTextView) v;  
-            if (hasFocus) {  
-                view.showDropDown();  
-            }  
+	    AutoCompleteTextView view = (AutoCompleteTextView) v;
+	    if (hasFocus) {
+		view.showDropDown();
+	    }
 	}
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         init SceneState           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         initElectriClock           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// init SceneState
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initElectriClock
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initElectriClock() { // electriClock
 	positiveTotalPower = (EditText) findViewById(R.id.electri_total_power);
 	positivePeak = (EditText) findViewById(R.id.electri_peak);
@@ -535,45 +565,52 @@ public class DetailActivity extends Activity {
 		    }
 		});
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         initElectriClock           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         initSceneVerify           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initElectriClock
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initSceneVerify
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneVerify() {
 	verifyHumidity = (EditText) findViewById(R.id.verify_humidity);
 	verifyTemperature = (EditText) findViewById(R.id.verify_temperature);
 	verifyTestTextView = (ListView) findViewById(R.id.machine_data_list);
 	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
 	verifyMadeNumberSpinner = (Spinner) findViewById(R.id.verify_made_number);
-	//将可选内容与ArrayAdapter连接起来  
+	// 将可选内容与ArrayAdapter连接起来
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	List<Map<String, String>> listMap = parseDbf2Map.getListMapFromDbf(bzqjPath);
-	final List<String> list= new ArrayList<String>();
+	List<Map<String, String>> listMap = parseDbf2Map
+		.getListMapFromDbf(bzqjPath);
+	final List<String> list = new ArrayList<String>();
 	if (listMap.size() != 0) {
-	        for (int i = 1; i < listMap.size(); i++) {
-	            String string= listMap.get(i).get("MADE_NO");
-	            list.add(string);
-	        }
+	    for (int i = 1; i < listMap.size(); i++) {
+		String string = listMap.get(i).get("MADE_NO");
+		list.add(string);
 	    }
-	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,list);  
-        //设置下拉列表的风格  
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);  
-        //将adapter 添加到spinner中  
-        verifyMadeNumberSpinner.setAdapter(adapter);  
-        //添加事件Spinner事件监听    
-        verifyMadeNumberSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-	    @Override
-	    public void onItemSelected(AdapterView<?> arg0, View view,
-		    int position, long arg3) {
-		((TextView) view).setText(list.get(position));  
-	    }
-	    @Override
-	    public void onNothingSelected(AdapterView<?> arg0) {
-	    }
-	});  
+	}
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		android.R.layout.simple_spinner_item, list);
+	// 设置下拉列表的风格
+	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	// 将adapter 添加到spinner中
+	verifyMadeNumberSpinner.setAdapter(adapter);
+	// 添加事件Spinner事件监听
+	verifyMadeNumberSpinner
+		.setOnItemSelectedListener(new OnItemSelectedListener() {
+		    @Override
+		    public void onItemSelected(AdapterView<?> arg0, View view,
+			    int position, long arg3) {
+			((TextView) view).setText(list.get(position));
+		    }
+
+		    @Override
+		    public void onNothingSelected(AdapterView<?> arg0) {
+		    }
+		});
 	verifyReadMachine.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
@@ -587,21 +624,21 @@ public class DetailActivity extends Activity {
 				BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 		    } else {
-			    searchDevice();
+			searchDevice();
 		    }
 		    verifyReadMachine.setEnabled(false);
 		}
 	    }
 	});
     }
-    
+
     /**
      * 打开搜索蓝牙设备界面
      */
     private void searchDevice() {
 	System.out.println("setupChat---------->");
-//	mConversationArrayAdapter = new ArrayAdapter<String>(this,
-//		R.layout.bluetooth_message_item);
+	// mConversationArrayAdapter = new ArrayAdapter<String>(this,
+	// R.layout.bluetooth_message_item);
 	// Initialize the buffer for outgoing messages
 	Intent serverIntent = null;
 	serverIntent = new Intent(this, DiscoveryDevicesActivity.class);
@@ -615,10 +652,12 @@ public class DetailActivity extends Activity {
 	case REQUEST_CONNECT_DEVICE_SECURE:
 	    // When DeviceListActivity returns with a device to connect
 	    if (resultCode == Activity.RESULT_OK) {
-		String address = data.getExtras().getString(EXTRA_DEVICE_ADDRESS);
-		//新线程与蓝牙通信
-		bluetoothSppClient = new BluetoothSppClient(DetailActivity.this, address , mreadMachineHandler);
-		//打开等待框
+		String address = data.getExtras().getString(
+			EXTRA_DEVICE_ADDRESS);
+		// 新线程与蓝牙通信
+		bluetoothSppClient = new BluetoothSppClient(
+			DetailActivity.this, address, mreadMachineHandler);
+		// 打开等待框
 		readMachineWaitDialog();
 		System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>OK");
 	    } else {
@@ -628,20 +667,23 @@ public class DetailActivity extends Activity {
 	    break;
 	case REQUEST_ENABLE_BT:
 	    // When the request to enable Bluetooth returns
-	    if (resultCode == Activity.RESULT_OK) 
+	    if (resultCode == Activity.RESULT_OK)
 		searchDevice();
-	    else 
+	    else
 		Toast.makeText(this, "无法打开蓝牙", Toast.LENGTH_SHORT).show();
-		// User did not enable Bluetooth or an error occured
+	    // User did not enable Bluetooth or an error occured
 	}
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////                         initSceneVerify           ////////////////////////////////////////////////////////////   
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         initResultConfirm           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initSceneVerify
+    // ////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// initResultConfirm
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initResultConfirm() {
 	confirmDateTime = (TextView) findViewById(R.id.confirm_date_textview);
 	confirmMachineNumber = (TextView) findViewById(R.id.confirm_machine_number);
@@ -654,10 +696,13 @@ public class DetailActivity extends Activity {
 	confirmSceneVerifyConclusion = (SpinnerEditText) findViewById(R.id.confirm_scene_verify_conclusion);
 	confirmAddEventButton = (Button) findViewById(R.id.confirm_add_event);
 	confirmAddEvenTextView = (AutoCompleteTextView) findViewById(R.id.confirm_event_textview);
-	//创建一个ArrayAdapter  
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,configTxtData.get("常用备注"));  
-        confirmAddEvenTextView.setAdapter(adapter);
-        confirmAddEvenTextView.setOnFocusChangeListener(new showDropDownListener());  
+	// 创建一个ArrayAdapter
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		android.R.layout.simple_dropdown_item_1line,
+		configTxtData.get("常用备注"));
+	confirmAddEvenTextView.setAdapter(adapter);
+	confirmAddEvenTextView
+		.setOnFocusChangeListener(new showDropDownListener());
 	// 显示当前日期
 	SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	String currentDate = sDateFormat.format(new java.util.Date());
@@ -684,17 +729,20 @@ public class DetailActivity extends Activity {
 		    confirmAddEvenTextView.setVisibility(View.GONE);
 		} else {
 		    confirmAddEvenTextView.setVisibility(View.VISIBLE);
-		}	    
 		}
+	    }
 	});
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         initResultConfirm           /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         init titlebar          		 /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// initResultConfirm
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// init titlebar
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 初始化titlebar控件
      */
@@ -990,6 +1038,7 @@ public class DetailActivity extends Activity {
 	ChangeTitleText(titleString, resources.getString(R.string.title_back),
 		resources.getString(R.string.title_next), true, false);
     }
+
     private void ChangeTitleText(String titleString, String leftButtonString,
 	    String rightButtonString, Boolean isRight, Boolean isNeedAnimation) {
 	title.setText(titleString);
@@ -1041,13 +1090,16 @@ public class DetailActivity extends Activity {
 	    isAnimating = true;
 	}
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         init titlebar          		 /////////////////////////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         init openDialogMethod          		 /////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// init titlebar
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// init openDialogMethod
+    // /////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 打开datepicker选择日期
      * 
@@ -1264,14 +1316,14 @@ public class DetailActivity extends Activity {
 	waitReadMachineDialog.setCancelable(false);
 	waitReadMachineDialog.getWindow().setContentView(myView);
 	waitReadMachineDialog.show();
-	//启动线程，连接失败时中断。
+	// 启动线程，连接失败时中断。
 	readMachineThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
 		try {
-		    Thread.sleep(20*1000);
-			waitReadMachineDialog.dismiss();
-			DetailActivity.this.mreadMachineHandler.sendEmptyMessage(0);
+		    Thread.sleep(20 * 1000);
+		    waitReadMachineDialog.dismiss();
+		    DetailActivity.this.mreadMachineHandler.sendEmptyMessage(0);
 		} catch (InterruptedException e) {
 		    e.printStackTrace();
 		}
@@ -1279,7 +1331,9 @@ public class DetailActivity extends Activity {
 	});
 	readMachineThread.start();
     }
-    /**	处理与仪器校验时的等待工作
+
+    /**
+     * 处理与仪器校验时的等待工作
      * 
      */
     Handler mreadMachineHandler = new Handler() {
@@ -1290,18 +1344,22 @@ public class DetailActivity extends Activity {
 	    switch (msg.what) {
 	    case 0:
 		System.out.println("mreadMachineHandler---0");
-		//与机器校验过程中出错时，弹出提示dialog
-		new AlertDialog.Builder(DetailActivity.this).setTitle("Error")
-			.setMessage("校验出错，请关闭蓝牙重试!").setCancelable(false)
-			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-			    public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.dismiss();
-			    }
-			}).show();
+		// 与机器校验过程中出错时，弹出提示dialog
+		new AlertDialog.Builder(DetailActivity.this)
+			.setTitle("Error")
+			.setMessage("校验出错，请关闭蓝牙重试!")
+			.setCancelable(false)
+			.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog,
+					    int whichButton) {
+					dialog.dismiss();
+				    }
+				}).show();
 		verifyReadMachine.setEnabled(true);
 		break;
 	    case 1:
-		//接收完了
+		// 接收完了
 		System.out.println("mreadMachineHandler---1");
 		verifyReadMachine.setText("读取完成");
 		waitReadMachineDialog.dismiss();
@@ -1312,78 +1370,49 @@ public class DetailActivity extends Activity {
 		bluetoothSppClient = null;
 		break;
 	    case 2:
-		//error
+		// error
 		System.out.println("mreadMachineHandler---2");
 		waitReadMachineDialog.dismiss();
 		readMachineThread.interrupt();
-		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG).show();
+		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG)
+			.show();
 		bluetoothSppClient.close();
 		bluetoothSppClient = null;
 		break;
 	    }
 	}
     };
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////                         init openDialogMethod          		 /////////////////////////////////////////    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-   public void  startNaviFromAddress(String address) {
-       AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-       asyncHttpClient.get("http://maps.google."
-	       + "com/maps/api/geocode/json?address=" 
-	       + address + "&sensor=false", new JsonHttpResponseHandler() {
-		@Override
-		public void onFailure(Throwable e, JSONObject errorResponse) {
-		    // TODO Auto-generated method stub
-		    super.onFailure(e, errorResponse);
-		    Toast.makeText(getApplicationContext(), "请检查网络..", Toast.LENGTH_LONG).show();
-		}
-		@Override
-		public void onSuccess(int statusCode, JSONObject response) {
-		    // TODO Auto-generated method stub
-		    super.onSuccess(statusCode, response);
-		    GPSManager gpsManager = new GPSManager(getApplicationContext());
-		    startNavi(gpsManager.getGeoPoint(response));
-		}
-		   
-	       });
-   }
-    /**	打开导航
-     * @param startLatitude
-     * @param startLongtitude
-     * @param destLatitude
-     * @param destLongtitude
-     */
-    public void startNavi(GeoPoint deskPoint) {
-	GPSManager gpsManager = new GPSManager(getApplicationContext());
-	Location location = gpsManager.getMyLastKnownLocation();
-	if(location == null ) {
-	    Toast.makeText(getApplicationContext(), "定位失败,请检查网络..", Toast.LENGTH_SHORT).show();
-	    return;
-	}
-	if (deskPoint.getLatitudeE6() == 0 && deskPoint.getLongitudeE6() == 0 ) {
-	    Toast.makeText(getApplicationContext(), "查找不到终点坐标..", Toast.LENGTH_SHORT).show();
-	    return;
-	}
-	int lat = (int) (location.getLatitude() * 1E6);
-	int lon = (int) (location.getLongitude() * 1E6);
-	GeoPoint pt1 = new GeoPoint(lat, lon);
-	// 构建 导航参数
-	NaviPara para = new NaviPara();
-	para.startPoint = pt1;
-	para.startName = "从这里开始";
-	para.endPoint = deskPoint;
-	para.endName = "到这里结束";
-	try {
-	    BaiduMapNavigation.openBaiduMapNavi(para, this);
-	} catch (BaiduMapAppNotSupportNaviException e) {
-	    e.printStackTrace();
-	    Toast.makeText(getApplicationContext(), "您尚未安装百度地图..", Toast.LENGTH_LONG).show();
-	}
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// init openDialogMethod
+    // /////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void reverseFromAddress(String address) {
+	AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+	asyncHttpClient.get("http://maps.google."
+		+ "com/maps/api/geocode/json?address=" + address
+		+ "&sensor=false", new JsonHttpResponseHandler() {
+	    @Override
+	    public void onFailure(Throwable e, JSONObject errorResponse) {
+		// TODO Auto-generated method stub
+		super.onFailure(e, errorResponse);
+		Toast.makeText(getApplicationContext(), "请检查网络..",
+			Toast.LENGTH_LONG).show();
+	    }
+
+	    @Override
+	    public void onSuccess(int statusCode, JSONObject response) {
+		// TODO Auto-generated method stub
+		super.onSuccess(statusCode, response);
+	    }
+
+	});
     }
 
-    /* (non-Javadoc)	拦截返回键
+    /*
+     * (non-Javadoc) 拦截返回键
+     * 
      * @see android.app.Activity#onKeyDown(int, android.view.KeyEvent)
      */
     @Override
@@ -1412,11 +1441,11 @@ public class DetailActivity extends Activity {
 	return super.onKeyDown(keyCode, event);
     }
 
-
     @Override
     protected void onDestroy() {
 	// TODO Auto-generated method stub
 	super.onDestroy();
-	if (mChatService != null) mChatService.stop();
+	if (mChatService != null)
+	    mChatService.stop();
     }
 }

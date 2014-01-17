@@ -100,7 +100,10 @@ public class MyData implements DataBaseService {
 	return flag;
     }
 
-    // 根据Id号来查询，查询的每一行数据返回用 Map 集合来存储
+    /* (non-Javadoc)
+     * @see refreshablelist.DataBaseService#viewMyData(java.lang.String, java.lang.String, java.lang.String[])
+     * 根据指定的表和查询条件返回查询到的数据（多条）
+     */
     @Override
     public List<Map<String, String>> viewMyData(String tableName,
 	    String selectionWhere, String[] selectionArgs) {
@@ -140,8 +143,10 @@ public class MyData implements DataBaseService {
 	return list;
     }
 
-    // 多条记录 用 List<Map<String, String>> 来封装,每一行产生一个 Map集合来装载这一行的数据
-    // 这样就有多个Map值，然后放入List中.
+    /* (non-Javadoc)
+     * @see refreshablelist.DataBaseService#listMyDataMaps(java.lang.String, java.lang.String[])
+     * 获取指定表中的所有条数据
+     */
     @Override
     public List<Map<String, String>> listMyDataMaps(String tableName,
 	    String[] selectionArgs) {

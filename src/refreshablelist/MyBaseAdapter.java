@@ -136,8 +136,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.line_name.setText(searchMap.get(LINE_NAME).trim());
 	    holder.made_number.setText(searchMap.get(MADE_NO).trim());
 	    // 将被点击的任务的详细信息传递到任务信息界面以显示
-	    StringToMap stringToMap = new StringToMap();
-	    String stringMap = stringToMap.MapToString(searchMap);
+	    String stringMap = StringToMap.MapToString(searchMap);
 	    holder.save_map.setText(stringMap);
 
 	    Boolean IsCategoriesOne = getItem(position).get(CATEGORIES).trim()

@@ -9,9 +9,6 @@ public class StringToMap {
     private static final String SEP1 = "#";  
     private static final String SEP2 = "|"; 
     private static final String SEP3 = "="; 
-    public StringToMap() {
-	
-    }
     /** 
      * List转换String 
      *  

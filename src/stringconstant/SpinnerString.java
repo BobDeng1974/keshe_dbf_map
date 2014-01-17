@@ -1,9 +1,10 @@
 package stringconstant;
 
 import android.os.Environment;
+import static stringconstant.StringConstant.*;
 
 public class SpinnerString {
-    public static String configTXTPath = Environment.getExternalStorageDirectory() +"/dbf/config.txt" ;
+    public static String configTXTPath = root +"/config.txt" ;
     //
     public static String[] SCENE_VERIFY_ARRAY = { "/", "不合格", "合格", "功率因数小",
 	    "电压异常", "停电", "无负荷", "负荷小" };

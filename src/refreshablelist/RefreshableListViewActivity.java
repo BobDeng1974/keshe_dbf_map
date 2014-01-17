@@ -44,6 +44,13 @@ public class RefreshableListViewActivity extends Fragment {
     private RefreshableListView mListView;
     private TextView completeNumber;
 
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+	    Intent intent = new Intent(getActivity(), GPSService.class);
+	    getActivity().startService(intent);
+	super.onCreate(savedInstanceState);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	    Bundle savedInstanceState) {
@@ -55,8 +62,8 @@ public class RefreshableListViewActivity extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onViewCreated(view, savedInstanceState);
-	//检查dbf文件夹是否存在。不存在则退出
-	if (isDirExist("dbf", null, false)) {
+	// 检查dbf文件夹是否存在。不存在则退出
+	if (isDirExist(dbfPath)) {
 	    mItems = getItems();
 	    mListView = (RefreshableListView) view.findViewById(R.id.listview);
 	    completeNumber = (TextView) view
@@ -74,11 +81,10 @@ public class RefreshableListViewActivity extends Fragment {
 		}
 	    });
 	    updateCompleteNumber();
-	    Intent intent = new Intent(getActivity(), GPSService.class);
-	    getActivity().startService(intent);
 	}
     }
 
+    
     private class NewDataTask extends
 	    AsyncTask<Void, Void, Map<String, String>> {
 
@@ -145,23 +151,27 @@ public class RefreshableListViewActivity extends Fragment {
      * @return
      */
     private List<Map<String, String>> getItems() {
-//	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-//	List<Map<String, String>> list = parseDbf2Map.getListMapFromDbf(gpsPath);
-//	System.out.println(list);
+	// ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+	// List<Map<String, String>> list =
+	// parseDbf2Map.getListMapFromDbf(gpsPath);
+	// System.out.println(list);
 	DataBaseService service = new MyData(getActivity());
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
 	return items;
     }
 
-//    // //DBF文件的数据添加
-//     public void addItem() throws Exception {
-//     DBFWriter dbfwriter = new DBFWriter(new File(gpsPath));
-//     Object[] obj=new Object[15];
-//      obj[11]="442899999811111111";
-//      obj[10]="123";
-//      obj[0]="广州软件";
-//     dbfwriter.addRecord(obj);
-//     }
+    // // //DBF文件的数据添加
+    // public void addItem() throws Exception {
+    // DBFWriter dbfwriter = new DBFWriter(new File(gpsPath));
+    // Object[] obj=new Object[15];
+    // obj[11]="442899999811111111";
+    // obj[10]="123";
+    // obj[0]="广州软件";
+    // dbfwriter.addRecord(obj);
+    // }
+    /**
+     * 此函数用来更新 已完成数量/总数量
+     */
     private void updateCompleteNumber() {
 	DataBaseService service = new MyData(getActivity());
 	String[] seleStrings = new String[] { "已完成" };
@@ -169,40 +179,34 @@ public class RefreshableListViewActivity extends Fragment {
 		seleStrings);
 	Log.e("updateCompleteNumber----->", searchMap + "");
 	List<Map<String, String>> tableAll = service.listMyDataMaps(RW, null);
-	int length = service.fetchTableLength(RW);
 	// WCZT=未完成 ,
 	completeNumber.setText(String.format("当前已完成 %d 条/共有 %d 条",
 		searchMap.size(), tableAll.size() - 1));
     }
-
-    /*
-     * 判断SD卡中目录或文件是否存在
+    /**判断SD卡中目录或文件是否存在
+     * @param path
+     * @return
      */
-    public boolean isDirExist(String dir, String fileName, Boolean isFile) {
-	System.out.println("isDirExist--------------->");
-	String SDCardRoot = Environment.getExternalStorageDirectory()
-		.getAbsolutePath() + File.separator;
-	File file = null;
-	if (isFile) {
-	    file = new File(SDCardRoot + dir + File.separator + fileName);
-	} else {
-	    file = new File(SDCardRoot + dir + File.separator);
-	}
-	if (!file.exists()) {
-	     new AlertDialog.Builder(getActivity())
-	     .setTitle("警告")
-	     .setMessage("未发现dbf文件,请检查SDCard!")
-	     .setPositiveButton("确定",
-	     new DialogInterface.OnClickListener() {
-	     public void onClick(DialogInterface dialog,
-	     int whichButton) {
-	     getActivity().finish();
-	     }
-	     }).show();
+    public  boolean isDirExist(String path) {
+	// 如果不存在的话，则创建存储目录
+	File mediaStorageDir = new File(path);
+	if (!mediaStorageDir.exists()) {
+	    new AlertDialog.Builder(getActivity())
+		    .setTitle("警告")
+		    .setMessage("未发现dbf文件,请检查SDCard!")
+		    .setPositiveButton("确定",
+			    new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,
+					int whichButton) {
+				    getActivity().finish();
+				}
+			    }).show();
+	    if (!mediaStorageDir.mkdirs()) {
+		Log.d("MyCameraApp", "failed to create directory");
+	    }
 	    return false;
 	} else {
 	    return true;
 	}
-	// file.mkdir(); //如果不存在则创建
     }
 }

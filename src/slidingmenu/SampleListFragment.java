@@ -5,34 +5,50 @@ import java.util.ArrayList;
 import baidumapsdk.demo.R;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class SampleListFragment extends ListFragment {
-
+public class SampleListFragment extends Fragment  implements OnItemClickListener{
+	private ListView mListView;
+	private  FragmentManager mFragmentManager;
+	public SampleListFragment() {
+	    
+	}
+	public SampleListFragment(FragmentManager fragmentManager){
+		mFragmentManager = fragmentManager;
+	}
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	    Bundle savedInstanceState) {
-	return inflater.inflate(R.layout.list, null);
+	
+	View view = inflater.inflate(R.layout.list, null);
+	mListView = (ListView) view.findViewById(R.id.menu_frag_list);
+	ArrayList<String> mItems = new ArrayList<String>();
+	mItems.add("任务列表");
+	mItems.add("DBF文件夹");
+	mItems.add("更改AK值");
+	mItems.add("查看设备号");
+	SampleAdapter adapter = new SampleAdapter(getActivity());
+	for (int i = 0; i < mItems.size(); i++) {
+	    adapter.add(new SampleItem(mItems.get(i),
+		    android.R.drawable.ic_menu_search));
+	    mListView.setAdapter(adapter);
+	}
+	mListView.setOnItemClickListener(this);
+	
+	return view;
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
 	super.onActivityCreated(savedInstanceState);
-
-	ArrayList<String> arrayList = getArguments() != null ? getArguments()
-		.getStringArrayList("title") : null;
-
-	SampleAdapter adapter = new SampleAdapter(getActivity());
-
-	for (int i = 0; i < arrayList.size(); i++) {
-	    adapter.add(new SampleItem(arrayList.get(i),
-		    android.R.drawable.ic_menu_search));
-	    setListAdapter(adapter);
-	}
     }
 
     private class SampleItem {
@@ -66,5 +82,19 @@ public class SampleListFragment extends ListFragment {
 	    return convertView;
 	}
 
+    }
+    
+	private IChangeFragment iChangeFragment;
+	
+	public void setChangeFragmentListener(IChangeFragment listener){
+		iChangeFragment = listener;
+	}
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	if(iChangeFragment != null){
+		iChangeFragment.changeFragment(position);
+	}
+//	myAdapter.setSelectPosition(position);
+//	myAdapter.notifyDataSetChanged();
     }
 }
