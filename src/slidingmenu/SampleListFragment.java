@@ -94,7 +94,5 @@ public class SampleListFragment extends Fragment  implements OnItemClickListener
 	if(iChangeFragment != null){
 		iChangeFragment.changeFragment(position);
 	}
-//	myAdapter.setSelectPosition(position);
-//	myAdapter.notifyDataSetChanged();
     }
 }

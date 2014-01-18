@@ -5,6 +5,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
+                android:background="@drawable/shape"
         android:id="@+id/change_contact"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -46,6 +47,8 @@
     </LinearLayout>
 
     <LinearLayout
+                android:background="@drawable/shape"
+                android:layout_marginTop="3dip"
         android:id="@+id/get_position"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -71,13 +74,17 @@
     </LinearLayout>
 
 <Button 
+            android:background="@drawable/shape"
+                    android:layout_marginTop="3dip"
     android:id="@+id/set_navigation"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/set_navigation"
     />
 
     <ListView
+                        android:layout_marginTop="3dip"
+        android:background="@drawable/shape"
         android:id="@+id/mission_info_listview"
         android:layout_width="fill_parent"
         android:layout_height="match_parent" >

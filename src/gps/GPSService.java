@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import stringconstant.StringConstant;
+
 import baidumapsdk.demo.R.id;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -17,6 +19,7 @@ import android.R.string;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
@@ -31,7 +34,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class GPSService extends Service {
-    private String myAK = "3323e0313fc29a0263ba3f50fc28791c";
+    private String myAK;
     private String imei = "-1";
     private int geoTableID = -1;
     private long lastTimer = 0;
@@ -40,13 +43,23 @@ public class GPSService extends Service {
     private LocationListener locationListener = null;
     private HashMap<String, String> paramMap = null;
     private RequestParams requestParams = null;
-    private Boolean isThreadStart = false;
     
     Handler handler = new Handler() {
 	@Override
 	public void handleMessage(Message msg) {
 	    super.handleMessage(msg);
-	    httpPostToUpdateMyLocation(null);
+	    switch (msg.what) {
+	    case 1:
+		httpPostToUpdateMyLocation(null);
+		break;
+	    case 2:
+		gpsManager.updateProvider();
+		gpsManager.removeLocationListener(locationListener);
+		gpsManager.setRequestLocationUpdates(locationListener);
+		break;
+	    default:
+		break;
+	    }
 	}
     };
 
@@ -55,10 +68,17 @@ public class GPSService extends Service {
 	super.onCreate();
 	this.gpsService = this;
 	System.out.println("GpsService---------->onCreat");
+	locationListener = new myLocationListener();
+	new Thread(new TimerThread()).start();
+	//获取AK值
+	SharedPreferences sharedPreferences = gpsService.getSharedPreferences(StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
+	myAK = sharedPreferences.getString("AK", StringConstant.DEF_AK);
+	//获取手机设备号
 	TelephonyManager telephonyManager = (TelephonyManager) this
 		.getSystemService(Context.TELEPHONY_SERVICE);
 	imei = telephonyManager.getDeviceId();
 	System.out.println(imei);
+	
 	paramMap = new HashMap<String, String>();
 	// 创建表传递的参数
 	paramMap.put("ak", myAK);
@@ -106,7 +126,6 @@ public class GPSService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 	gpsManager = new GPSManager(gpsService);
-	locationListener = new myLocationListener();
 	gpsManager.setRequestLocationUpdates(locationListener);
 	System.out.println("GpsService---------->onStart");
 	return super.onStartCommand(intent, flags, startId);
@@ -134,12 +153,13 @@ public class GPSService extends Service {
 	@Override
 	public void onLocationChanged(Location location) {
 	    System.out.println("GpsService---------->onLocationChanged");
-	    gpsManager.getNewLocation(location);
+	    gpsManager.printNewLocation(location);
 	    httpPostToUpdateMyLocation(location);
 	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
+		handler.sendEmptyMessage(2);
 	    System.out.println("GpsService---------->onProviderDisabled");
 	    Toast.makeText(gpsService, "获GPS失败，请打开网络连接..", Toast.LENGTH_LONG)
 		    .show();
@@ -147,6 +167,8 @@ public class GPSService extends Service {
 
 	@Override
 	public void onProviderEnabled(String arg0) {
+	    gpsManager.updateProvider();
+
 	    System.out.println("GpsService---------->onProviderEnabled");
 	    // gpsManager.removeLocationListener(locationListener);
 	    // gpsManager.setRequestLocationUpdates(locationListener);
@@ -168,12 +190,11 @@ public class GPSService extends Service {
 		paramMap.put("time", System.currentTimeMillis()+"");
 		paramMap.put("coord_type", 1+"");
 		paramMap.put("title", null);
-		if (location != null) {
-		    paramMap.put("longitude", location.getLongitude() + "");
-		    paramMap.put("latitude", location.getLatitude() + "");
-		}else {
+		if (location == null) {
 		    location = gpsManager.getMyLastKnownLocation();
 		}
+		paramMap.put("longitude", location.getLongitude() + "");
+		paramMap.put("latitude", location.getLatitude() + "");
 		requestParams = new RequestParams(paramMap);
 		System.out.println(paramMap);
 		LocationHttpClient.post("geodata/v2/poi/create", requestParams,
@@ -183,25 +204,33 @@ public class GPSService extends Service {
 				    JSONObject errorResponse) {
 				Log.e("json-------------->", "onFailure"
 					+ "-->" + errorResponse);
+				Toast.makeText(gpsService, "坐标上传error..请检查网络.",
+					Toast.LENGTH_SHORT).show();
 				super.onFailure(e, errorResponse);
-				    Toast.makeText(gpsService, "坐标上传error..请检查网络.",
-					    Toast.LENGTH_SHORT).show();
 			    }
 			    @Override
 			    public void onSuccess(int statusCode,
 				    Header[] headers,
 				    org.json.JSONObject response) {
 				if (statusCode == 200) {
-				    Log.e("json-------------->", "onSuccess"
-					    + "-->" + response);
-				    Toast.makeText(gpsService, "成功上传一个坐标..",
-					    Toast.LENGTH_SHORT).show();
+				    Log.e("json-------------->", "onSuccess"+ "-->" + response);
+				    //检查是否返回的是上传成功
+				    if (response.has("message")) {
+					String message = "";
+					try {
+					    message = response.getString("message");
+					} catch (JSONException e) {
+					    e.printStackTrace();
+					}
+					if (message.equals("成功")) {
+					    Toast.makeText(gpsService, "成功上传一个坐标..",
+						    Toast.LENGTH_SHORT).show();
+					}else {
+					    
+					}
+				    }
 				}
 				lastTimer = System.currentTimeMillis();
-				if(!isThreadStart) {
-				    new Thread(new TimerThread()).start();
-				    isThreadStart = true;
-				}
 			    }
 
 			});
@@ -227,5 +256,22 @@ public class GPSService extends Service {
 	    }
 	}
     }
-
+    
+	private final double EARTH_RADIUS = 6378137.0; 
+	/**测量两点间的距离
+	 * @return 米为单位
+	 */
+	private double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
+	       double radLat1 = (lat_a * Math.PI / 180.0);
+	       double radLat2 = (lat_b * Math.PI / 180.0);
+	       double a = radLat1 - radLat2;
+	       double b = (lng_a - lng_b) * Math.PI / 180.0;
+	       double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
+	              + Math.cos(radLat1) * Math.cos(radLat2)
+	              * Math.pow(Math.sin(b / 2), 2)));
+	       s = s * EARTH_RADIUS;
+	       s = Math.round(s * 10000) / 10000;
+	       System.out.println("距离--->"+s);
+	       return s;
+	    }
 }

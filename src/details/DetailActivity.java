@@ -80,6 +80,7 @@ public class DetailActivity extends Activity {
     Resources resources;
     HashMap<String, List<String>> configTxtData;
     private String Cons_No = "";//是CONS_NO的detail
+    private String wiringMode = "";
     // title
     private TextView title;
     private Button leftBtn;
@@ -344,8 +345,11 @@ public class DetailActivity extends Activity {
 	changeContactPhone.setText(contactPhone);
 	//获取从任务列表传过来的详细任务信息,改为list，用于再listview中显示
 	Map<String, Object> map = StringToMap.StringToMap(missionInfoString);
+	//标志此次的详细信息是号码为Cons_No的
 	Cons_No = (String) map.get(CONS_NO);
-//	System.out.println(map);
+	//获取接线方式
+	wiringMode = (String) map.get(WIRING);
+//	System.out.println(wiringMode);
 	List<HashMap<String, Object>> maps = new ArrayList<HashMap<String, Object>>();
 	if (intent.hasExtra(CONTACT)) {
 	    for (int z = 0; z < missionItem1.length; z++) {

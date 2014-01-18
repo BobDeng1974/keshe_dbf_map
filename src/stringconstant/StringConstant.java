@@ -4,6 +4,7 @@ import android.os.Environment;
 
 public class StringConstant {
 
+
     public static String DNBXX = "dnbxx";
 
     public static String RW = "rw";
@@ -13,7 +14,11 @@ public class StringConstant {
     public static String GPS = "gps";
     
     public static String BZQJ = "bzqj";
+    
+    public static String PREFS_NAME = "uniquestudio.mydata";
 
+    public static final String DEF_AK = "3323e0313fc29a0263ba3f50fc28791c";//默认AK
+    
     public static String root = Environment.getExternalStorageDirectory()
 		.getAbsolutePath() + "/Android/data/uniquestudio.Electric";
     public static String dbfPath = root + "/dbf/";
@@ -47,6 +52,7 @@ public class StringConstant {
     public static String DEMAND = "DEMAND";
     public static String CONST = "CONST";
     public static String MD_TYPE = "MD_TYPE";
+    public static String WIRING = "WIRING";
     //gps
     public static String LONGITUDE = "LONGITUDE";
     public static String LATITUDE = "LATITUDE";
@@ -55,7 +61,7 @@ public class StringConstant {
     
     public static String[] DNBXX_ITEM = { METER_ID, CONS_NO , CONS_NAME, SUBS_NAME,
 	    ELEC_ADDR,  LINE_NAME, MADE_NO, MODEL, VOLT_NAME, RATED,
-	    RC_RATIO, MULTIRATE, DEMAND, CONST, MD_TYPE };
+	    RC_RATIO, MULTIRATE, DEMAND, CONST, MD_TYPE ,WIRING};
 
     public static String[] DNBXYSJ_ITEM = { METER_ID };
     
@@ -76,6 +82,14 @@ public class StringConstant {
 	    LINE_NAME, RC_RATIO, MODEL };
     
     public static String[] MISSION_INFO_ITEM_02_CHINESE = { "变电所名称" ,"电压等级", "线路名称","TA变比","型号" };
+    
+    public static String[] WIRING_03 = {"温度：","湿度：","Uan：","Ubn：","Ucn：","Ia：","Ib：","Ic：",
+	"Uan^Ia：","Ubn^Ib：","Ucn^Ic：","A相功率：","B相功率：","C相功率：","功率因素：","二次总有功功率：",
+	"电表误差：","电表误差：","二次总无功功率："};
+    
+    public static String[] WIRING_OTHER = {"温度：","湿度：","Uab：","Uac：","Ucb：","Ia：","Ib：","Ic：","Uab^Ia：",
+	"Uac^Ib：","Ucb^Ic：","A相功率：","B相功率：","C相功率：","功率因素：","二次总有功功率：",
+	"电表误差：","电表误差：","二次总无功功率："};
     // intent
     public static String MISSION_DETAIL = "mission_detail";
     

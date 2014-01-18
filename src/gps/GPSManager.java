@@ -45,7 +45,7 @@ import android.widget.Toast;
 public class GPSManager {
     /** Called when the activity is first created. */
     private LocationManager locationManager;
-    private String provider;
+    private String provider = "";
     private Address address;
     private Context mContext;
     private Boolean isFirstIn = true;
@@ -61,45 +61,19 @@ public class GPSManager {
 	getProvider();
 	// 如果未设置位置源，打开GPS设置界面
 	openGPS();
-	this.locationManager.addGpsStatusListener(new Listener() {
-	    @Override
-	    public void onGpsStatusChanged(int event) {
-		switch (event) {
-		case GpsStatus.GPS_EVENT_STARTED:
-		    System.out.println("GpsStatus-------->GPS_EVENT_STARTED");
-		    provider = LocationManager.GPS_PROVIDER;
-		    break;
-
-		case GpsStatus.GPS_EVENT_STOPPED:
-		    provider = LocationManager.NETWORK_PROVIDER;
-		    System.out.println("GpsStatus-------->GPS_EVENT_STOPPED");
-		    break;
-
-		case GpsStatus.GPS_EVENT_FIRST_FIX:
-		    System.out.println("GpsStatus-------->GPS_EVENT_FIRST_FIX");
-		    break;
-
-		case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-		    break;
-		}
-	    }
-	});
     }
 
+    public  void updateProvider() {
+	this.getProvider();
+    }
+    
     public void setRequestLocationUpdates(LocationListener myLocationListener) {
 	// // 注册监听器locationListener，第2、3个参数可以控制接收gps消息的频度以节省电力。第2个参数为毫秒，
 	// // 表示调用listener的周期，第3个参数为米,表示位置移动指定距离后就调用listener
-	if (isGPSEnabled()) {
-	    System.out
-		    .println("setRequestLocationUpdates------------------->GPS");
+	if (!this.provider.equals("")) {
+	    System.out.println("setRequestLocationUpdates------------------->"+this.provider);
 	    this.locationManager.requestLocationUpdates(
-		    LocationManager.GPS_PROVIDER, minTime, minMeters, myLocationListener);
-	} else if (isNetworkEnabled()) {
-	    System.out
-		    .println("setRequestLocationUpdates------------------->Network");
-	    this.locationManager.requestLocationUpdates(
-		    LocationManager.NETWORK_PROVIDER, minTime, minMeters,
-		    myLocationListener);
+		    this.provider, minTime, minMeters, myLocationListener);
 	} else {
 	    Log.e("GPSManager", "noProviderIsEnable");
 	}
@@ -124,10 +98,16 @@ public class GPSManager {
     }
 
     public Location getMyLastKnownLocation() {
-	if (this.locationManager != null && this.provider != null)
-	    return locationManager.getLastKnownLocation(this.provider);
-	else
-	    return null;
+	Location lastKnownLocation = null;
+	if (this.locationManager != null && this.provider != null) {
+	    lastKnownLocation = locationManager.getLastKnownLocation(this.provider);
+	    System.out.println(provider);
+	}
+	if (lastKnownLocation == null) {
+            lastKnownLocation =locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            System.out.println(2);
+	}
+	return lastKnownLocation;
     }
 
     // 判断是否开启GPS，若未开启，打开GPS设置界面
@@ -136,34 +116,29 @@ public class GPSManager {
 	    Toast.makeText(mContext, "获取GPS中..", Toast.LENGTH_SHORT).show();
 	    return;
 	}
-	Toast.makeText(mContext, "位置源未设置,请开启网络！", Toast.LENGTH_SHORT).show();
 	if(isFirstIn) {
-	    CheckNetwork();
 	    isFirstIn = false;
+	    CheckNetwork();
 	}
     }
 
     // 获取Location Provider
     public void getProvider() {
-	// 构建位置查询条件
-	Criteria criteria = new Criteria();
-	// 查询精度：高
-	criteria.setAccuracy(Criteria.ACCURACY_FINE);
-	// 是否查询海拨：否
-	criteria.setAltitudeRequired(false);
-	// 是否查询方位角:否
-	criteria.setBearingRequired(false);
-	// 是否允许付费：是
-	criteria.setCostAllowed(true);
-	// 电量要求：低
-	criteria.setPowerRequirement(Criteria.POWER_LOW);
-	// 返回最合适的符合条件的provider，第2个参数为true说明,如果只有一个provider是有效的,则返回当前provider
-	this.provider = locationManager.getBestProvider(criteria, true);
+	// 如果只是Use GPS satellites勾选，即指允许使用GPS定位
+        if (isGPSEnabled() && !isNetworkEnabled())                 
+            this.provider = LocationManager.GPS_PROVIDER;
+       // 如果只是Use wireless networks勾选，即只允许使用网络定位。
+        else if(!isGPSEnabled() && isNetworkEnabled())
+            this.provider = LocationManager.NETWORK_PROVIDER;
+        // 如果二者都勾选，优先使用GPS,因为GPS定位更精确。
+       else if (isGPSEnabled() && isNetworkEnabled())
+	   this.provider = LocationManager.GPS_PROVIDER;
+        
 	System.out.println("provider--------------->" + this.provider);
     }
 
     // Gps监听器调用，处理位置信息
-    public void getNewLocation(Location location) {
+    public void printNewLocation(Location location) {
 	String latLongString;
 	if (location != null) {
 	    double lat = location.getLatitude();
@@ -332,3 +307,27 @@ public class GPSManager {
 	return flag;
     }
 }
+
+//this.locationManager.addGpsStatusListener(new Listener() {
+//@Override
+//public void onGpsStatusChanged(int event) {
+//	switch (event) {
+//	case GpsStatus.GPS_EVENT_STARTED:
+//	    System.out.println("GpsStatus-------->GPS_EVENT_STARTED");
+//	    provider = LocationManager.GPS_PROVIDER;
+//	    break;
+//
+//	case GpsStatus.GPS_EVENT_STOPPED:
+//	    provider = LocationManager.NETWORK_PROVIDER;
+//	    System.out.println("GpsStatus-------->GPS_EVENT_STOPPED");
+//	    break;
+//
+//	case GpsStatus.GPS_EVENT_FIRST_FIX:
+//	    System.out.println("GpsStatus-------->GPS_EVENT_FIRST_FIX");
+//	    break;
+//
+//	case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+//	    break;
+//	}
+//}
+//});

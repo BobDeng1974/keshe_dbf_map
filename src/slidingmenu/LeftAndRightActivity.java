@@ -1,8 +1,12 @@
 package slidingmenu;
 
+import gps.GPSService;
+
 import java.util.ArrayList;
 
 import refreshablelist.RefreshableListViewActivity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -12,15 +16,21 @@ import com.slidingmenu.lib.SlidingMenu;
 
 
 public class LeftAndRightActivity extends BaseActivity implements IChangeFragment{
-
   protected	RefreshableListViewActivity mFrag;
+  private ChangeAKFragment changeAKFragment;
+  private GetDBFDirFragment getDBFDirFragment;
+  private GetIMEIFragment getIMEIFragment;
 	public LeftAndRightActivity() {
-		super(R.string.left_and_right);
+	    super(R.string.left_and_right);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//启动后台监控GPS坐标
+//		Intent intent = new Intent(getApplicationContext(), GPSService.class);
+//		getApplicationContext().startService(intent);
+		    
 		getSlidingMenu().setMode(SlidingMenu.LEFT);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		
@@ -36,49 +46,45 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 		
 		//此处设置中间content内容部分
 		mFrag = new RefreshableListViewActivity();
+		changeAKFragment = new ChangeAKFragment();
+		getDBFDirFragment = new GetDBFDirFragment();
+		getIMEIFragment = new GetIMEIFragment();
 		setContentView(R.layout.content_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame,mFrag)
-		.commit();
-		
-//		SampleListFragment sf = new SampleListFragment();
-//		ArrayList<String> mItems = new ArrayList<String>();
-//		mItems.add("Personal Data");
-//		Bundle args = new Bundle();
-//		args.putStringArrayList("title", mItems);
-//		sf.setArguments(args);
-//		//此处设置右侧菜单
-//		getSlidingMenu().setSecondaryMenu(R.layout.menu_frame_two);
-//		getSlidingMenu().setSecondaryShadowDrawable(R.drawable.shadowright);
-//		getSupportFragmentManager()
-//		.beginTransaction()
-//		.replace(R.id.menu_frame_two, sf)
-//		.commit();
+		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.add(R.id.content_frame,mFrag);
+		fragmentTransaction.add(R.id.content_frame,changeAKFragment);
+		fragmentTransaction.add(R.id.content_frame,getDBFDirFragment);
+		fragmentTransaction.add(R.id.content_frame,getIMEIFragment);
+		fragmentTransaction.hide(changeAKFragment);
+		fragmentTransaction.hide(getDBFDirFragment);
+		fragmentTransaction.hide(getIMEIFragment);
+		fragmentTransaction.commit();
 	}
 	public void changeFragment(int position) {
 		FragmentTransaction t = this.getSupportFragmentManager()
 				.beginTransaction();
-		Fragment fragment = null;
+		t.hide(changeAKFragment).hide(getDBFDirFragment).hide(getIMEIFragment).hide(mFrag);
 		switch(position){
 		case 0:
-			fragment = new RefreshableListViewActivity();
+		    t.show(mFrag);
 			break;
 		case 1:
-			fragment  = new ChangeAKFragment();
+		    //DBF
+		    t.show(getDBFDirFragment);
 			break;
 		case 2:
-//			fragment  = new TiesFragment();
+		    //AK
+		    t.show(changeAKFragment);
 			break;
 		case 3:
-//			fragment  = new PicsFragment();
+		    //iMEID
+		    t.show(getIMEIFragment);
 			break;
 			default:
 				break;
-			
 		}
-		t.replace(R.id.content_frame, fragment);
 		t.commit();
 		getSlidingMenu().showContent();
 	}
+
 }

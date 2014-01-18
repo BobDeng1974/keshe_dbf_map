@@ -13,8 +13,6 @@ public class BaseActivity extends SlidingFragmentActivity {
 
     private int mTitleRes;
 
-    protected SampleListFragment mFrag;
-
     public BaseActivity(int titleRes) {
 	mTitleRes = titleRes;
     }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:padding="20dip"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:textSize="20sp"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="DBF文件目录:" />
+
+        <TextView
+            android:background="@drawable/shape"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_marginTop="5dip"
+            android:id="@+id/mydbfdir"
+            android:layout_width="fill_parent"
+            android:text="/Android/data/uniquestudio.eletric/"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

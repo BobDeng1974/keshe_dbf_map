@@ -46,12 +46,6 @@ public class RefreshableListViewActivity extends Fragment {
 
     
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-	    Intent intent = new Intent(getActivity(), GPSService.class);
-	    getActivity().startService(intent);
-	super.onCreate(savedInstanceState);
-    }
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	    Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
