@@ -5,6 +5,14 @@ import static stringconstant.StringConstant.*;
 
 public class SpinnerString {
     public static String configTXTPath = root +"/config.txt" ;
+    
+    public static String OldBox = "端子盒旧封类型";
+     
+    public static String OldCabinet = "计量柜旧封类型";
+    
+    public static String NewCabinet = "计量柜新封类型";
+    
+    public static String NewBox = "端子盒新封类型";
     //
     public static String[] SCENE_VERIFY_ARRAY = { "/", "不合格", "合格", "功率因数小",
 	    "电压异常", "停电", "无负荷", "负荷小" };

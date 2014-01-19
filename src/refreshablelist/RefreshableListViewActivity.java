@@ -145,12 +145,14 @@ public class RefreshableListViewActivity extends Fragment {
      * @return
      */
     private List<Map<String, String>> getItems() {
-	// ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	// List<Map<String, String>> list =
-	// parseDbf2Map.getListMapFromDbf(gpsPath);
-	// System.out.println(list);
+//	 ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+//	 List<Map<String, String>> list =
+//	 parseDbf2Map.getListMapFromDbf(gpsPath);
+//	 System.out.println(list);
 	DataBaseService service = new MyData(getActivity());
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
+	
+//	gps2m(30.510428, 114.426294, 30.507962, 114.42796);
 	return items;
     }
 
@@ -185,6 +187,9 @@ public class RefreshableListViewActivity extends Fragment {
 	// 如果不存在的话，则创建存储目录
 	File mediaStorageDir = new File(path);
 	if (!mediaStorageDir.exists()) {
+	    if (!mediaStorageDir.mkdirs()) {
+		Log.d("MyCameraApp", "failed to create directory");
+	    }
 	    new AlertDialog.Builder(getActivity())
 		    .setTitle("警告")
 		    .setMessage("未发现dbf文件,请检查SDCard!")
@@ -195,12 +200,27 @@ public class RefreshableListViewActivity extends Fragment {
 				    getActivity().finish();
 				}
 			    }).show();
-	    if (!mediaStorageDir.mkdirs()) {
-		Log.d("MyCameraApp", "failed to create directory");
-	    }
 	    return false;
 	} else {
 	    return true;
 	}
     }
+    
+	private final double EARTH_RADIUS = 6378137.0; 
+	/**测量两点间的距离
+	 * @return 米为单位
+	 */
+	private double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
+	       double radLat1 = (lat_a * Math.PI / 180.0);
+	       double radLat2 = (lat_b * Math.PI / 180.0);
+	       double a = radLat1 - radLat2;
+	       double b = (lng_a - lng_b) * Math.PI / 180.0;
+	       double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
+	              + Math.cos(radLat1) * Math.cos(radLat2)
+	              * Math.pow(Math.sin(b / 2), 2)));
+	       s = s * EARTH_RADIUS;
+	       s = Math.round(s * 10000) / 10000;
+	       System.out.println("距离--->"+s);
+	       return s;
+	    }
 }

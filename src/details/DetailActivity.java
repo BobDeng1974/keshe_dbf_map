@@ -23,8 +23,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -78,6 +80,7 @@ public class DetailActivity extends Activity {
     private static final boolean D = true;
 
     Resources resources;
+    HashMap<String, Object> missionData;//存放此次所有输入的数据
     HashMap<String, List<String>> configTxtData;
     private String Cons_No = "";//是CONS_NO的detail
     private String wiringMode = "";
@@ -157,13 +160,40 @@ public class DetailActivity extends Activity {
     private String mConnectedDeviceName = null;
     // Array adapter for the conversation thread
     private ArrayAdapter<String> mConversationArrayAdapter;
-    // String buffer for outgoing messages
-    private StringBuffer mOutStringBuffer;
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
     private BluetoothChatService mChatService = null;
 
+    private static final int inputVerifyDataID = 8;
+    //手动inputData
+    private TextView UanTextView;
+    private TextView UbnTextView;
+    private TextView UcnTextView;
+    private TextView UanIaTextView;//Uan^Ia
+    private TextView UbnIbTextView;
+    private TextView UcnIcTextView;
+    
+    private EditText TemperatureEditText;
+    private EditText HumidityEditText;
+    private EditText UanEditText;
+    private EditText UbnEditText;
+    private EditText UcnEditText;
+    private EditText IaEditText;
+    private EditText IbEditText;
+    private EditText IcEditText;
+    private EditText UanIaEditText;//Uan^Ia
+    private EditText UbnIbEditText;
+    private EditText UcnIcEditText;
+    private EditText paEditText;//A相功率
+    private EditText pbEditText;
+    private EditText pcEditText;
+    private EditText powerRateEditText;//功率因素
+    private EditText secondActivePowerEditText;//二次总有功功率
+    private EditText errOneEditText;//电表误差
+    private EditText errTwoEditText;
+    private EditText secondPositivePowerEditText;//二次总无功功率
+    
     // result confirm
     private static final int resultConfirmID = 6;
     private TextView confirmDateTime;
@@ -178,7 +208,12 @@ public class DetailActivity extends Activity {
     private Button confirmAddEventButton;
     private AutoCompleteTextView confirmAddEvenTextView;
     private static final int newSealID = 7;
-    private static final int inputVerifyDataID = 8;
+    private SpinnerEditText newCabinetSealOne;
+    private SpinnerEditText newCabinetSealTwo;
+    private SpinnerEditText newTableSealOne;
+    private SpinnerEditText newTableSealTwo;
+    private SpinnerEditText newBoxSealOne;
+    private SpinnerEditText newBoxSealTwo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -188,13 +223,16 @@ public class DetailActivity extends Activity {
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
 	resources = getResources();
+	missionData = new HashMap<String, Object>();
+	//解析TXT配置文件获得的数据
 	configTxtData = AnalyseTxtUtil.getDataFromConfigTXT(configTXTPath);
+	
 	// first page
 	initViewAnimatior();
 	initTitleListener();
 	initMissionInfo();
 	// second page
-	initSpinnerEdittext();
+	initOldSeal();
 	// third page
 	initMissionStatus();
 	// four page
@@ -203,18 +241,21 @@ public class DetailActivity extends Activity {
 	initElectriClock();
 	// six page
 	initSceneVerify();
+	initIputVerifyData();
 	// seven page
 	initResultConfirm();
+	// eight page
+	initNewSeal();
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ///////////////////////////////////// init MySpinner
+    // ///////////////////////////////////// init initOldSeal
     // //////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 初始化展开选择EditText ，名字，展开的数据，点击的监听器
      */
-    private void initSpinnerEdittext() {
+    private void initOldSeal() {
 	// TODO Auto-generated method stub
 	cabinetSealOne = (SpinnerEditText) findViewById(R.id.st_cabinet_1);
 	cabinetSealTwo = (SpinnerEditText) findViewById(R.id.st_cabinet_2);
@@ -222,12 +263,12 @@ public class DetailActivity extends Activity {
 	tableSealTwo = (SpinnerEditText) findViewById(R.id.st_table_2);
 	boxSealOne = (SpinnerEditText) findViewById(R.id.st_box_1);
 	boxSealTwo = (SpinnerEditText) findViewById(R.id.st_box_2);
-	cabinetSealOne.init(configTxtData.get("计量柜旧封类型"), "柜封1:", true);
-	cabinetSealTwo.init(configTxtData.get("计量柜旧封类型"), "柜封2:", true);
+	cabinetSealOne.init(configTxtData.get(OldCabinet), "柜封1:", true);
+	cabinetSealTwo.init(configTxtData.get(OldCabinet), "柜封2:", true);
 	tableSealOne.init(TABLE_SEAL_ARRAY, "表封1:", true);
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
-	boxSealOne.init(configTxtData.get("端子盒旧封类型"), "盒封1:", true);
-	boxSealTwo.init(configTxtData.get("端子盒旧封类型"), "盒封2:", true);
+	boxSealOne.init(configTxtData.get(OldBox), "盒封1:", true);
+	boxSealTwo.init(configTxtData.get(OldBox), "盒封2:", true);
 	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
 		cabinetSealOne));
 	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
@@ -262,7 +303,7 @@ public class DetailActivity extends Activity {
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ///////////////////////////////////// init MySpinner
+    // ///////////////////////////////////// initOldSeal
     // //////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -325,7 +366,7 @@ public class DetailActivity extends Activity {
 		    mLon1 = searchMap.get(0).get(LONGITUDE);
 		    message = "点击‘到这去’..";
 		}
-		Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+message);
+		Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+"?q="+message);
 		Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
 		startActivity(mIntent);
 	    }
@@ -583,6 +624,9 @@ public class DetailActivity extends Activity {
 	verifyHumidity = (EditText) findViewById(R.id.verify_humidity);
 	verifyTemperature = (EditText) findViewById(R.id.verify_temperature);
 	verifyTestTextView = (ListView) findViewById(R.id.machine_data_list);
+        mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.bluetooth_message_item);
+        verifyTestTextView.setAdapter(mConversationArrayAdapter);
+        
 	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
 	verifyMadeNumberSpinner = (Spinner) findViewById(R.id.verify_made_number);
 	// 将可选内容与ArrayAdapter连接起来
@@ -627,7 +671,7 @@ public class DetailActivity extends Activity {
 			Intent enableIntent = new Intent(
 				BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-		    } else {
+		    } else if(bluetoothSppClient == null){
 			searchDevice();
 		    }
 		    verifyReadMachine.setEnabled(false);
@@ -678,12 +722,110 @@ public class DetailActivity extends Activity {
 	    // User did not enable Bluetooth or an error occured
 	}
     }
+    /**
+     * 处理与仪器校验时的等待工作
+     * 
+     */
+    Handler mreadMachineHandler = new Handler() {
+	@Override
+	public void handleMessage(Message msg) {
+	    // TODO Auto-generated method stub
+	    super.handleMessage(msg);
+	    switch (msg.what) {
+	    case 0:
+		System.out.println("mreadMachineHandler---0");
+		// 与机器校验过程中出错时，弹出提示dialog
+		new AlertDialog.Builder(DetailActivity.this)
+			.setTitle("Error")
+			.setMessage("校验出错，请关闭蓝牙重试!")
+			.setCancelable(false)
+			.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog,
+					    int whichButton) {
+					dialog.dismiss();
+				    }
+				}).show();
+		break;
+	    case 1:
+		// 接收完了
+		System.out.println("mreadMachineHandler---1");
+		verifyReadMachine.setText("读取完成");
+		waitReadMachineDialog.dismiss();
+		readMachineThread.interrupt();
+		PecData pecData = bluetoothSppClient.getPecData();
+		HashMap<String , Object> hashMap = pecData.toList();
+		for(int i =0;i<hashMap.size();i++) {
+		    String key = PecDataItem[i];
+		    mConversationArrayAdapter.add(key + ":" + hashMap.get(key));
+		}
+		break;
+	    case 2:
+		// error
+		System.out.println("mreadMachineHandler---2");
+		waitReadMachineDialog.dismiss();
+		readMachineThread.interrupt();
+		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG)
+			.show();
+		break;
+	    }
+	    bluetoothSppClient.close();
+	    bluetoothSppClient = null;
+	    verifyReadMachine.setEnabled(true);
+	}
+    };
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ///////////////////////////////////// initSceneVerify
     // ////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initIputVerifyData
+    // ////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+    private void initIputVerifyData() {
+	UanTextView = (TextView) findViewById(R.id.Uan);
+	UbnTextView = (TextView) findViewById(R.id.Ubn);
+	UcnTextView = (TextView) findViewById(R.id.Ucn);
+	UanIaTextView = (TextView) findViewById(R.id.Uan_Ia);
+	UbnIbTextView = (TextView) findViewById(R.id.Ubn_Ib);
+	UcnIcTextView = (TextView) findViewById(R.id.Ucn_Ic);
+	if (!wiringMode.equals("03")) {
+	    UanTextView.setText("Uab:");
+	    UbnTextView.setText("Uac:");
+	    UcnTextView.setText("Ucb:");
+	    UanIaTextView.setText("Uab^Ia:");
+	    UbnIbTextView.setText("Uac^Ib");
+	    UcnIcTextView.setText("Ucb^Ic");
+	}
+	TemperatureEditText = (EditText) findViewById(R.id.wendu_et);
+	HumidityEditText = (EditText) findViewById(R.id.shidu_et);
+	UanEditText = (EditText ) findViewById(R.id.Uan_et);
+	UbnEditText = (EditText) findViewById(R.id.Ubn_et);
+	UcnEditText = (EditText) findViewById(R.id.Ucn_et);
+	IaEditText = (EditText) findViewById(R.id.Ia_et);
+	IbEditText = (EditText) findViewById(R.id.Ib_et);
+	IcEditText = (EditText) findViewById(R.id.Ic_et);
+	UanIaEditText = (EditText) findViewById(R.id.Uan_Ia_et);
+	UbnIbEditText = (EditText) findViewById(R.id.Ubn_Ib_et);
+	UcnIcEditText = (EditText) findViewById( R.id.Ucn_Ic_et);
+	paEditText = (EditText) findViewById(R.id.a_phase_et);
+	pbEditText = (EditText) findViewById(R.id.b_phase_et);
+	pcEditText = (EditText) findViewById(R.id.c_phase_et);
+	powerRateEditText = (EditText) findViewById(R.id.power_rate_et);
+	secondActivePowerEditText = (EditText) findViewById(R.id.second_active_power_et);
+	secondPositivePowerEditText = (EditText) findViewById(R.id.second_positive_power_et);
+	errOneEditText = (EditText) findViewById(R.id.dianbiao_deviation_et1);
+	errTwoEditText = (EditText) findViewById(R.id.dianbiao_deviation_et2);
+    }
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////// initIputVerifyData
+    // ////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////// initResultConfirm
     // /////////////////////////////////////////////////////////////
@@ -743,6 +885,35 @@ public class DetailActivity extends Activity {
     // /////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// initNewSeal
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void initNewSeal() {
+	newCabinetSealOne = (SpinnerEditText) findViewById(R.id.new_st_cabinet_1);
+	newCabinetSealTwo = (SpinnerEditText) findViewById(R.id.new_st_cabinet_2);
+	newTableSealOne = (SpinnerEditText) findViewById(R.id.new_st_table_1);
+	newTableSealTwo = (SpinnerEditText) findViewById(R.id.new_st_table_2);
+	newBoxSealOne = (SpinnerEditText) findViewById(R.id.new_st_box_1);
+	newBoxSealTwo = (SpinnerEditText) findViewById(R.id.new_st_box_2);
+	newCabinetSealOne.init(configTxtData.get(NewCabinet), "柜封1:", true);
+	newCabinetSealTwo.init(configTxtData.get(NewCabinet), "柜封2:", true);
+	newTableSealOne.init(TABLE_SEAL_ARRAY, "表封1:", true);
+	newTableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
+	newBoxSealOne.init(configTxtData.get(NewBox), "盒封1:", true);
+	newBoxSealTwo.init(configTxtData.get(NewBox), "盒封2:", true);
+	newTableSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
+		newTableSealOne));
+	newTableSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
+		newTableSealTwo));
+    }
+    
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////// initNewSeal
+    // /////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////// init titlebar
     // /////////////////////////////////////////////////////////////
@@ -1312,7 +1483,7 @@ public class DetailActivity extends Activity {
      */
     private void readMachineWaitDialog() {
 	// 创建自定义dialog
-	waitReadMachineDialog = new Dialog(this, R.style.dialog);
+	waitReadMachineDialog = new Dialog(this, R.style.transparentDialog);
 	final View myView = LayoutInflater.from(DetailActivity.this).inflate(
 		R.layout.read_machine_wait_dialog, null);
 	myView.findFocus();
@@ -1336,56 +1507,6 @@ public class DetailActivity extends Activity {
 	readMachineThread.start();
     }
 
-    /**
-     * 处理与仪器校验时的等待工作
-     * 
-     */
-    Handler mreadMachineHandler = new Handler() {
-	@Override
-	public void handleMessage(Message msg) {
-	    // TODO Auto-generated method stub
-	    super.handleMessage(msg);
-	    switch (msg.what) {
-	    case 0:
-		System.out.println("mreadMachineHandler---0");
-		// 与机器校验过程中出错时，弹出提示dialog
-		new AlertDialog.Builder(DetailActivity.this)
-			.setTitle("Error")
-			.setMessage("校验出错，请关闭蓝牙重试!")
-			.setCancelable(false)
-			.setPositiveButton("确定",
-				new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog,
-					    int whichButton) {
-					dialog.dismiss();
-				    }
-				}).show();
-		verifyReadMachine.setEnabled(true);
-		break;
-	    case 1:
-		// 接收完了
-		System.out.println("mreadMachineHandler---1");
-		verifyReadMachine.setText("读取完成");
-		waitReadMachineDialog.dismiss();
-		readMachineThread.interrupt();
-		PecData pecData = bluetoothSppClient.getPecData();
-		pecData.printer();
-		bluetoothSppClient.close();
-		bluetoothSppClient = null;
-		break;
-	    case 2:
-		// error
-		System.out.println("mreadMachineHandler---2");
-		waitReadMachineDialog.dismiss();
-		readMachineThread.interrupt();
-		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG)
-			.show();
-		bluetoothSppClient.close();
-		bluetoothSppClient = null;
-		break;
-	    }
-	}
-    };
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////// init openDialogMethod

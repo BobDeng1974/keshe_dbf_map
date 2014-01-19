@@ -26,38 +26,16 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 	System.out.println("onCreate创建表");  
-	// TODO Auto-generated method stub
-	//获取rw的列名
-	String rw_col_string = "";
-	for (int i = 0; i < RW_ITEM.length; i++) {
-	    rw_col_string = rw_col_string + ","+RW_ITEM[i] + " TEXT";
-	}
-	//获取dnbxx的列名
-	String dnbxx_col_string = "";
-	for (int i = 0; i < DNBXX_ITEM.length; i++) {
-	    dnbxx_col_string = dnbxx_col_string + ","+DNBXX_ITEM[i] + " TEXT";
-	}
-	//获取dnbxysj的列名
-	String dnbxysj_col_string = ",METER_ID char(16)";
-	//获取gps的列名
-	String dnbgps_col_string = ",CONS_NO char(16),LATITUDE char(16),LONGITUDE char(16)";
 
-//	System.out.println(myString);
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
 	// 数据库这边有一个特点，就是SQLite数据库中文本类型没有过多的约束，也就是可以把布尔类型的数据存储到文本类型中，这样也是可以的
-	String sql_rw = "create table rw(id integer primary key autoincrement"+rw_col_string+")";
-	String sql_dnbxx = "create table dnbxx(id integer primary key autoincrement"+dnbxx_col_string+")";
-	String sql_dnbxysj = "create table dnbxysj(id integer primary key autoincrement"+dnbxysj_col_string+")";
-	String sql_dnbgps = "create table gps(id integer primary key autoincrement"+dnbgps_col_string+")";
-	db.execSQL("drop table if exists " + RW);
-	db.execSQL(sql_rw);
-	db.execSQL("drop table if exists " + DNBXX);
-	db.execSQL(sql_dnbxx); 
-	db.execSQL("drop table if exists " + DNBXYSJ);
-	db.execSQL(sql_dnbxysj);
-	db.execSQL("drop table if exists " + GPS);
-	db.execSQL(sql_dnbgps);
-	creatTable(db);
+	CreatTableSQL(RW_ITEM, RW,rwPath,db);
+	CreatTableSQL(DNBXX_ITEM, DNBXX,dnbxxPath,db);
+	CreatTableSQL(DNBXYSJ_ITEM, DNBXYSJ,dnbxysjPath,db);
+	CreatTableSQL(DNBXCSSXX_ITEM, DNBXCSSXX, dnbxcssxxPath,db);
+	CreatTableSQL(DNBDGLXX_ITEM, DNBDGLXX, dnbdglxxPath,db);
+	CreatTableSQL(JLFYZCXX_ITEM, JLFYZCXX,jlfyzcxxPath, db);
+	CreatTableSQL(GPS_ITEM, GPS,gpsPath,db);
     }
 
     @Override
@@ -66,14 +44,18 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	System.out.println("onUpgrade删除表");  
     }
     
-    private void creatTable(SQLiteDatabase db) {
-	creatDBTable(db ,RW, RW_ITEM, rwPath);
-	creatDBTable(db ,DNBXX, DNBXX_ITEM, dnbxxPath);
-	creatDBTable(db ,DNBXYSJ, DNBXYSJ_ITEM, dnbxysjPath);
-	creatDBTable(db ,GPS, GPS_ITEM, gpsPath);
+    private void  CreatTableSQL(String[] colums , String tableName , String filePath , SQLiteDatabase database /*String[] type*/) {
+	//获取列名
+	String col_string = "";
+	for (int i = 0; i < colums.length; i++) 
+	    col_string = col_string + ","+colums[i] + " TEXT";
+	String sql = "create table "+tableName+"(id integer primary key autoincrement"+col_string+")";
+	database.execSQL("drop table if exists " + tableName);
+	database.execSQL(sql);
+	incertDBTable(database, tableName, colums, filePath);
     }
-
-    private void creatDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
+    
+    private void incertDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
 	    String filePath) {
 	Boolean flag = false;
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();

@@ -166,6 +166,7 @@ public class GPSManager {
 		Geocoder gc = new Geocoder(mContext, Locale.getDefault());
 		result = gc.getFromLocation(location.getLatitude(),
 			location.getLongitude(), 1);
+		System.out.println(result);
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace();

@@ -30,16 +30,17 @@ public class MyData implements DataBaseService {
     @Override
     public boolean addMyData(String tableName, String[] tableItems,
 	    Object[] params) {
-	// TODO Auto-generated method stub
-	boolean flag = false;
-	SQLiteDatabase database = null;
 	ContentValues cv = new ContentValues();
-	// 获取table列名
 	for (int i = 0; i < tableItems.length; i++) {
-//	    Log.e("addMyDate--------->tableitems------>", tableItems[i]+"");
-//	    Log.e("addMyDate--------->Paramitems------>", params[i]+"");
 	    cv.put(tableItems[i], params[i].toString());
 	}
+	Boolean flag = addMyData(tableName, cv);
+	return flag;
+    }
+
+    public boolean addMyData(String tableName,ContentValues cv) {
+	boolean flag = false;
+	SQLiteDatabase database = null;
 	try {
 	    database = helper.getWritableDatabase(); // 实现对数据库写的操作
 	    database.insert(tableName, null, cv);
@@ -53,14 +54,13 @@ public class MyData implements DataBaseService {
 	}
 	return flag;
     }
-
     @Override
-    public boolean deleteMyData(Object[] params) {
+    public boolean deleteMyData(String tableName ,String whereArgs , Object[] params) {
 	// TODO Auto-generated method stub
 	boolean flag = false;
 	SQLiteDatabase database = null;
 	try {
-	    String sql = "delete from person where id = ? ";
+	    String sql = "delete from "+tableName+" where "+whereArgs+" = ? ";
 	    database = helper.getWritableDatabase();
 	    database.execSQL(sql, params);
 	    flag = true;
@@ -182,23 +182,5 @@ public class MyData implements DataBaseService {
 	return list;
     }
 
-    @Override
-    public int fetchTableLength(String tableName) {
-	SQLiteDatabase database = null;
-	int length = -1;
-	try {
-	    database = helper.getReadableDatabase();
-	    Cursor cursor = database.rawQuery("Select count(*) from "
-		    + tableName + ";", null);
-	    length = cursor.getCount();
-	} catch (Exception e) {
-
-	} finally {
-	    if (database != null) {
-		database.close();
-	    }
-	}
-	return length;
-    }
 
 }

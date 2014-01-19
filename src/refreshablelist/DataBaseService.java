@@ -3,13 +3,16 @@ package refreshablelist;
 import java.util.List;
 import java.util.Map;
 
+import android.content.ContentValues;
+
 public interface DataBaseService {
     
-    public int fetchTableLength(String tableName);
     
     public boolean addMyData(String tableName ,String[] tableItems , Object[] params);   
     
-    public boolean deleteMyData(Object[] params);  
+    public boolean addMyData(String tableName,ContentValues cv);
+    
+    public boolean deleteMyData(String tableName ,String whereArgs , Object[] params);  
       
     public boolean updateMyData(String tableName,String where , String  whereValue , String[] tableItems , Object[] params);
       

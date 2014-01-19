@@ -6,6 +6,7 @@ import android.R.string;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothClass.Device;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,12 +25,14 @@ public class BluetoothSppClient {
     private byte[][] glbFileDataBuf = new byte[FRAME_MAX_NUM][DATA_MAX_LEN];
     private int[] glbFileDataLen = new int[FRAME_MAX_NUM];
     private boolean isfinish = false;
+    private boolean creatBondResult = false;
     private PecData pecData;
     private String pin = "00000000";
     
     private String TAG = "BluetoothSppClient";
     private BluetoothChatService mChatService;
-//    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice remoteDevice;
+    private BluetoothAdapter mBluetoothAdapter;
     private String mConnectedDeviceName;
     private Context mContext;
     private Handler mWaitMachineHandler;
@@ -128,12 +131,13 @@ public class BluetoothSppClient {
 	mContext.registerReceiver(_mPairingRequest, new IntentFilter(
 		BluetoothDevice.ACTION_BOND_STATE_CHANGED));
 	// Get the BLuetoothDevice object
-	BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 	BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(MAC);
 	if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
 	    try {
 		BluetoothCtrl.createBond(device); // 开始配对
-		// result=true;
+		 creatBondResult=true;
+		 remoteDevice = device;
 	    } catch (Exception e) {
 		Log.d("mylog", "setPiN failed!");
 		e.printStackTrace();
@@ -241,8 +245,20 @@ public class BluetoothSppClient {
     public void close() {
 	if (mChatService != null)
 	    mChatService.stop();
-	//关蓝牙
+	mContext.unregisterReceiver(_mPairingRequest);
 	
+	//断开配对
+	if(creatBondResult && remoteDevice!=null) {
+	    try {
+		BluetoothCtrl.removeBond(remoteDevice);
+	    } catch (Exception e) {
+		Toast.makeText(mContext, "已与设备断开配对", Toast.LENGTH_SHORT).show();
+		e.printStackTrace();
+	    }
+	}
+	//关蓝牙
+//	if(mBluetoothAdapter.getState() == BluetoothAdapter.STATE_OFF)
+//	    mBluetoothAdapter.disable();
     }
     
     // 广播监听:蓝牙自动配对处理
@@ -255,6 +271,7 @@ public class BluetoothSppClient {
 			.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 		try {
 		    BluetoothCtrl.setPin(device, pin); // 置入配对密码
+		    BluetoothCtrl.cancelPairingUserInput(device);
 		} catch (Exception e) {
 		    Log.d(TAG,
 			    ">>_mPairingRequest err!");

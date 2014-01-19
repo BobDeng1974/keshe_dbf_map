@@ -1,7 +1,12 @@
 package bluetooth;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import bluetooth.CHexConver;
 import android.util.Printer;
+import  static stringconstant.StringConstant.PecDataItem;
 
 public class PecData {
 
@@ -28,6 +33,7 @@ public class PecData {
 	if (newTimer.length > 50) {
 	    return;
 	}
+	this.stTimer = new byte[newTimer.length];
 	System.arraycopy(newTimer, 0, this.stTimer, 0, newTimer.length);
     }
     
@@ -39,6 +45,19 @@ public class PecData {
 	return this.stTimer;
     }
     
+    
+    public HashMap<String, Object> toList() {
+	HashMap<String , Object> hashMap  = new HashMap<String, Object>();
+	String stTimerString = CHexConver.decode(CHexConver.printHexString("stTimer : ", this.stTimer));
+	hashMap.put("Timer", stTimerString);
+	for (int i = 0; i < PecDataItem.length; i++) {
+	    if(this.dataFlag[i].getFlag())	
+		hashMap.put(PecDataItem[i], this.dataFlag[i].getData());
+	    else
+		hashMap.put(PecDataItem[i], "无");
+	}
+	return hashMap;
+    }
     public void printer() {
 	System.out.println("stTimer:"+CHexConver.decode(CHexConver.printHexString("stTimer : ", this.stTimer)));
 	for (int i = 0; i < DataInd.DATA_IND_MAX; i++) {

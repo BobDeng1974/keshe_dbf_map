@@ -28,8 +28,8 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//启动后台监控GPS坐标
-//		Intent intent = new Intent(getApplicationContext(), GPSService.class);
-//		getApplicationContext().startService(intent);
+		Intent intent = new Intent(getApplicationContext(), GPSService.class);
+		getApplicationContext().startService(intent);
 		    
 		getSlidingMenu().setMode(SlidingMenu.LEFT);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);

@@ -577,7 +577,7 @@ public class BluetoothChatService {
 			    first0xAA = false;
 		    }
 		} catch (IOException e) {
-		    Log.e(TAG, "disconnected", e);
+		    Log.e(TAG, "接收数据时disconnected", e);
 		    connectionLost();
 		    break;
 		}

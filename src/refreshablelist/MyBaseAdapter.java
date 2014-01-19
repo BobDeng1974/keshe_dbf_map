@@ -21,7 +21,7 @@ import baidumapsdk.demo.R;
 import details.StringToMap;
 
 public class MyBaseAdapter extends BaseAdapter {
-    private int[] colors = new int[] { 0xff3cb371, 0xffa0a0a0 };
+    private int[] colors = new int[] { 0xffdcdcdc, 0xfff8f8ff };
     private Context mContext;
     private List<Map<String, String>> dataList;
     private Boolean isFirstNotFound = true;
