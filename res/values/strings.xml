@@ -90,7 +90,7 @@
     <string name="humidity">湿度:</string>
     <string name="check_after_verify">校准后标准器核查</string>
     <string name="read_from_calibrator">读取校验仪</string>
-    <string name="made_number">生产编号:</string>
+    <string name="made_number">编号:</string>
     <!-- Result confirm -->
     <string name="read_time">读取时间:</string>
     <string name="machine_number">设备编号:</string>

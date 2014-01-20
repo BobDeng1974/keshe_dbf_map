@@ -16,9 +16,9 @@ import org.json.JSONObject;
 
 import refreshablelist.DataBaseService;
 import refreshablelist.MyData;
-import refreshablelist.ParseDbf2Map;
 import spinneredittext.SpinnerEditText;
 import AnalyseTxt.AnalyseTxtUtil;
+import DBFRW.ParseDbf2Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -674,7 +674,6 @@ public class DetailActivity extends Activity {
 		    } else if(bluetoothSppClient == null){
 			searchDevice();
 		    }
-		    verifyReadMachine.setEnabled(false);
 		}
 	    }
 	});
@@ -707,6 +706,7 @@ public class DetailActivity extends Activity {
 			DetailActivity.this, address, mreadMachineHandler);
 		// 打开等待框
 		readMachineWaitDialog();
+		verifyReadMachine.setEnabled(false);
 		System.out.println("REQUEST_CONNECT_DEVICE_SECURE------>OK");
 	    } else {
 		System.out
@@ -1145,9 +1145,10 @@ public class DetailActivity extends Activity {
 			break;
 		    case newSealID:
 			// 新封口再右点，即提示完成任务,并处理数据,返回任务列表主界面
+			//弹出确认对话框，后台执行数据库的更新和dbf文件的读写
 			new AlertDialog.Builder(DetailActivity.this)
-				.setMessage("任务完成")
-				.setTitle("hmmm...")
+				.setMessage("确定写入数据？")
+				.setTitle("任务完成")
 				.setIcon(android.R.drawable.ic_dialog_info)
 				.setPositiveButton("ok",
 					new DialogInterface.OnClickListener() {
@@ -1155,10 +1156,15 @@ public class DetailActivity extends Activity {
 					    public void onClick(
 						    DialogInterface dialog,
 						    int which) {
-						// 存储数据
-						finish();
+						// 存储数据 async
 					    }
-					}).show();
+					})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				    }
+				}).show();
 			break;
 		    case inputVerifyDataID:
 			ChangeTitleText(
@@ -1568,9 +1574,12 @@ public class DetailActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-	// TODO Auto-generated method stub
-	super.onDestroy();
 	if (mChatService != null)
 	    mChatService.stop();
+	
+	BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+	if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) 
+	    bluetoothAdapter.disable();
+	super.onDestroy();
     }
 }

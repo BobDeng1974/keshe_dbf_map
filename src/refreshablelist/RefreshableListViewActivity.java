@@ -16,6 +16,8 @@ import details.DetailActivity;
 
 import refreshablelist.RefreshableListView.OnRefreshListener;
 import static stringconstant.StringConstant.*;
+import DBFRW.ParseDbf2Map;
+import DBFRW.WriteDbfFile;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -145,26 +147,20 @@ public class RefreshableListViewActivity extends Fragment {
      * @return
      */
     private List<Map<String, String>> getItems() {
-//	 ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-//	 List<Map<String, String>> list =
-//	 parseDbf2Map.getListMapFromDbf(gpsPath);
-//	 System.out.println(list);
+//	gps2m(30.510428, 114.426294, 30.507962, 114.42796);
+	 
 	DataBaseService service = new MyData(getActivity());
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
 	
-//	gps2m(30.510428, 114.426294, 30.507962, 114.42796);
+//	WriteDbfFile.creatDbfFile(root+"/rw.dbf", RW_ITEM, items);
+	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+	List<Map<String, String>> list =
+		parseDbf2Map.getListMapFromDbf(jlfyzcxxPath);
+	System.out.println(list);
+	
 	return items;
     }
 
-    // // //DBF文件的数据添加
-    // public void addItem() throws Exception {
-    // DBFWriter dbfwriter = new DBFWriter(new File(gpsPath));
-    // Object[] obj=new Object[15];
-    // obj[11]="442899999811111111";
-    // obj[10]="123";
-    // obj[0]="广州软件";
-    // dbfwriter.addRecord(obj);
-    // }
     /**
      * 此函数用来更新 已完成数量/总数量
      */

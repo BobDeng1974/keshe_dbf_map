@@ -122,6 +122,17 @@ public class StringConstant {
     //SCR
     //SCSJ
     
+    public static String ACTIVE_TOTAL = "active_total";//11有功（总）
+    public static String ACTIVE_PEAK = "active_peak";//13有功（峰）
+    public static String ACTIVE_VALLEY = "active_valley";//14有功（谷）
+    public static String ACTIVE_AVERAGE = "active_average";//15有功（平）
+    public static String REACTIVE_TOTAL = "reactive_total";//21无功(总)
+    public static String MAX_NEED = "max_need";//31最大需量
+    public static String ACTIVE_REVERSE_TOTAL = "active_reverse_total";//41有功反向（总）
+    public static String ACTIVE_REVERSE_PEAK = "active_reverse_peak";//43有功反向（峰）
+    public static String ACTIVE_REVERSE_VALLEY = "active_reverse_valley";//44有功反向（谷）
+    public static String ACTIVE_REVERSE_AVERAGE = "active_reverse_average";//45有功反向（平）
+    public static String REACTIVE_REVERSE = "reactive_reverse";//51无功反向（总）
     //电能表校验多功能数据(dnbdglxx.dbf)修改以前的记录信息
     //APP_NO
     //METER_ID
