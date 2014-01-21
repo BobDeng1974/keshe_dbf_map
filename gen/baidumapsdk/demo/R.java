@@ -1191,13 +1191,13 @@ containing a value of this type.
         public static final int confirm_check_people=0x7f050115;
         public static final int confirm_conclusion_secondary_line=0x7f05011a;
         public static final int confirm_date_textview=0x7f050113;
-        public static final int confirm_equipment_rating=0x7f050118;
+        public static final int confirm_equipment_rating=0x7f050117;
         public static final int confirm_event_textview=0x7f05011d;
         public static final int confirm_machine_number=0x7f050114;
         public static final int confirm_scene_verify_conclusion=0x7f05011b;
         public static final int confirm_seal=0x7f050119;
         public static final int confirm_verify_people=0x7f050116;
-        public static final int confirm_work_model=0x7f050117;
+        public static final int confirm_work_model=0x7f050118;
         public static final int content_frame=0x7f05007a;
         public static final int custombutton=0x7f050123;
         public static final int customicon=0x7f050124;

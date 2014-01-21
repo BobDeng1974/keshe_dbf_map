@@ -76,7 +76,7 @@ public class MyData implements DataBaseService {
 
     @Override
     public boolean updateMyData(String tableName, String where,
-	    String whereValue, String[] tableItems, Object[] params) {
+	    String whereValue, String[] tableItems, String[] params) {
 	// TODO Auto-generated method stub
 	boolean flag = false;
 	SQLiteDatabase database = null;
@@ -84,7 +84,7 @@ public class MyData implements DataBaseService {
 	String whereis = where + " = ?";
 	String[] whereValues = { whereValue };
 	for (int i = 0; i < tableItems.length; i++) {
-	    cv.put(tableItems[i], params[i].toString());
+	    cv.put(tableItems[i], params[i]);
 	}
 	try {
 	    database = helper.getWritableDatabase();

@@ -64,59 +64,109 @@
         </spinneredittext.SpinnerEditText>
 
         <spinneredittext.SpinnerEditText
-            android:id="@+id/confirm_work_model"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
-
-        <spinneredittext.SpinnerEditText
             android:id="@+id/confirm_equipment_rating"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
         </spinneredittext.SpinnerEditText>
 
-        
-        <spinneredittext.SpinnerEditText 
-            android:id="@+id/confirm_seal"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            ></spinneredittext.SpinnerEditText>
-        
-        <spinneredittext.SpinnerEditText
-            android:id="@+id/confirm_conclusion_secondary_line"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
+            android:orientation="horizontal" >
 
-        <spinneredittext.SpinnerEditText
-            android:id="@+id/confirm_scene_verify_conclusion"
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="@string/work_mode"
+                android:textColor="@color/blue_light" />
+
+            <Spinner
+                android:id="@+id/confirm_work_model"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="@string/seal"
+                android:textColor="@color/blue_light" />
+
+            <Spinner
+                android:id="@+id/confirm_seal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="@string/conclusion_secondary_line"
+                android:textColor="@color/blue_light" />
+
+            <Spinner
+                android:id="@+id/confirm_conclusion_secondary_line"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="@string/scene_verify_conclusion"
+                android:textColor="@color/blue_light" />
+
+            <Spinner
+                android:id="@+id/confirm_scene_verify_conclusion"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1px"
-            android:layout_marginTop="2dip"
             android:layout_marginBottom="2dip"
+            android:layout_marginTop="2dip"
             android:background="@android:color/black" />
-        
-        <Button 
+
+        <Button
             android:id="@+id/confirm_add_event"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="事件"
-            />
+            android:layout_height="wrap_content"
+            android:text="事件" />
+
         <AutoCompleteTextView
-        android:id="@+id/confirm_event_textview"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:gravity="top"
-        android:hint="在此添加事件.."
-        android:textColor="@android:color/black"
-        android:visibility="gone"
-         />
+            android:id="@+id/confirm_event_textview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:gravity="top"
+            android:hint="在此添加事件.."
+            android:textColor="@android:color/black"
+            android:visibility="gone" />
     </LinearLayout>
 
 </ScrollView>

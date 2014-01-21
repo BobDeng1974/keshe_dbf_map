@@ -43,6 +43,7 @@ public class GPSService extends Service {
     private LocationListener locationListener = null;
     private HashMap<String, String> paramMap = null;
     private RequestParams requestParams = null;
+    private int timerMinute = 2;//最久2分钟上传一次
     
     Handler handler = new Handler() {
 	@Override
@@ -247,7 +248,7 @@ public class GPSService extends Service {
 	    while(true) {
 		try {
 		    Thread.sleep(2*60*1000);
-		    if((System.currentTimeMillis() - lastTimer) > 5*60*1000)
+		    if((System.currentTimeMillis() - lastTimer) > timerMinute*60*1000)
 			handler.sendEmptyMessage(1);
 		    Log.e("TimerThread---->", lastTimer+"");
 		} catch (InterruptedException e) {

@@ -29,6 +29,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -458,6 +459,8 @@ public class BluetoothChatService {
 		// successful connection or an exception
 		mmSocket.connect();
 		System.out.println("ConnectThread-----> Connect");
+		//保存此建立连接的mac地址，下次优先连此地址
+		mHandler.obtainMessage(BluetoothConstant.MESSAGE_SAVE_DEF, -1, -1).sendToTarget();
 	    } catch (IOException e) {
 		// Close the socket
 		try {

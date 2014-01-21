@@ -5,6 +5,8 @@ import static stringconstant.StringConstant.*;
 import static bluetooth.BluetoothConstant.*;
 
 import gps.GPSManager;
+
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,6 +21,7 @@ import refreshablelist.MyData;
 import spinneredittext.SpinnerEditText;
 import AnalyseTxt.AnalyseTxtUtil;
 import DBFRW.ParseDbf2Map;
+import DBFRW.WriteDbfFile;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -78,10 +81,13 @@ public class DetailActivity extends Activity {
     // Debugging
     private static final String TAG = "DetailActivity";
     private static final boolean D = true;
-
+    
     Resources resources;
+    SharedPreferences sharedPreferences;
+    DataBaseService dataBaseService;
     HashMap<String, Object> missionData;//存放此次所有输入的数据
     HashMap<String, List<String>> configTxtData;
+    private String Zc_id = "";
     private String Cons_No = "";//是CONS_NO的detail
     private String wiringMode = "";
     // title
@@ -97,6 +103,7 @@ public class DetailActivity extends Activity {
     private Animation slideOutRight;
     // mission_info
     private static final int missionInfoID = 0;
+    private List<Map<String, String>> GPSSearchMap;//搜索对应的gps数据
     private Button setNavigation;
     private LinearLayout changeContact;
     private TextView changeContactPerson;
@@ -128,9 +135,9 @@ public class DetailActivity extends Activity {
     // scene state
     private static final int sceneStateID = 3;
     private EditText clockDeviation;
-    private SpinnerEditText clockDeviationConclusion;
+    private Spinner clockDeviationConclusion;
     private Button electriClockDate;
-    private SpinnerEditText electriClockDateConclusion;
+    private Spinner electriClockDateConclusion;
     private Button electriClockEventButton;
     private AutoCompleteTextView electirClockEvent;
     // electriClock
@@ -141,7 +148,7 @@ public class DetailActivity extends Activity {
     private EditText positiveAverage;
     private TextView combinationDeviation;
     private Button otherPowerButton;
-    private SpinnerEditText voltPhase;
+    private Spinner voltPhase;
     private EditText testLaps;
     private CheckBox electriClockExceptionErrorOne;
     private CheckBox electriClockExceptionErrorTwo;
@@ -152,6 +159,8 @@ public class DetailActivity extends Activity {
     private EditText verifyHumidity;
     private ListView verifyTestTextView;
     private Button verifyReadMachine;
+    private boolean s = false;
+    private boolean canConnectDefDevice = true;
     private Spinner verifyMadeNumberSpinner;
     private BluetoothSppClient bluetoothSppClient;
     private Dialog waitReadMachineDialog;
@@ -200,11 +209,11 @@ public class DetailActivity extends Activity {
     private TextView confirmMachineNumber;
     private SpinnerEditText confirmCheckPeople;
     private SpinnerEditText confirmVerifyPeople;
-    private SpinnerEditText confirmWorkMode;
+    private Spinner confirmWorkMode;
     private SpinnerEditText confirmEquipmentRating;
-    private SpinnerEditText confirmSeal;
-    private SpinnerEditText confirmSecondaryLineConclusion;
-    private SpinnerEditText confirmSceneVerifyConclusion;
+    private Spinner confirmSeal;
+    private Spinner confirmSecondaryLineConclusion;
+    private Spinner confirmSceneVerifyConclusion;
     private Button confirmAddEventButton;
     private AutoCompleteTextView confirmAddEvenTextView;
     private static final int newSealID = 7;
@@ -223,6 +232,8 @@ public class DetailActivity extends Activity {
 	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 		R.layout.detail_activity_title);
 	resources = getResources();
+	sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+	dataBaseService = new MyData(getApplicationContext());
 	missionData = new HashMap<String, Object>();
 	//解析TXT配置文件获得的数据
 	configTxtData = AnalyseTxtUtil.getDataFromConfigTXT(configTXTPath);
@@ -269,16 +280,16 @@ public class DetailActivity extends Activity {
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
 	boxSealOne.init(configTxtData.get(OldBox), "盒封1:", true);
 	boxSealTwo.init(configTxtData.get(OldBox), "盒封2:", true);
-	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
-		cabinetSealOne));
-	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
-		cabinetSealTwo));
+//	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
+//		cabinetSealOne));
+//	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
+//		cabinetSealTwo));
 	tableSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
-		tableSealOne));
+		tableSealOne,"旧表封1"));
 	tableSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
-		tableSealTwo));
-	boxSealOne.setOpenDialogListener(new myOpenSealInfoDialog(boxSealOne));
-	boxSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(boxSealTwo));
+		tableSealTwo, "旧表封2"));
+//	boxSealOne.setOpenDialogListener(new myOpenSealInfoDialog(boxSealOne));
+//	boxSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(boxSealTwo));
     }
 
     /**
@@ -287,9 +298,10 @@ public class DetailActivity extends Activity {
      */
     class myOpenSealInfoDialog implements OnFocusChangeListener {
 	private SpinnerEditText spinnerEditText;
-
-	public myOpenSealInfoDialog(SpinnerEditText spinnerEditText) {
+	private String titleString;
+	public myOpenSealInfoDialog(SpinnerEditText spinnerEditText , String title) {
 	    this.spinnerEditText = spinnerEditText;
+	    this.titleString = title;
 	}
 
 	@Override
@@ -297,8 +309,8 @@ public class DetailActivity extends Activity {
 	    // TODO Auto-generated method stub
 	    if (hasFocus)
 		openClickSealInfoDialog(
-			resources.getString(R.string.seal_info),
-			spinnerEditText);
+			this.titleString,
+			this.spinnerEditText);
 	}
     }
 
@@ -322,10 +334,14 @@ public class DetailActivity extends Activity {
 	changeContactPerson = (TextView) findViewById(R.id.change_contact_person);
 	changeContactPhone = (TextView) findViewById(R.id.change_contact_phone);
 	getPositionTextView = (TextView) findViewById(R.id.get_position_text);
-
 	missionInfoListView = (ListView) findViewById(R.id.mission_info_listview);
+	
+	System.out.println("---------"+Cons_No+"----");
 	initMissionInfoListView();
 	initMissionInfoListener();
+	GPSSearchMap = dataBaseService.viewMyData(GPS, CONS_NO,new String[] { Cons_No });
+	if(GPSSearchMap.size() == 0)
+	    setNavigation.setText("开启导航(无目的地信息)");
     }
 
     /**
@@ -345,7 +361,8 @@ public class DetailActivity extends Activity {
 	    @Override
 	    public void onClick(View v) {
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		getPositionTextView.setText(gpsManager.getNowPosition());
+		getPositionTextView.setText(gpsManager.getNowPosition(Cons_No));
+		//写GPS文件 update db
 	    }
 	});
 	setNavigation.setOnClickListener(new OnClickListener() {
@@ -357,14 +374,10 @@ public class DetailActivity extends Activity {
 		String mLat1 = "39.915291"; 
 	   	String mLon1 = "116.403857"; 
 	   	String message = "请手动搜索终点位置..";
-		DataBaseService service = new MyData(getApplicationContext());
-		System.out.println("---------"+Cons_No);
-		List<Map<String, String>> searchMap = service.viewMyData(GPS, CONS_NO,
-			new String[] { Cons_No });
-		if (searchMap.size() != 0) {
-		    mLat1 = searchMap.get(0).get(LATITUDE);
-		    mLon1 = searchMap.get(0).get(LONGITUDE);
-		    message = "点击‘到这去’..";
+		if (GPSSearchMap.size() != 0) {
+		    mLat1 = GPSSearchMap.get(0).get(LATITUDE);
+		    mLon1 = GPSSearchMap.get(0).get(LONGITUDE);
+		    message = "已定位到目的地,请点击‘到这去’..";
 		}
 		Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+"?q="+message);
 		Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
@@ -388,6 +401,7 @@ public class DetailActivity extends Activity {
 	Map<String, Object> map = StringToMap.StringToMap(missionInfoString);
 	//标志此次的详细信息是号码为Cons_No的
 	Cons_No = (String) map.get(CONS_NO);
+	Zc_id = (String) map.get(ZC_ID);
 	//获取接线方式
 	wiringMode = (String) map.get(WIRING);
 //	System.out.println(wiringMode);
@@ -442,8 +456,11 @@ public class DetailActivity extends Activity {
 		.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 		    @Override
 		    public void onCheckedChanged(RadioGroup group, int checkedId) {
-			if (checkedId == missionStatusOne.getId())
+			if (checkedId == missionStatusOne.getId()) {
 			    missionStatus = 1;
+			    confirmMachineNumber.setText("无");
+			    missionData.put(MD_NO, "");
+			}
 			else if (checkedId == missionStatusTwo.getId())
 			    missionStatus = 2;
 			else if (checkedId == missionStatusThree.getId())
@@ -463,9 +480,14 @@ public class DetailActivity extends Activity {
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initSceneState() {
 	clockDeviation = (EditText) findViewById(R.id.clock_mistake_value);
-	clockDeviationConclusion = (SpinnerEditText) findViewById(R.id.clock_mistake_conclusion);
+	clockDeviationConclusion = (Spinner) findViewById(R.id.clock_mistake_conclusion);
 	electriClockDate = (Button) findViewById(R.id.clock_date_value);
-	electriClockDateConclusion = (SpinnerEditText) findViewById(R.id.clock_date_conclusion);
+	Calendar calendar = Calendar.getInstance();
+	int year = calendar.get(Calendar.YEAR);
+	int monthOfYear = calendar.get(Calendar.MONTH)+1;
+	int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+	electriClockDate.setText(year + "/" + monthOfYear + "/" + dayOfMonth);
+	electriClockDateConclusion = (Spinner) findViewById(R.id.clock_date_conclusion);
 	electriClockEventButton = (Button) findViewById(R.id.clock_event_button);
 	electirClockEvent = (AutoCompleteTextView) findViewById(R.id.clock_event_textview);
 	// 创建一个ArrayAdapter
@@ -474,10 +496,8 @@ public class DetailActivity extends Activity {
 		configTxtData.get("常用备注"));
 	electirClockEvent.setAdapter(adapter);
 	electirClockEvent.setOnFocusChangeListener(new showDropDownListener());
-	clockDeviationConclusion.init(CLOCK_MISTAKE_CONCLUSION,
-		resources.getString(R.string.clock_mistake_conclusion), false);
-	electriClockDateConclusion.init(CLOCK_DATE_CONCLUSION,
-		resources.getString(R.string.date_conclusion), false);
+	initNormalSpinner(clockDeviationConclusion, CLOCK_MISTAKE_CONCLUSION);
+	initNormalSpinner(electriClockDateConclusion, CLOCK_DATE_CONCLUSION);
 	electriClockDate.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
@@ -521,13 +541,12 @@ public class DetailActivity extends Activity {
 	positiveValley = (EditText) findViewById(R.id.electri_valley);
 	positiveAverage = (EditText) findViewById(R.id.electri_average);
 	combinationDeviation = (TextView) findViewById(R.id.electri_combination_deviation);
-	voltPhase = (SpinnerEditText) findViewById(R.id.electri_volt_phase);
+	voltPhase = (Spinner) findViewById(R.id.electri_volt_phase);
 	testLaps = (EditText) findViewById(R.id.electri_test_laps);
 	electriClockExceptionErrorOne = (CheckBox) findViewById(R.id.electri_radio_bt_one);
 	electriClockExceptionErrorTwo = (CheckBox) findViewById(R.id.electri_radio_bt_two);
 	otherPowerButton = (Button) findViewById(R.id.electir_other_power);
-	voltPhase.init(VOLT_PHASE_ARRAY,
-		resources.getString(R.string.vol_phase_sequence), false);
+	initNormalSpinner(voltPhase, VOLT_PHASE_ARRAY);
 	initElectriClockListener();
 	// 组合误差：（总电量-峰-平-谷）/总电量;Format(_T("%6.4f"));
 	// 组合误差的显示：组合误差的百分比方式
@@ -538,45 +557,32 @@ public class DetailActivity extends Activity {
 	// textview listener
 	class myTextWatcher implements TextWatcher {
 	    @Override
-	    public void afterTextChanged(Editable s) {
-	    }
-
+	    public void afterTextChanged(Editable s) {}
 	    @Override
 	    public void beforeTextChanged(CharSequence s, int start, int count,
-		    int after) {
-	    }
-
+		    int after) {}
 	    @Override
 	    public void onTextChanged(CharSequence s, int start, int before,
 		    int count) {
-		boolean isTotalHave = !positiveTotalPower.getText().toString()
-			.equals("");
-		boolean isPeakHave = !positivePeak.getText().toString()
-			.equals("");
-		boolean isValleyHave = !positiveValley.getText().toString()
-			.equals("");
-		boolean isAverageHave = !positiveAverage.getText().toString()
-			.equals("");
+		boolean isTotalHave = !(positiveTotalPower.getText().toString().length() == 0);
+		boolean isPeakHave = !(positivePeak.getText().toString().length() == 0);
+		boolean isValleyHave = !(positiveValley.getText().toString().length() == 0);
+		boolean isAverageHave = !(positiveAverage.getText().toString().length() == 0);
 		if (isTotalHave && isPeakHave && isValleyHave && isAverageHave) {
-		    int total = Integer.parseInt(positiveTotalPower.getText()
-			    .toString());
-		    int peak = Integer.parseInt(positivePeak.getText()
-			    .toString());
-		    int valley = Integer.parseInt(positiveValley.getText()
-			    .toString());
-		    int average = Integer.parseInt(positiveAverage.getText()
-			    .toString());
-		    combinationDeviation
-			    .setText((total - peak - valley - average) / total
-				    + "");
+		    int total = Integer.parseInt(positiveTotalPower.getText().toString());
+		    int peak = Integer.parseInt(positivePeak.getText() .toString());
+		    int valley = Integer.parseInt(positiveValley.getText().toString());
+		    int average = Integer.parseInt(positiveAverage.getText().toString());
+		    float deviation =(float) (total - peak - valley - average) / total;
+		    deviation *= 100;
+		    DecimalFormat dFormat = new DecimalFormat("0.00");
+		    String deviationString = dFormat.format(deviation);
+		    combinationDeviation.setText(deviationString+ "%");
+		}else {
+		    combinationDeviation.setText("");
 		}
 	    }
-	}
-	;
-	positiveTotalPower.setInputType(InputType.TYPE_CLASS_PHONE);
-	positivePeak.setInputType(InputType.TYPE_CLASS_PHONE);
-	positiveAverage.setInputType(InputType.TYPE_CLASS_PHONE);
-	positiveValley.setInputType(InputType.TYPE_CLASS_PHONE);
+	};
 	positiveTotalPower.addTextChangedListener(new myTextWatcher());
 	positivePeak.addTextChangedListener(new myTextWatcher());
 	positiveAverage.addTextChangedListener(new myTextWatcher());
@@ -629,36 +635,17 @@ public class DetailActivity extends Activity {
         
 	verifyReadMachine = (Button) findViewById(R.id.verify_read_machine);
 	verifyMadeNumberSpinner = (Spinner) findViewById(R.id.verify_made_number);
+
 	// 将可选内容与ArrayAdapter连接起来
-	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	List<Map<String, String>> listMap = parseDbf2Map
-		.getListMapFromDbf(bzqjPath);
+	List<Map<String, String>> listMap = dataBaseService.listMyDataMaps(BZQJ, null);
 	final List<String> list = new ArrayList<String>();
 	if (listMap.size() != 0) {
 	    for (int i = 1; i < listMap.size(); i++) {
-		String string = listMap.get(i).get("MADE_NO");
+		String string = listMap.get(i).get(MADE_NO);
 		list.add(string);
 	    }
 	}
-	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-		android.R.layout.simple_spinner_item, list);
-	// 设置下拉列表的风格
-	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	// 将adapter 添加到spinner中
-	verifyMadeNumberSpinner.setAdapter(adapter);
-	// 添加事件Spinner事件监听
-	verifyMadeNumberSpinner
-		.setOnItemSelectedListener(new OnItemSelectedListener() {
-		    @Override
-		    public void onItemSelected(AdapterView<?> arg0, View view,
-			    int position, long arg3) {
-			((TextView) view).setText(list.get(position));
-		    }
-
-		    @Override
-		    public void onNothingSelected(AdapterView<?> arg0) {
-		    }
-		});
+	initNomorlSpinner(verifyMadeNumberSpinner,list);
 	verifyReadMachine.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
@@ -671,14 +658,87 @@ public class DetailActivity extends Activity {
 			Intent enableIntent = new Intent(
 				BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-		    } else if(bluetoothSppClient == null){
-			searchDevice();
+		    } else if(bluetoothSppClient == null ){
+			if(canConnectDefDevice) {
+				// 新线程与蓝牙通信
+			    String address = sharedPreferences.getString("def_device", "");
+			    if(address.equals(""))
+				searchDevice();
+			    else {
+				bluetoothSppClient = new BluetoothSppClient(DetailActivity.this, address, true , mreadMachineHandler);
+				// 打开等待框
+				readMachineWaitDialog();
+				verifyReadMachine.setEnabled(false);
+			    }
+			}else    
+			    searchDevice();
 		    }
 		}
 	    }
 	});
     }
+ /** spinner   设备编号 工作方式 封印 二次线结论 现场校验结论 日期结论，时钟误差结论 电压相序
+ * @param spinner
+ */
+private void initNomorlSpinner(Spinner spinner , List<String> data) {
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, data);
+	// 设置下拉列表的风格
+	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	// 将adapter 添加到spinner中
+	spinner.setAdapter(adapter);
+	// 添加事件Spinner事件监听
+	spinner.setOnItemSelectedListener(new MySpinnerListener(data));
+    }
+private void initNormalSpinner(Spinner spinner , String[] data) {
+    List<String> list = new ArrayList<String>();
+    for (int i = 0; i < data.length; i++) 
+	list.add(data[i]);
+    initNomorlSpinner(spinner, list);
+}
 
+/** spinner的监听器 设备编号 工作方式 封印 二次线结论 现场校验结论 日期结论，时钟误差结论 电压相序
+ */ 
+class MySpinnerListener implements OnItemSelectedListener{
+    private List<String> datas;
+    public MySpinnerListener(List<String> data) {
+	this.datas = data;
+    }
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view,
+	    int position, long id) {
+	if (parent.equals(verifyMadeNumberSpinner)) {
+	    if(position == 0 && !s) {
+		s = true;
+		int pos = sharedPreferences.getInt("spinner_position", -1);
+		if(pos != -1) 
+		    position = pos;
+	    }
+	    if(s) {
+		confirmMachineNumber.setText(datas.get(position));
+		missionData.put(MD_NO, datas.get(position));
+		sharedPreferences.edit().putInt("spinner_position", position).commit();
+	    }
+
+	}else if(parent.equals(confirmWorkMode)) {
+	    
+	}else if(parent.equals(confirmSeal)) {
+	    
+	}else if(parent.equals(confirmSecondaryLineConclusion)) {
+	    
+	}else if(parent.equals(confirmSceneVerifyConclusion)) {
+	    
+	}else if(parent.equals(clockDeviationConclusion)) {
+	    
+	}else if (parent.equals(electriClockDateConclusion)) {
+	    
+	}else if(parent.equals(voltPhase)) {
+	    
+	}
+	((TextView) view).setText(datas.get(position));
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {}
+ }
     /**
      * 打开搜索蓝牙设备界面
      */
@@ -701,6 +761,7 @@ public class DetailActivity extends Activity {
 	    if (resultCode == Activity.RESULT_OK) {
 		String address = data.getExtras().getString(
 			EXTRA_DEVICE_ADDRESS);
+		sharedPreferences.edit().putString("def_device", address);
 		// 新线程与蓝牙通信
 		bluetoothSppClient = new BluetoothSppClient(
 			DetailActivity.this, address, mreadMachineHandler);
@@ -755,23 +816,37 @@ public class DetailActivity extends Activity {
 		readMachineThread.interrupt();
 		PecData pecData = bluetoothSppClient.getPecData();
 		HashMap<String , Object> hashMap = pecData.toList();
-		for(int i =0;i<hashMap.size();i++) {
+		String stTimer = hashMap.get("Timer").toString();
+		mConversationArrayAdapter.add("Time:" + stTimer);
+		for(int i =0;i<PecDataItem.length;i++) {
 		    String key = PecDataItem[i];
+		    System.out.println(key);
 		    mConversationArrayAdapter.add(key + ":" + hashMap.get(key));
 		}
 		break;
 	    case 2:
 		// error
-		System.out.println("mreadMachineHandler---2");
+		System.out.println("mreadMachineHandler---error");
+		Toast.makeText(DetailActivity.this, "连接失败..", Toast.LENGTH_LONG)
+			.show();
 		waitReadMachineDialog.dismiss();
 		readMachineThread.interrupt();
-		Toast.makeText(DetailActivity.this, "校验失败..", Toast.LENGTH_LONG)
+	    case 3:
+		//default device connect error
+		System.out.println("mreadMachineHandler---error");
+		Toast.makeText(DetailActivity.this, "连接不上默认设备,搜索其他设备..", Toast.LENGTH_LONG)
 			.show();
+		waitReadMachineDialog.dismiss();
+		readMachineThread.interrupt();
+		canConnectDefDevice = false;
+		sharedPreferences.edit().putString("def_device" , "").commit();//清除这个默认的mac地址
 		break;
 	    }
 	    bluetoothSppClient.close();
 	    bluetoothSppClient = null;
 	    verifyReadMachine.setEnabled(true);
+	    if(msg.what == 3)
+		searchDevice();
 	}
     };
 
@@ -835,11 +910,11 @@ public class DetailActivity extends Activity {
 	confirmMachineNumber = (TextView) findViewById(R.id.confirm_machine_number);
 	confirmCheckPeople = (SpinnerEditText) findViewById(R.id.confirm_check_people);
 	confirmVerifyPeople = (SpinnerEditText) findViewById(R.id.confirm_verify_people);
-	confirmWorkMode = (SpinnerEditText) findViewById(R.id.confirm_work_model);
+	confirmWorkMode = (Spinner) findViewById(R.id.confirm_work_model);
 	confirmEquipmentRating = (SpinnerEditText) findViewById(R.id.confirm_equipment_rating);
-	confirmSeal = (SpinnerEditText) findViewById(R.id.confirm_seal);
-	confirmSecondaryLineConclusion = (SpinnerEditText) findViewById(R.id.confirm_conclusion_secondary_line);
-	confirmSceneVerifyConclusion = (SpinnerEditText) findViewById(R.id.confirm_scene_verify_conclusion);
+	confirmSeal = (Spinner) findViewById(R.id.confirm_seal);
+	confirmSecondaryLineConclusion = (Spinner) findViewById(R.id.confirm_conclusion_secondary_line);
+	confirmSceneVerifyConclusion = (Spinner) findViewById(R.id.confirm_scene_verify_conclusion);
 	confirmAddEventButton = (Button) findViewById(R.id.confirm_add_event);
 	confirmAddEvenTextView = (AutoCompleteTextView) findViewById(R.id.confirm_event_textview);
 	// 创建一个ArrayAdapter
@@ -861,13 +936,10 @@ public class DetailActivity extends Activity {
 	confirmEquipmentRating.init(configTxtData.get("设备评级"),
 		resources.getString(R.string.equipment_ratings), false);
 	// 事件点击
-	confirmSceneVerifyConclusion.init(SCENE_VERIFY_ARRAY,
-		resources.getString(R.string.scene_verify_conclusion), false);
-	confirmWorkMode.init(WORK_MODE_ARRAY,
-		resources.getString(R.string.work_mode), false);
-	confirmSeal.init(SEAL_ARRAY, resources.getString(R.string.seal), false);
-	confirmSecondaryLineConclusion.init(SECONDARY_LINE_CONCLUSION_ARRAY,
-		resources.getString(R.string.conclusion_secondary_line), false);
+	initNormalSpinner(confirmWorkMode , WORK_MODE_ARRAY);
+	initNormalSpinner(confirmSeal, SEAL_ARRAY);
+	initNormalSpinner(confirmSecondaryLineConclusion, SECONDARY_LINE_CONCLUSION_ARRAY);
+	initNormalSpinner(confirmSceneVerifyConclusion, SCENE_VERIFY_ARRAY);
 	confirmAddEventButton.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View arg0) {
@@ -904,9 +976,9 @@ public class DetailActivity extends Activity {
 	newBoxSealOne.init(configTxtData.get(NewBox), "盒封1:", true);
 	newBoxSealTwo.init(configTxtData.get(NewBox), "盒封2:", true);
 	newTableSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
-		newTableSealOne));
+		newTableSealOne, "新表封1"));
 	newTableSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
-		newTableSealTwo));
+		newTableSealTwo, "新表封2"));
     }
     
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1157,6 +1229,7 @@ public class DetailActivity extends Activity {
 						    DialogInterface dialog,
 						    int which) {
 						// 存储数据 async
+						new MyWriteDataTask(DetailActivity.this).execute(missionData);
 					    }
 					})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -1297,12 +1370,12 @@ public class DetailActivity extends Activity {
 		.findViewById(R.id.dialog_datepicker);
 	Button dialogConfirmButton = (Button) myView
 		.findViewById(R.id.datepicker_confirm_bt);
-	Calendar calendar = Calendar.getInstance();
-	int year = calendar.get(Calendar.YEAR);
-	int monthOfYear = calendar.get(Calendar.MONTH);
-	int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-	dateButton.setText(year + "/" + monthOfYear + "/" + dayOfMonth);
-	datePicker.init(year, monthOfYear, dayOfMonth,
+	String date = dateButton.getText().toString();
+	String[] dates = date.split("/");
+	int year = Integer.parseInt(dates[0]);
+	int monthOfYear = Integer.parseInt(dates[1]);
+	int dayOfMonth = Integer.parseInt(dates[2]);
+	datePicker.init(year, monthOfYear-1, dayOfMonth,
 		new OnDateChangedListener() {
 		    public void onDateChanged(DatePicker view, int year,
 			    int monthOfYear, int dayOfMonth) {
@@ -1359,19 +1432,27 @@ public class DetailActivity extends Activity {
 	dialogConfirmButton.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-		// TODO Auto-generated method stub
-		personText.setText(dialogContactEditText.getText().toString());
-		phoneText.setText(dialogPhoneEditText.getText().toString());
-		Toast.makeText(
-			getApplicationContext(),
-			dialogContactEditText.getText().toString() + " "
-				+ dialogPhoneEditText.getText().toString(),
-			Toast.LENGTH_SHORT).show();
+		String contact = dialogContactEditText.getText().toString();
+		String phone = dialogPhoneEditText.getText().toString();
+		personText.setText(contact);
+		phoneText.setText(phone);
+		updateContactInFile(contact , phone);
 		dialog.dismiss();
 	    }
 	});
 	dialog.getWindow().setContentView(myView);
 	dialog.show();
+    }
+
+    private void updateContactInFile(String contact, String phone) {
+	dataBaseService.updateMyData(RW, ZC_ID, Zc_id, 
+		new String[] {CONTACT , PHONE},
+		new String[] {contact ,phone});
+	List<Map<String, String>> listMap = dataBaseService.listMyDataMaps(RW, null);
+	if(WriteDbfFile.creatDbfFile(root + "/rw.dbf", RW_ITEM, listMap))
+	    Toast.makeText(getApplicationContext(), "联系人信息成功更新", Toast.LENGTH_LONG).show();
+	else
+	    Toast.makeText(getApplicationContext(), "联系人信息成功更新", Toast.LENGTH_LONG).show();
     }
 
     /**

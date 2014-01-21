@@ -151,6 +151,8 @@ public class StringConstant {
     //SCR
     //SCSJ
 
+    
+    
     //计量封印装拆信息(jlfyzcxx.dbf)  除以前的记录信息。然后在添加新信息
     public static String SEAL_TYPE = "SEAL_TYPE";//封印类别，01普通封印、02防盗封印、03印模
     public static String SEAL_ID = "SEAL_ID";//“封口信息”中的封印的编号
@@ -207,6 +209,8 @@ public class StringConstant {
     
     public static String[] GPS_ITEM = { CONS_NO , CP_NO,MP_NO,MP_ADDR,METER_ID,MADE_NO,T_FACTOR,
 	TAL_ADDR,ELEC_ADDR,TEL,LATITUDE , LONGITUDE,UPBZ,SCR,SCSJ };
+    
+    public static String[] BZQJ_ITEM = {MADE_NO};
     
     public static String[] MISSION_INFO_ITEM_01 = { CONS_NO , CONS_NAME, ELEC_ADDR,
 	    CONTACT, PHONE, MODEL, VOLT_NAME, RATED, RC_RATIO, MULTIRATE,

@@ -415,13 +415,13 @@ int id confirm_add_event 0x7f05011c
 int id confirm_check_people 0x7f050115
 int id confirm_conclusion_secondary_line 0x7f05011a
 int id confirm_date_textview 0x7f050113
-int id confirm_equipment_rating 0x7f050118
+int id confirm_equipment_rating 0x7f050117
 int id confirm_event_textview 0x7f05011d
 int id confirm_machine_number 0x7f050114
 int id confirm_scene_verify_conclusion 0x7f05011b
 int id confirm_seal 0x7f050119
 int id confirm_verify_people 0x7f050116
-int id confirm_work_model 0x7f050117
+int id confirm_work_model 0x7f050118
 int id content_frame 0x7f05007a
 int id custombutton 0x7f050123
 int id customicon 0x7f050124

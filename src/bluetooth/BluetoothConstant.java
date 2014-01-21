@@ -49,6 +49,7 @@ public class BluetoothConstant {
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
     public static final int MESSAGE_CONNECT_FAILURE = 6;
+    public static final int MESSAGE_SAVE_DEF = 7;
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
     // Intent request codes

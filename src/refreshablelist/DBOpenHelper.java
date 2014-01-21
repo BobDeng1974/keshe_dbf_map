@@ -37,6 +37,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	CreatTableSQL(DNBDGLXX_ITEM, DNBDGLXX, dnbdglxxPath,db);
 	CreatTableSQL(JLFYZCXX_ITEM, JLFYZCXX,jlfyzcxxPath, db);
 	CreatTableSQL(GPS_ITEM, GPS,gpsPath,db);
+	CreatTableSQL(BZQJ_ITEM, BZQJ,bzqjPath,db);
     }
 
     @Override

@@ -1,24 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<LinearLayout 
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="12dip" >
+    android:layout_height="fill_parent" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:padding="12dip" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/positive_active"
+                android:textColor="@android:color/black" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1px"
+                android:background="@android:color/black" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="7"
+                    android:gravity="center"
+                    android:text="@string/total_power"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/electri_total_power"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="请输入.."
+                    android:inputType="number"
+                    android:textColor="@android:color/widget_edittext_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="7"
+                    android:gravity="center"
+                    android:text="@string/peak"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/electri_peak"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="请输入.."
+                    android:inputType="number"
+                    android:textColor="@android:color/widget_edittext_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="7"
+                    android:gravity="center"
+                    android:text="@string/valley"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/electri_valley"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="请输入.."
+                    android:inputType="number"
+                    android:textColor="@android:color/widget_edittext_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="7"
+                    android:gravity="center"
+                    android:text="@string/average"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/electri_average"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="请输入.."
+                    android:inputType="number"
+                    android:textColor="@android:color/widget_edittext_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/combination_deviation"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/electri_combination_deviation"
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@android:color/black" />
+
+                <Button
+                    android:id="@+id/electir_other_power"
+                    style="@android:attr/textAppearanceMedium"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dip"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/other_power"
+                    android:textColor="@android:color/black" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@android:color/black" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+                        android:layout_marginTop="5dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="@string/vol_phase_sequence"
+                android:textColor="@color/blue_light" />
+
+            <Spinner
+                android:id="@+id/electri_volt_phase"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:gravity="center"
+                android:text="@string/test_laps"
+                android:textColor="@android:color/black" />
+
+            <EditText
+                android:id="@+id/electri_test_laps"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="请输入.."
+                android:inputType="number"
+                android:singleLine="true"
+                android:textColor="@android:color/widget_edittext_dark" />
+        </LinearLayout>
 
         <TextView
             style="?android:attr/textAppearanceMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/positive_active"
+            android:layout_marginTop="5dip"
+            android:text="@string/exception_error"
             android:textColor="@android:color/black" />
 
         <View
@@ -27,210 +225,30 @@
             android:background="@android:color/black" />
 
         <LinearLayout
+            android:id="@+id/electri_radio_group"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dip"
             android:orientation="horizontal" >
 
-            <TextView
-                style="?android:attr/textAppearanceMedium"
+            <CheckBox
+                android:id="@+id/electri_radio_bt_one"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="7"
-                android:gravity="center"
-                android:text="@string/total_power"
-                android:textColor="@android:color/black" />
-
-            <EditText
-                android:id="@+id/electri_total_power"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:hint="请输入.."
-                android:textColor="@android:color/widget_edittext_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:orientation="horizontal" >
-
-            <TextView
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="7"
-                android:gravity="center"
-                android:text="@string/peak"
-                android:textColor="@android:color/black" />
-
-            <EditText
-                android:id="@+id/electri_peak"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:hint="请输入.."
-                android:textColor="@android:color/widget_edittext_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:orientation="horizontal" >
-
-            <TextView
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="7"
-                android:gravity="center"
-                android:text="@string/valley"
-                android:textColor="@android:color/black" />
-
-            <EditText
-                android:id="@+id/electri_valley"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:hint="请输入.."
-                android:textColor="@android:color/widget_edittext_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:orientation="horizontal" >
-
-            <TextView
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="7"
-                android:gravity="center"
-                android:text="@string/average"
-                android:textColor="@android:color/black" />
-
-            <EditText
-                android:id="@+id/electri_average"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:hint="请输入.."
-                android:textColor="@android:color/widget_edittext_dark" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:orientation="horizontal" >
-
-            <TextView
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/combination_deviation"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:id="@+id/electri_combination_deviation"
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textColor="@android:color/black" />
+                android:text="@string/not_meet_verify_requirment" />
 
-            <Button
-                android:id="@+id/electir_other_power"
-                style="@android:attr/textAppearanceMedium"
+            <CheckBox
+                android:id="@+id/electri_radio_bt_two"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dip"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/other_power"
-                android:textColor="@android:color/black" />
+                android:text="@string/can_not_verify" />
         </LinearLayout>
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1px"
-        android:background="@android:color/black" />
-
-    <spinneredittext.SpinnerEditText
-        android:id="@+id/electri_volt_phase"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:clickable="true" >
-    </spinneredittext.SpinnerEditText>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:orientation="horizontal" >
-
-        <TextView
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="7"
-            android:gravity="center"
-            android:text="@string/test_laps"
-            android:textColor="@android:color/black" />
-
-        <EditText
-            android:id="@+id/electri_test_laps"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="请输入.."
-            android:textColor="@android:color/widget_edittext_dark" />
-    </LinearLayout>
-
-    <TextView
-        style="?android:attr/textAppearanceMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:text="@string/exception_error"
-        android:textColor="@android:color/black" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1px"
-        android:background="@android:color/black" />
-
-    <LinearLayout
-        android:id="@+id/electri_radio_group"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
-        android:orientation="horizontal" >
-
-        <CheckBox
-            android:id="@+id/electri_radio_bt_one"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/not_meet_verify_requirment" />
-
-        <CheckBox
-            android:id="@+id/electri_radio_bt_two"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-                        android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:text="@string/can_not_verify" />
-    </LinearLayout>
-</LinearLayout>
 </ScrollView>

@@ -2,21 +2,29 @@ package gps;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import refreshablelist.DataBaseService;
+import refreshablelist.MyData;
+import stringconstant.SpinnerString;
+import static stringconstant.StringConstant.*;
+
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
 import details.DetailActivity;
 
+import DBFRW.WriteDbfFile;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,7 +58,7 @@ public class GPSManager {
     private Context mContext;
     private Boolean isFirstIn = true;
     private int minTime = 0;
-    private int minMeters = 200;
+    private int minMeters = 220;
 
     public GPSManager(Context context) {
 	this.mContext = context;
@@ -178,19 +186,39 @@ public class GPSManager {
     /**	由GPS定位坐标获取地址
      * @return	转换后的地址
      */
-    public String getNowPosition() {
+    public String getNowPosition(String cons_no) {
 	String nowPosition = "";
 	Location location = this.getMyLastKnownLocation();
 	List<Address> gps = this.getAddresses(location);
 	// System.out.println("GPS------------>" + gps);
-	if (gps == null || gps.size() == 0) {
-	    Toast.makeText(mContext, "无法获取,请检查网络状况..",
-		    Toast.LENGTH_LONG).show();
-	} else {
-	    Log.e("GPS--------->Address----->", gps.size()+"");
-	    Address address = gps.get(0);
-	    nowPosition = address.getAddressLine(0);
-	}
+	if(location != null) {
+	    if (gps == null || gps.size() == 0)
+		nowPosition = "获取GPS成功,解析地址失败";
+	    else {
+		Log.e("GPS--------->Address----->", gps.size()+"");
+		Address address = gps.get(0);
+		nowPosition = address.getAddressLine(0);
+	    }
+	    //写入gps信息
+	    DataBaseService dataBaseService = new MyData(mContext);
+	    if(dataBaseService.listMyDataMaps(GPS, null).size() == 0) {
+		//无对应数据则新建
+		ContentValues cv = new ContentValues();
+		cv.put(CONS_NO, cons_no);
+		cv.put(LATITUDE, location.getLatitude());
+		cv.put(LONGITUDE, location.getLongitude());
+		dataBaseService.addMyData(GPS, cv);
+	    }else {
+		//有对应数据则更新
+		dataBaseService.updateMyData(GPS, CONS_NO, cons_no,
+			new String[] {LATITUDE , LONGITUDE}, 
+			new String[] {Double.toString(location.getLatitude()),Double.toString(location.getLongitude())});
+	    }
+	    List<Map<String, String>> listMap = dataBaseService.listMyDataMaps(GPS, null);
+	    if(WriteDbfFile.creatDbfFile(gpsPath, GPS_ITEM, listMap))
+		Toast.makeText(mContext, "成功写入GPS信息", Toast.LENGTH_LONG).show();
+	} else
+	    Toast.makeText(mContext, "无法获取,请检查网络状况..",Toast.LENGTH_LONG).show();
 	return nowPosition;
     }
     

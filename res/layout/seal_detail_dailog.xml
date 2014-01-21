@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dip"
             android:hint="请输入编号.."
-            
+            android:digits="1234567890qwertyuiopasdfghjklzxcvbnm"
             android:textColor="@color/text_color_black" />
     </LinearLayout>
 

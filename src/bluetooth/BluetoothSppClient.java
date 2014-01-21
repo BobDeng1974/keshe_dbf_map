@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -28,6 +29,7 @@ public class BluetoothSppClient {
     private boolean creatBondResult = false;
     private PecData pecData;
     private String pin = "00000000";
+    private String macAddress;
     
     private String TAG = "BluetoothSppClient";
     private BluetoothChatService mChatService;
@@ -35,6 +37,7 @@ public class BluetoothSppClient {
     private BluetoothAdapter mBluetoothAdapter;
     private String mConnectedDeviceName;
     private Context mContext;
+    private boolean isDefaultDevice = false;
     private Handler mWaitMachineHandler;
     private boolean hasGetFileName = false;
     
@@ -43,6 +46,15 @@ public class BluetoothSppClient {
 	this.mChatService = new BluetoothChatService(this.mContext, mHandler);
 	this.mWaitMachineHandler = handler;
 	this.connectDevice(mac);
+	this.macAddress = mac;
+    }
+    public BluetoothSppClient(Context context, String mac , Boolean isDefDevice,Handler handler) {
+	this.mContext = context;
+	this.mChatService = new BluetoothChatService(this.mContext, mHandler);
+	this.mWaitMachineHandler = handler;
+	this.connectDevice(mac);
+	this.isDefaultDevice = isDefDevice;
+	this.macAddress = mac;
     }
     
     // The Handler that gets information back from the BluetoothChatService
@@ -101,7 +113,15 @@ public class BluetoothSppClient {
 		break;
 	    case MESSAGE_CONNECT_FAILURE:
 		//通知连接失败
-		mWaitMachineHandler.obtainMessage(2, -1, -1);
+		if(!isDefaultDevice)
+		    mWaitMachineHandler.obtainMessage(2, -1, -1);
+		else
+		    mWaitMachineHandler.obtainMessage(3, -1, -1);
+		break;
+	    case MESSAGE_SAVE_DEF:
+		SharedPreferences sharedPreferences = mContext.getSharedPreferences(StringConstant.PREFS_NAME, 0);
+		sharedPreferences.edit().putString("def_device", macAddress).commit();
+		System.out.println("saved the default address:"+macAddress);
 		break;
 	    }
 	}

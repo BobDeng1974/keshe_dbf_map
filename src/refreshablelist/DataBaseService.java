@@ -14,7 +14,7 @@ public interface DataBaseService {
     
     public boolean deleteMyData(String tableName ,String whereArgs , Object[] params);  
       
-    public boolean updateMyData(String tableName,String where , String  whereValue , String[] tableItems , Object[] params);
+    public boolean updateMyData(String tableName,String where , String  whereValue , String[] tableItems , String[] params);
       
     //使用 Map<String, String> 做一个封装，比如说查询数据库的时候返回的单条记录  
     public List<Map<String, String>>  viewMyData(String tableName , String selectionWhere,

@@ -203,6 +203,13 @@ public class SpinnerEditText extends LinearLayout{
 		public void onClick(View v) {
 		    // TODO Auto-generated method stub
 		    editText1.setText(editContent);
+		    if(editContent.equals("/")) {
+			editText2.setEnabled(false);
+			editText2.setHint("不填");
+		    }else {
+			editText2.setEnabled(true);
+			editText2.setHint("");
+		    }
 		    pop.dismiss();
 		}
 	    });

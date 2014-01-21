@@ -12,7 +12,7 @@ import com.linuxense.javadbf.DBFWriter;
 
 public class WriteDbfFile {
 
-    public static boolean creatDbfFile(String dbfName, // 生成的dbf文件名 加文件路径
+    public static boolean creatDbfFile(String dbfNameWithPath, // 生成的dbf文件名 加文件路径
 	    String[] strutName, // 列名
 //	    byte[] strutType,// 列类型
 //	    int[] strutLenght,// 列类型长度char（16） char（254）
@@ -41,7 +41,7 @@ public class WriteDbfFile {
 		fields[i] = new DBFField();
 		fields[i].setName(strutName[i]);
 		fields[i].setDataType(DBFField.FIELD_TYPE_C);//默认全是字符串型
-		fields[i].setFieldLength(16);//默认全是16   部分应处理为254
+		fields[i].setFieldLength(30);//默认全是30   部分应处理为254
 	    }
 	    DBFWriter writer = new DBFWriter();
 	    writer.setCharactersetName("GBK");
@@ -50,7 +50,7 @@ public class WriteDbfFile {
 	    for (int j = 0; j < dataCount; j++) {
 		writer.addRecord(objects[j]);
 	    }		
-	    fos = new FileOutputStream(dbfName);
+	    fos = new FileOutputStream(dbfNameWithPath);
 	    writer.write(fos);
 	    flag = true;
  	} catch (Exception e) {
@@ -61,7 +61,7 @@ public class WriteDbfFile {
 		fos.close();
 	    } catch (IOException e) {}
 	}
-	System.out.println("creatDbfFile "+dbfName+"-->" + flag);
+	System.out.println("creatDbfFile "+dbfNameWithPath+"-->" + flag);
 	return flag;
     }
 }

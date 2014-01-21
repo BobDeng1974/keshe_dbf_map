@@ -394,7 +394,7 @@ public class BuildFrameUtil {
 	strDataTemp = new byte[strDataTmpLen];
 	System.arraycopy(data, Ind[1] + 1, strDataTemp, 0, Ind[2] - Ind[1] - 1);
 	// 拷贝时间，以字符串的形式。
-	strDataTemp = new byte[strDataTmpLen];
+	strDataTemp = new byte[Ind[16] - Ind[15] - 1];
 	System.arraycopy(data, Ind[15] + 1, strDataTemp, 0, Ind[16] - Ind[15]
 		- 1);
 	pecData.setTimer(strDataTemp);

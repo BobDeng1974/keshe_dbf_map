@@ -155,7 +155,8 @@ public class RefreshableListViewActivity extends Fragment {
 //	WriteDbfFile.creatDbfFile(root+"/rw.dbf", RW_ITEM, items);
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
 	List<Map<String, String>> list =
-		parseDbf2Map.getListMapFromDbf(jlfyzcxxPath);
+		parseDbf2Map.getListMapFromDbf(gpsPath);
+//		parseDbf2Map.getListMapFromDbf(root +"/"+JLFYZCXX+".dbf");
 	System.out.println(list);
 	
 	return items;
@@ -188,7 +189,7 @@ public class RefreshableListViewActivity extends Fragment {
 	    }
 	    new AlertDialog.Builder(getActivity())
 		    .setTitle("警告")
-		    .setMessage("未发现dbf文件,请检查SDCard!")
+		    .setMessage("未发现dbf文件,请放到"+root+"下")
 		    .setPositiveButton("确定",
 			    new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,
