@@ -137,6 +137,7 @@ public class MyBaseAdapter extends BaseAdapter {
 	    holder.made_number.setText(searchMap.get(MADE_NO).trim());
 	    // 将被点击的任务的详细信息传递到任务信息界面以显示
 	    searchMap.put(ZC_ID, getItem(position).get(ZC_ID.trim()));
+	    searchMap.put(TASKID, getItem(position).get(TASKID));
 	    String stringMap = StringToMap.MapToString(searchMap);
 	    holder.save_map.setText(stringMap);
 
@@ -176,9 +177,7 @@ public class MyBaseAdapter extends BaseAdapter {
 			.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 				    public void onClick(DialogInterface dialog,
-					    int whichButton) {
-					((Activity)mContext).finish();
-				    }
+					    int whichButton) {}
 				}).show();
 		isFirstNotFound = false;
 	    }

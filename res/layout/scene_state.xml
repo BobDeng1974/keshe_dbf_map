@@ -22,7 +22,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="输入误差值.."
-            android:inputType="number"
+            android:digits="-.1234567890"
             android:singleLine="true"
             android:textColor="@android:color/widget_edittext_dark" />
     </LinearLayout>

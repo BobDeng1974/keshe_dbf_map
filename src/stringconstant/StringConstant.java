@@ -228,8 +228,8 @@ public class StringConstant {
     
     public static String[] MISSION_INFO_ITEM_02_CHINESE = { "变电所名称" ,"电压等级", "线路名称","TA变比","型号" };
     
-    public static String[] PecDataItem = {"Ua","Ia","Ub","Ib","Uc","Ic","Pa","Pb","Pc","Qa","Qb","Qc","Aa","Ab","Ac",
-	"Pabc","Qabc","Uab","Uac","Iac","Cos","Fre","Ucb","Error1","Error2"};
+    public static String[] PecDataItem = {UA,IA,UB,IB,UC,IC,A_PF,B_PF,C_PF,"Qa","Qb","Qc",I1,I2,I3,
+	SND_PF,SND_RPF,U12_U1,U2,"Iac","Cos","Fre",U32_U3,ERR1,ERR2};
     
     public static String[] WIRING_03 = {"温度：","湿度：","Uan：","Ubn：","Ucn：","Ia：","Ib：","Ic：",
 	"Uan^Ia：","Ubn^Ib：","Ucn^Ic：","A相功率：","B相功率：","C相功率：","功率因素：","二次总有功功率：",

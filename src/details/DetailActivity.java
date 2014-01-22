@@ -88,6 +88,7 @@ public class DetailActivity extends Activity {
     HashMap<String, Object> missionData;//存放此次所有输入的数据
     HashMap<String, List<String>> configTxtData;
     private String Zc_id = "";
+    private String Task_id = "";
     private String Cons_No = "";//是CONS_NO的detail
     private String wiringMode = "";
     // title
@@ -336,7 +337,6 @@ public class DetailActivity extends Activity {
 	getPositionTextView = (TextView) findViewById(R.id.get_position_text);
 	missionInfoListView = (ListView) findViewById(R.id.mission_info_listview);
 	
-	System.out.println("---------"+Cons_No+"----");
 	initMissionInfoListView();
 	initMissionInfoListener();
 	GPSSearchMap = dataBaseService.viewMyData(GPS, CONS_NO,new String[] { Cons_No });
@@ -402,6 +402,8 @@ public class DetailActivity extends Activity {
 	//标志此次的详细信息是号码为Cons_No的
 	Cons_No = (String) map.get(CONS_NO);
 	Zc_id = (String) map.get(ZC_ID);
+	Task_id = (String) map.get(TASKID);
+	System.out.println(Cons_No+"-"+Zc_id + "-" +Task_id);
 	//获取接线方式
 	wiringMode = (String) map.get(WIRING);
 //	System.out.println(wiringMode);
@@ -486,7 +488,7 @@ public class DetailActivity extends Activity {
 	int year = calendar.get(Calendar.YEAR);
 	int monthOfYear = calendar.get(Calendar.MONTH)+1;
 	int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-	electriClockDate.setText(year + "/" + monthOfYear + "/" + dayOfMonth);
+	electriClockDate.setText(year + "-" + monthOfYear + "-" + dayOfMonth);
 	electriClockDateConclusion = (Spinner) findViewById(R.id.clock_date_conclusion);
 	electriClockEventButton = (Button) findViewById(R.id.clock_event_button);
 	electirClockEvent = (AutoCompleteTextView) findViewById(R.id.clock_event_textview);
@@ -720,19 +722,37 @@ class MySpinnerListener implements OnItemSelectedListener{
 	    }
 
 	}else if(parent.equals(confirmWorkMode)) {
-	    
+	    if(position == 0 || missionData.containsKey(WORK_MODE))
+		missionData.remove(WORK_MODE);
+	    else
+		missionData.put(WORK_MODE, position);
 	}else if(parent.equals(confirmSeal)) {
-	    
+	    missionData.put(SEAL_FLAG, datas.get(position));
 	}else if(parent.equals(confirmSecondaryLineConclusion)) {
-	    
+	    if(position == 0) 
+		missionData.put(SND_CONC, "");
+	    else if(position == 1 || position == 2)
+		missionData.put(SND_CONC, position -1);
+	    else
+		missionData.put(SND_CONC, 9);
 	}else if(parent.equals(confirmSceneVerifyConclusion)) {
-	    
+	    if(position == 0 ) 
+		missionData.put(TEST_RSLT, "");
+	    else if(0 < position && position <= 2) 
+		missionData.put(TEST_RSLT, position - 1);
+	    else
+		missionData.put(TEST_RSLT, position + 1);
 	}else if(parent.equals(clockDeviationConclusion)) {
-	    
+	    if(position == 0 ) missionData.put(T_ERR_CONC, "");
+	    else 	missionData.put(T_ERR_CONC, position-1);
 	}else if (parent.equals(electriClockDateConclusion)) {
-	    
+	    if(position == 0 ) missionData.put(DATE_CONC, "");
+	    else 	missionData.put(DATE_CONC, position-1);
 	}else if(parent.equals(voltPhase)) {
-	    
+	    if(position == 0 || missionData.containsKey(PHASE_CODE)) 
+		missionData.remove(PHASE_CODE); 
+	    else 
+		missionData.put(PHASE_CODE, datas.get(position));
 	}
 	((TextView) view).setText(datas.get(position));
     }
@@ -761,7 +781,8 @@ class MySpinnerListener implements OnItemSelectedListener{
 	    if (resultCode == Activity.RESULT_OK) {
 		String address = data.getExtras().getString(
 			EXTRA_DEVICE_ADDRESS);
-		sharedPreferences.edit().putString("def_device", address);
+		sharedPreferences.edit().putString("def_device", address).commit();
+		canConnectDefDevice = true;
 		// 新线程与蓝牙通信
 		bluetoothSppClient = new BluetoothSppClient(
 			DetailActivity.this, address, mreadMachineHandler);
@@ -823,6 +844,13 @@ class MySpinnerListener implements OnItemSelectedListener{
 		    System.out.println(key);
 		    mConversationArrayAdapter.add(key + ":" + hashMap.get(key));
 		}
+		//填充missionData数据
+		String[] needData = {UA,IA,UB,IB,UC,IC,A_PF,B_PF,C_PF,I1,I2,I3,SND_PF,SND_RPF
+			,U12_U1,U2,U32_U3,ERR1,ERR2};
+		for(int i =0;i<needData.length;i++) {
+		    String key = needData[i];
+		    missionData.put(key,hashMap.get(key));
+		}
 		break;
 	    case 2:
 		// error
@@ -831,6 +859,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 			.show();
 		waitReadMachineDialog.dismiss();
 		readMachineThread.interrupt();
+		break;
 	    case 3:
 		//default device connect error
 		System.out.println("mreadMachineHandler---error");
@@ -839,7 +868,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 		waitReadMachineDialog.dismiss();
 		readMachineThread.interrupt();
 		canConnectDefDevice = false;
-		sharedPreferences.edit().putString("def_device" , "").commit();//清除这个默认的mac地址
+//		sharedPreferences.edit().putString("def_device" , "").commit();//清除这个默认的mac地址
 		break;
 	    }
 	    bluetoothSppClient.close();
@@ -986,6 +1015,100 @@ class MySpinnerListener implements OnItemSelectedListener{
     // /////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    /**
+     * 写dbf文件前，把输入好的数据收集起来
+     */
+    public void collectMissionData() {
+		missionData.put(ZC_ID, Zc_id);
+		missionData.put(CONS_NO, Cons_No);
+		missionData.put(TASKID, Task_id);
+	    //计量封印装拆信息(jlfyzcxx.dbf)
+	    collectSealData(tableSealOne, "old", "");
+	    collectSealData(tableSealTwo, "old", "2");
+	    collectSealData(newTableSealOne, "new", "");
+	    collectSealData(newTableSealTwo, "new", "2");
+	    missionData.put(EQUIPCATEG, 01);
+	    missionData.put(EQUIP_ID, Zc_id);//检查
+	    missionData.put(HANDLEDATE, confirmDateTime.getText().toString());
+	    missionData.put(CHG_REASON, "电能表校验");
+	    missionData.put(HANDLER_NO, confirmCheckPeople.getType());
+	    //电能表校验结果(dnbxysj.dbf)
+	    missionData.put(APP_NO, Task_id);
+	    missionData.put(METER_ID, Zc_id);
+	    missionData.put(TEST_CIRCLE_QRY, testLaps.getText().toString());
+	    missionData.put(TESTER_NO, confirmCheckPeople.getType());
+	    missionData.put(TEST_DATE, confirmDateTime.getText().toString());
+	    missionData.put(CHECKER_NO, confirmVerifyPeople.getType());
+	    missionData.put(TEMP, verifyTemperature.getText().toString());
+	    missionData.put(HUMIDITY, verifyHumidity.getText().toString());
+	    addRemarkData();//添加remark
+	    //电能表校验多功能数据(dnbdglxx.dbf)
+	    missionData.put(TIME_ERR, clockDeviation.getText().toString());
+	    missionData.put(METET_DATE, electriClockDate.getText().toString());
+	    String combination = combinationDeviation.getText().toString();
+	    if(combination.length() >1) {
+		combination = combination.substring(0, combination.length()-1);
+		double c = Double.parseDouble(combination);
+		if(c<10)
+		    missionData.put(C_ERR_CONC, 1);//组合误差<0.1
+		else
+		    missionData.put(C_ERR_CONC, 0);
+	    }
+	    //电能表现场检验示数(dnbxcssxx.dbf)
+	    missionData.put(ACTIVE_TOTAL, positiveTotalPower.getText().toString());
+	    missionData.put(ACTIVE_PEAK, positivePeak.getText().toString());
+	    missionData.put(ACTIVE_VALLEY, positiveValley.getText().toString());
+	    missionData.put(ACTIVE_AVERAGE, positiveAverage.getText().toString());
+    }
+    
+    public void collectSealData(SpinnerEditText sp , String newOrOld , String nullOrSecond) {
+	String oldTableType = sp.getType();
+	if(oldTableType.equals("/")) 	return;
+	if(oldTableType.equals("普通")) missionData.put(newOrOld+SEAL_TYPE+nullOrSecond, 01);
+	if(oldTableType.equals("防盗")) missionData.put(newOrOld+SEAL_TYPE+nullOrSecond, 02);
+	if(oldTableType.equals("印模")) missionData.put(newOrOld+SEAL_TYPE+nullOrSecond, 03);
+	missionData.put(newOrOld+SEAL_ID+nullOrSecond, sp.getValue());
+	int oldTableStatus = sp.getStatus();
+	if(oldTableStatus == -1) {
+	    missionData.put(newOrOld+VALID_FLAG+nullOrSecond, 01); 
+	    missionData.put(newOrOld+INTACTFLAG+nullOrSecond, 01);
+	} else if(oldTableStatus == 1) {
+	    missionData.put(newOrOld+VALID_FLAG+nullOrSecond, 02); 
+	    missionData.put(newOrOld+INTACTFLAG+nullOrSecond, 01);
+	}else {
+	    missionData.put(newOrOld+VALID_FLAG+nullOrSecond, 01); 
+	    missionData.put(newOrOld+INTACTFLAG+nullOrSecond, 02);
+	}
+    }
+    private void addRemarkData() {
+	String oldCabinet = cabinetSealOne.getType().equals("/") ?
+		"" : "柜旧封1:"+cabinetSealOne.getType() +cabinetSealOne.getStatus()+ ";" ;
+	String oldCabinet2 = cabinetSealTwo.getType().equals("/") ? 
+		"" : "柜旧封2:"+cabinetSealTwo.getType() +cabinetSealTwo.getStatus()+ ";" ;
+	String oldTable = tableSealOne.getType().equals("/") ? 
+		"" : "电能表旧封1:"+tableSealOne.getType() +tableSealOne.getStatus()+ ";" ;
+	String oldTable2 = tableSealTwo.getType().equals("/") ? 
+		"" : "电能表旧封2:"+tableSealTwo.getType() +tableSealTwo.getStatus()+ ";" ;
+	String oldBox = boxSealOne.getType().equals("/") ? 
+		"" : "端子盒旧封1:"+boxSealOne.getType() +boxSealOne.getStatus()+ ";" ;
+	String oldBox2 = boxSealTwo.getType().equals("/") ? 
+		"" : "端子盒旧封2:"+boxSealTwo.getType() +boxSealTwo.getStatus()+ ";" ;
+	
+	String newCabinet = newCabinetSealOne.getType().equals("/") ?
+		"" : "柜新封1:"+newCabinetSealOne.getType() +newCabinetSealOne.getStatus()+ ";" ;
+	String newCabinet2 = newCabinetSealTwo.getType().equals("/") ?
+		"" : "柜新封2:"+newCabinetSealTwo.getType() +newCabinetSealTwo.getStatus()+ ";" ;
+	String newTable = newTableSealOne.getType().equals("/") ? 
+		"" : "电能表新封1:"+newTableSealOne.getType() +newTableSealOne.getStatus()+ ";" ;
+	String newTable2 = newTableSealTwo.getType().equals("/") ? 
+		"" : "电能表新封2:"+newTableSealTwo.getType() +newTableSealTwo.getStatus()+ ";" ;
+	String newBox = newBoxSealOne.getType().equals("/") ?
+		"" : "端子盒新封1:"+newBoxSealOne.getType() +newBoxSealOne.getStatus()+ ";" ;
+	String newBox2 = newBoxSealTwo.getType().equals("/") ? 
+		"" : "端子盒新封2:"+newBoxSealTwo.getType() +newBoxSealTwo.getStatus()+ ";" ;
+	missionData.put(REMARK, oldCabinet+oldCabinet2+oldTable+oldTable2+oldBox+oldBox2+
+		"\n"+newCabinet+newCabinet2+newTable+newTable2+newBox+newBox2);
+    }
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ////////////////////////////////// init titlebar
     // /////////////////////////////////////////////////////////////
@@ -1229,6 +1352,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 						    DialogInterface dialog,
 						    int which) {
 						// 存储数据 async
+						collectMissionData();
 						new MyWriteDataTask(DetailActivity.this).execute(missionData);
 					    }
 					})
@@ -1371,7 +1495,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 	Button dialogConfirmButton = (Button) myView
 		.findViewById(R.id.datepicker_confirm_bt);
 	String date = dateButton.getText().toString();
-	String[] dates = date.split("/");
+	String[] dates = date.split("-");
 	int year = Integer.parseInt(dates[0]);
 	int monthOfYear = Integer.parseInt(dates[1]);
 	int dayOfMonth = Integer.parseInt(dates[2]);
@@ -1379,7 +1503,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 		new OnDateChangedListener() {
 		    public void onDateChanged(DatePicker view, int year,
 			    int monthOfYear, int dayOfMonth) {
-			dateButton.setText(year + "/" + (monthOfYear + 1) + "/"
+			dateButton.setText(year + "-" + (monthOfYear + 1) + "-"
 				+ dayOfMonth);
 		    }
 		});
@@ -1449,7 +1573,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 		new String[] {CONTACT , PHONE},
 		new String[] {contact ,phone});
 	List<Map<String, String>> listMap = dataBaseService.listMyDataMaps(RW, null);
-	if(WriteDbfFile.creatDbfFile(root + "/rw.dbf", RW_ITEM, listMap))
+	if(WriteDbfFile.creatDbfFile(rwPath, RW_ITEM, listMap))
 	    Toast.makeText(getApplicationContext(), "联系人信息成功更新", Toast.LENGTH_LONG).show();
 	else
 	    Toast.makeText(getApplicationContext(), "联系人信息成功更新", Toast.LENGTH_LONG).show();
@@ -1550,11 +1674,23 @@ class MySpinnerListener implements OnItemSelectedListener{
 	Button dialogConfirmButton = (Button) myView
 		.findViewById(R.id.dialog_electir_confirm);
 	titleTextView.setText(title);
-
+	final EditText dialogTotalPower = (EditText) myView.findViewById(R.id.dialog_total_power);
+	final EditText dialogPeakPower = (EditText) myView.findViewById(R.id.dialog_peak);
+	final EditText dialogValleyPower = (EditText) myView.findViewById(R.id.dialog_valley);
+	final EditText dialogAveragePower = (EditText) myView.findViewById(R.id.dialog_average);
+	final EditText dialogPositiveReactive = (EditText) myView.findViewById(R.id.dialog_positive_reactive);
+	final EditText dialogNegetiveReactive = (EditText) myView.findViewById(R.id.dialog_negative_reactive);
+	final EditText dialogMaxDemand = (EditText) myView.findViewById(R.id.dialog_maximum_active_demand);
 	dialogConfirmButton.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-		// TODO Auto-generated method stub
+		missionData.put(REACTIVE_TOTAL, dialogPositiveReactive.getText().toString());
+		missionData.put(REACTIVE_REVERSE, dialogNegetiveReactive.getText().toString());
+		missionData.put(MAX_NEED, dialogMaxDemand.getText().toString());
+		missionData.put(ACTIVE_REVERSE_TOTAL, dialogTotalPower.getText().toString());
+		missionData.put(ACTIVE_REVERSE_PEAK, dialogPeakPower.getText().toString());
+		missionData.put(ACTIVE_REVERSE_VALLEY, dialogValleyPower.getText().toString());
+		missionData.put(ACTIVE_REVERSE_AVERAGE, dialogAveragePower.getText().toString());
 		dialog.dismiss();
 	    }
 	});

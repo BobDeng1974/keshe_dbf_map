@@ -100,23 +100,26 @@ public class BluetoothSppClient {
 	    case MESSAGE_DEVICE_NAME:
 		// save the connected device's name
 		mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-		Toast.makeText(mContext,
-			"Connected to " + mConnectedDeviceName,
-			Toast.LENGTH_SHORT).show();
+		Toast.makeText(mContext,"Connected to " + mConnectedDeviceName,Toast.LENGTH_SHORT).show();
+		
 		break;
 	    case MESSAGE_TOAST:
+		String toast = msg.getData().getString(TOAST);
 		Toast.makeText(mContext,
-			msg.getData().getString(TOAST), Toast.LENGTH_SHORT)
+			toast, Toast.LENGTH_SHORT)
 			.show();
 		System.out.println("MESSAGE_DEVICE_NAME---------->"
-			+ msg.getData().getString(TOAST));
+			+ toast);
+		if(toast.equals("Unable to connect device"))
+		    mHandler.sendEmptyMessage(MESSAGE_CONNECT_FAILURE);
 		break;
 	    case MESSAGE_CONNECT_FAILURE:
 		//通知连接失败
+		System.out.println("MESSAGE_CONNECT_FAILURE");
 		if(!isDefaultDevice)
-		    mWaitMachineHandler.obtainMessage(2, -1, -1);
+		    mWaitMachineHandler.obtainMessage(2, -1, -1).sendToTarget();
 		else
-		    mWaitMachineHandler.obtainMessage(3, -1, -1);
+		    mWaitMachineHandler.obtainMessage(3, -1, -1).sendToTarget();
 		break;
 	    case MESSAGE_SAVE_DEF:
 		SharedPreferences sharedPreferences = mContext.getSharedPreferences(StringConstant.PREFS_NAME, 0);

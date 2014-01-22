@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
 
@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
     
@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -149,7 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -169,7 +169,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -189,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -209,7 +209,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -229,7 +229,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -249,7 +249,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -269,7 +269,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
             <RelativeLayout
@@ -289,7 +289,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -309,7 +309,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -329,7 +329,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -349,7 +349,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
          <RelativeLayout
@@ -369,7 +369,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
         <RelativeLayout
@@ -389,7 +389,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:inputType="number"
+            android:digits="-.1234567890"
             />
     </RelativeLayout>
 </LinearLayout>

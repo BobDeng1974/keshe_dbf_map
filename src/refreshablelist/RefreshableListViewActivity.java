@@ -45,6 +45,7 @@ public class RefreshableListViewActivity extends Fragment {
     private List<Map<String, String>> mItems;
     private RefreshableListView mListView;
     private TextView completeNumber;
+    private MyBaseAdapter myBaseAdapter;
 
     
     @Override
@@ -60,12 +61,11 @@ public class RefreshableListViewActivity extends Fragment {
 	super.onViewCreated(view, savedInstanceState);
 	// 检查dbf文件夹是否存在。不存在则退出
 	if (isDirExist(dbfPath)) {
-	    mItems = getItems();
 	    mListView = (RefreshableListView) view.findViewById(R.id.listview);
 	    completeNumber = (TextView) view
 		    .findViewById(R.id.accomplish_number);
-	    MyBaseAdapter myBaseAdapter = new MyBaseAdapter(getActivity(),
-		    mItems);
+	    myBaseAdapter = new MyBaseAdapter(getActivity(),
+		    getItems());
 	    mListView.setAdapter(myBaseAdapter);
 	    // Callback to refresh the list
 	    mListView.setOnItemClickListener(new ItemClickListener());
@@ -87,10 +87,8 @@ public class RefreshableListViewActivity extends Fragment {
 	@Override
 	protected Map<String, String> doInBackground(Void... params) {
 	    Map<String, String> map = new HashMap<String, String>();
-	    // map.put("ZC_ID", "121212");
-	    map.put("CONTACT", "李狗蛋");
 	    try {
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 	    } catch (InterruptedException e) {
 	    }
 
@@ -101,6 +99,7 @@ public class RefreshableListViewActivity extends Fragment {
 	protected void onPostExecute(Map<String, String> result) {
 	    // mItems.add(result);
 	    // This should be called after refreshing finished
+	    myBaseAdapter.notifyDataSetChanged();
 	    mListView.completeRefreshing();
 
 	    super.onPostExecute(result);
@@ -140,7 +139,17 @@ public class RefreshableListViewActivity extends Fragment {
 	    startActivity(intent);
 	}
     }
-
+    
+    @Override
+    public void onResume() {
+	System.out.println("refreshlistview onresume");
+	if(mListView != null) {
+	    myBaseAdapter = new MyBaseAdapter(getActivity(),
+		    getItems());
+	    mListView.setAdapter(myBaseAdapter);
+	}
+	super.onResume();
+    }
     /**
      * 设置ListView的数据
      * 
@@ -153,11 +162,11 @@ public class RefreshableListViewActivity extends Fragment {
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
 	
 //	WriteDbfFile.creatDbfFile(root+"/rw.dbf", RW_ITEM, items);
-	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-	List<Map<String, String>> list =
-		parseDbf2Map.getListMapFromDbf(gpsPath);
+//	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
+//	List<Map<String, String>> list =
+//		parseDbf2Map.getListMapFromDbf(rwPath);
 //		parseDbf2Map.getListMapFromDbf(root +"/"+JLFYZCXX+".dbf");
-	System.out.println(list);
+//	System.out.println(list);
 	
 	return items;
     }
@@ -176,6 +185,8 @@ public class RefreshableListViewActivity extends Fragment {
 	completeNumber.setText(String.format("当前已完成 %d 条/共有 %d 条",
 		searchMap.size(), tableAll.size() - 1));
     }
+    
+    
     /**判断SD卡中目录或文件是否存在
      * @param path
      * @return

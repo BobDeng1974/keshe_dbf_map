@@ -288,6 +288,7 @@ public class BluetoothChatService {
      */
     private void connectionFailed() {
 	// Send a failure message back to the Activity
+//	mHandler.obtainMessage(BluetoothConstant.MESSAGE_CONNECT_FAILURE, -1, -1).sendToTarget();
 	Message msg = mHandler.obtainMessage(BluetoothConstant.MESSAGE_TOAST);
 	Bundle bundle = new Bundle();
 	bundle.putString(BluetoothConstant.TOAST, "Unable to connect device");
@@ -303,11 +304,11 @@ public class BluetoothChatService {
      */
     private void connectionLost() {
 	// Send a failure message back to the Activity
-	Message msg = mHandler.obtainMessage(BluetoothConstant.MESSAGE_TOAST);
-	Bundle bundle = new Bundle();
-	bundle.putString(BluetoothConstant.TOAST, "Device connection was lost");
-	msg.setData(bundle);
-	mHandler.sendMessage(msg);
+//	Message msg = mHandler.obtainMessage(BluetoothConstant.MESSAGE_TOAST);
+//	Bundle bundle = new Bundle();
+//	bundle.putString(BluetoothConstant.TOAST, "Device connection was lost");
+//	msg.setData(bundle);
+//	mHandler.sendMessage(msg);
 
 	// Start the service over to restart listening mode
 	BluetoothChatService.this.start();
@@ -427,7 +428,6 @@ public class BluetoothChatService {
 			new Class[] { int.class });
 		tmp = (BluetoothSocket) m.invoke(device, Integer.valueOf(1));
 	    } catch (Exception e1) {
-		// TODO Auto-generated catch block
 		e1.printStackTrace();
 	    }
 	    // try {
@@ -466,7 +466,6 @@ public class BluetoothChatService {
 		try {
 		    mmSocket.close();
 		    System.out.println("ConnectThread-----> Failure");
-		    mHandler.obtainMessage(BluetoothConstant.MESSAGE_CONNECT_FAILURE, -1, -1).sendToTarget();
 		} catch (IOException e2) {
 		    Log.e(TAG, "unable to close() " + mSocketType
 			    + " socket during connection failure", e2);

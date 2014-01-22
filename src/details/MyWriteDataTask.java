@@ -28,10 +28,10 @@ public class MyWriteDataTask extends
     ProgressDialog mProgressDialog;
     ContentValues contentValues;
     
-    String creatDnbxysjPath = root+"/"+DNBXYSJ +".dbf";
-    String creatDnbxcssxxPath = root+"/"+DNBXCSSXX +".dbf";
-    String creatDnbdglxxPath =  root+"/"+DNBDGLXX +".dbf";
-    String creatJlfyzcxxPath =  root+"/"+JLFYZCXX +".dbf";
+    String creatDnbxysjPath =dnbxysjPath;// root+"/"+DNBXYSJ +".dbf";
+    String creatDnbxcssxxPath = dnbxcssxxPath;//root+"/"+DNBXCSSXX +".dbf";
+    String creatDnbdglxxPath =  dnbdglxxPath;//root+"/"+DNBDGLXX +".dbf";
+    String creatJlfyzcxxPath =  jlfyzcxxPath;//root+"/"+JLFYZCXX +".dbf";
     
     public MyWriteDataTask(Activity context) {
 	this.mContext = context;
@@ -57,6 +57,7 @@ public class MyWriteDataTask extends
 
 	// 先更新数据库，再用数据库数据生成dbf文件
 	String zc_id = getValue(dataMap, ZC_ID);
+	System.out.println("zc_id ="+zc_id);
 	// 删除已有信息
 	mDataService.deleteMyData(DNBXYSJ, METER_ID, new String[] { zc_id });
 	mDataService.deleteMyData(DNBXCSSXX, METER_ID, new String[] { zc_id });
@@ -78,6 +79,10 @@ public class MyWriteDataTask extends
 	
 	//操作jlfyzcxx文件 表封的
 	if(!doJlfyzcxxDB(dataMap))
+	    return false;
+	mDataService.updateMyData(RW, ZC_ID, zc_id, new String[] {WCZT},new String[] {"已完成"});
+	List<Map<String, String>> listMap = mDataService.listMyDataMaps(RW, null);
+	if(!WriteDbfFile.creatDbfFile(rwPath, RW_ITEM, listMap))
 	    return false;
 	return true;
     }
@@ -192,8 +197,10 @@ public class MyWriteDataTask extends
 	}
 	//先添加旧表封数据
 	cv.put(HANDLEFLAG, "02");//旧封02
-	if(!addNewOrOldSeal("old", "", cv, dataMap))
-	    return false;
+	if(dataMap.containsKey("old" + SEAL_TYPE)) {
+	    if(!addNewOrOldSeal("old", "", cv, dataMap))
+		return false;
+	}
 	//若有旧表封有两个
 	if(dataMap.containsKey("old"+SEAL_TYPE +"2")) {
 	    if(!addNewOrOldSeal("old", "2", cv, dataMap))
@@ -201,8 +208,10 @@ public class MyWriteDataTask extends
 	}
 	//添加新封
 	cv.put(HANDLEFLAG, "01");
-	if(!addNewOrOldSeal("new", "", cv, dataMap))
-	    return false;
+	if(dataMap.containsKey("new"+SEAL_TYPE)) {
+	    if(!addNewOrOldSeal("new", "", cv, dataMap))
+		return false;
+	}
 	//若有新表封有两个
 	if(dataMap.containsKey("new"+SEAL_TYPE +"2")) {
 	    if(!addNewOrOldSeal("new", "2", cv, dataMap))

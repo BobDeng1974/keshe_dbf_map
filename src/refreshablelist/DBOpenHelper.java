@@ -1,5 +1,6 @@
 package refreshablelist;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static String name = "MyDnb.db"; // 表示数据库的名称
     private static int version = 1; // 表示数据库的版本号
     private Context mContext;
+    private SQLiteDatabase sqLiteDatabase;
     
     public DBOpenHelper(Context context) {
 	super(context, name, null, version);
@@ -27,7 +29,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 	System.out.println("onCreate创建表");  
-
 	// SQLite 数据创建支持的数据类型： 整型数据，字符串类型，日期类型，二进制的数据类型
 	// 数据库这边有一个特点，就是SQLite数据库中文本类型没有过多的约束，也就是可以把布尔类型的数据存储到文本类型中，这样也是可以的
 	CreatTableSQL(RW_ITEM, RW,rwPath,db);
@@ -46,18 +47,22 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	System.out.println("onUpgrade删除表");  
     }
     
-    private void  CreatTableSQL(String[] colums , String tableName , String filePath , SQLiteDatabase database /*String[] type*/) {
+    public static  boolean  CreatTableSQL(String[] colums , String tableName , String filePath , SQLiteDatabase database /*String[] type*/) {
 	//获取列名
+	boolean flag = false;
 	String col_string = "";
 	for (int i = 0; i < colums.length; i++) 
 	    col_string = col_string + ","+colums[i] + " TEXT";
 	String sql = "create table "+tableName+"(id integer primary key autoincrement"+col_string+")";
 	database.execSQL("drop table if exists " + tableName);
 	database.execSQL(sql);
-	incertDBTable(database, tableName, colums, filePath);
+	File sfile = new File(filePath);
+	if(sfile.exists())
+	    incertDBTable(database, tableName, colums, filePath);
+	return true;
     }
     
-    private void incertDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
+    private static void incertDBTable(SQLiteDatabase db,String tableName, String[] tableItem,
 	    String filePath) {
 	Boolean flag = false;
 	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
@@ -87,7 +92,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	}
     }
     
-    private void insertTableValue(SQLiteDatabase db , String tableName , String[] tableItems , String[] params) {
+    private static void insertTableValue(SQLiteDatabase db , String tableName , String[] tableItems , String[] params) {
 	String key = "";
 	String value = "";
 	for (int i = 0; i < tableItems.length; i++) {
