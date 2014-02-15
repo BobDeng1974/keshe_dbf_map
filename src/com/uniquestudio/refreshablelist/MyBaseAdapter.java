@@ -215,9 +215,4 @@ public class MyBaseAdapter extends BaseAdapter {
 	BadgeView badgeView_complete;
 	BadgeView badgeView_categories;
     }
-    // new int[] { R.id.item_zc_id, R.id.item_categories,R.id.item_begin_date,
-    // R.id.item_cons_name,R.id.item_address,R.id.item_contact, R.id.item_phone
-    // , //categories=01
-    // R.id.item_subs_name,R.id.item_substation,R.id.item_line_name,//categories=02
-    // R.id.item_made_number});
 }

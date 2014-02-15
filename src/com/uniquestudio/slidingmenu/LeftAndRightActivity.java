@@ -1,9 +1,11 @@
 package com.uniquestudio.slidingmenu;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.WindowManager;
 
 import com.slidingmenu.lib.SlidingMenu;
 import com.uniquestudio.R;
@@ -16,7 +18,6 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
   private ChangeAKFragment changeAKFragment;
   private GetDBFDirFragment getDBFDirFragment;
   private GetIMEIFragment getIMEIFragment;
-
 	public LeftAndRightActivity() {
 	    super(R.string.app_name);
 	}
@@ -56,6 +57,7 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 		fragmentTransaction.hide(getDBFDirFragment);
 		fragmentTransaction.hide(getIMEIFragment);
 		fragmentTransaction.commit();
+		
 	}
 	public void changeFragment(int position) {
 		FragmentTransaction t = this.getSupportFragmentManager()

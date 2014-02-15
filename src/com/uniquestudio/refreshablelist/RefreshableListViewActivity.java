@@ -59,6 +59,7 @@ public class RefreshableListViewActivity extends Fragment {
 	super.onViewCreated(view, savedInstanceState);
 	mListView = (RefreshableListView) view.findViewById(R.id.listview);
 	completeNumber = (TextView) view.findViewById(R.id.accomplish_number);
+	
 	// 检查dbf文件夹是否存在。不存在则退出
 	if (isDBFExist()) {
 	    mItems = getItems();
@@ -80,6 +81,7 @@ public class RefreshableListViewActivity extends Fragment {
 	    filter.addAction("com.unique.refresh");  
 	    //此处表示该接收器会刷新列表的广播请求
 	    getActivity().registerReceiver(refreshReceiver, filter); 
+	    
 	}
     }
     
@@ -182,22 +184,11 @@ public class RefreshableListViewActivity extends Fragment {
     
     /**
      * 设置ListView的数据
-     * 
      * @return
      */
     private List<Map<String, String>> getItems() {
-//	gps2m(30.510428, 114.426294, 30.507962, 114.42796);
-	 
 	DataBaseService service = new MyData(getActivity());
 	List<Map<String, String>> items = service.listMyDataMaps(RW, null);
-	
-//	WriteDbfFile.creatDbfFile(root+"/rw.dbf", RW_ITEM, items);
-//	ParseDbf2Map parseDbf2Map = new ParseDbf2Map();
-//	List<Map<String, String>> list =
-//		parseDbf2Map.getListMapFromDbf(rwPath);
-//		parseDbf2Map.getListMapFromDbf(root +"/"+JLFYZCXX+".dbf");
-//	System.out.println(list);
-	
 	return items;
     }
 
@@ -264,21 +255,4 @@ public class RefreshableListViewActivity extends Fragment {
         }
     };
     
-//	private final double EARTH_RADIUS = 6378137.0; 
-//	/**测量两点间的距离
-//	 * @return 米为单位
-//	 */
-//	private double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
-//	       double radLat1 = (lat_a * Math.PI / 180.0);
-//	       double radLat2 = (lat_b * Math.PI / 180.0);
-//	       double a = radLat1 - radLat2;
-//	       double b = (lng_a - lng_b) * Math.PI / 180.0;
-//	       double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
-//	              + Math.cos(radLat1) * Math.cos(radLat2)
-//	              * Math.pow(Math.sin(b / 2), 2)));
-//	       s = s * EARTH_RADIUS;
-//	       s = Math.round(s * 10000) / 10000;
-//	       System.out.println("距离--->"+s);
-//	       return s;
-//	    }
 }
