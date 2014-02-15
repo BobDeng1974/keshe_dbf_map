@@ -7,8 +7,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="40dip"
-         >
+        android:layout_height="40dip" >
 
         <TextView
             android:id="@+id/electir_dialog_title"
@@ -65,8 +64,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
-                            android:digits="-.1234567890"
+                android:digits="-.1234567890"
                 android:hint="请输入.."
+                android:inputType="number"
                 android:textColor="@color/text_color_black" />
         </LinearLayout>
 
@@ -90,8 +90,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
-                            android:digits="-.1234567890"
+                android:digits="-.1234567890"
                 android:hint="请输入.."
+                android:inputType="number"
                 android:textColor="@color/text_color_black" />
         </LinearLayout>
 
@@ -106,7 +107,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="6"
-                
                 android:gravity="center"
                 android:text="@string/valley"
                 android:textColor="@color/blue_light" />
@@ -115,9 +115,10 @@
                 android:id="@+id/dialog_valley"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                            android:digits="-.1234567890"
                 android:layout_weight="4"
+                android:digits="-.1234567890"
                 android:hint="请输入.."
+                android:inputType="number"
                 android:textColor="@color/text_color_black" />
         </LinearLayout>
 
@@ -141,8 +142,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
-                            android:digits="-.1234567890"
+                android:digits="-.1234567890"
                 android:hint="请输入.."
+                android:inputType="number"
                 android:textColor="@color/text_color_black" />
         </LinearLayout>
     </LinearLayout>
@@ -173,8 +175,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="4"
+            android:digits="-.1234567890"
             android:hint="请输入.."
-                        android:digits="-.1234567890"
+            android:inputType="number"
             android:textColor="@color/text_color_black" />
     </LinearLayout>
 
@@ -199,6 +202,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:hint="请输入.."
+            android:inputType="number"
             android:textColor="@color/text_color_black" />
     </LinearLayout>
 
@@ -221,18 +225,19 @@
             android:id="@+id/dialog_maximum_active_demand"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-                        android:digits="-.1234567890"
             android:layout_weight="4"
+            android:digits="-.1234567890"
             android:hint="请输入.."
+            android:inputType="number"
             android:textColor="@color/text_color_black" />
     </LinearLayout>
 
-    <Button 
+    <Button
+        android:id="@+id/dialog_electir_confirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/confirm"
-        android:id="@+id/dialog_electir_confirm"
         android:layout_gravity="right"
         android:layout_marginRight="5dip"
-        />
+        android:text="@string/confirm" />
+
 </LinearLayout>

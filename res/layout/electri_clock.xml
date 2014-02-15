@@ -46,8 +46,10 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
+                    android:digits="-.1234567890"
                     android:hint="请输入.."
-            android:digits="-.1234567890"
+                    android:inputType="number"
+                    android:singleLine="true"
                     android:textColor="@android:color/widget_edittext_dark" />
             </LinearLayout>
 
@@ -71,8 +73,10 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
+                    android:digits="-.1234567890"
                     android:hint="请输入.."
-            android:digits="-.1234567890"
+                    android:inputType="number"
+                    android:singleLine="true"
                     android:textColor="@android:color/widget_edittext_dark" />
             </LinearLayout>
 
@@ -96,8 +100,10 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
+                    android:digits="-.1234567890"
                     android:hint="请输入.."
-            android:digits="-.1234567890"
+                    android:inputType="number"
+                    android:singleLine="true"
                     android:textColor="@android:color/widget_edittext_dark" />
             </LinearLayout>
 
@@ -121,8 +127,10 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
+                    android:digits="-.1234567890"
                     android:hint="请输入.."
-            android:digits="-.1234567890"
+                    android:inputType="number"
+                    android:singleLine="true"
                     android:textColor="@android:color/widget_edittext_dark" />
             </LinearLayout>
 
@@ -165,10 +173,11 @@
             android:layout_width="fill_parent"
             android:layout_height="1px"
             android:background="@android:color/black" />
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-                        android:layout_marginTop="5dip"
+            android:layout_marginTop="5dip"
             android:orientation="horizontal" >
 
             <TextView
@@ -205,8 +214,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
+                android:digits="-.1234567890"
                 android:hint="请输入.."
-            android:digits="-.1234567890"
+                android:inputType="number"
                 android:singleLine="true"
                 android:textColor="@android:color/widget_edittext_dark" />
         </LinearLayout>

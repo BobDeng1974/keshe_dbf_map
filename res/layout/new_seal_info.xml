@@ -5,14 +5,14 @@
     android:orientation="vertical"
     android:padding="12dip" >
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_cabinet_1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true" />
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_cabinet_2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         android:layout_width="fill_parent"
         android:layout_height="30dip" />
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_table_1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:clickable="true"
         android:focusable="true" />
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_table_2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         android:layout_width="fill_parent"
         android:layout_height="30dip" />
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_box_1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         android:clickable="true"
         android:focusable="true" />
 
-    <spinneredittext.SpinnerEditText
+    <com.uniquestudio.spinneredittext.SpinnerEditText
         android:id="@+id/new_st_box_2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

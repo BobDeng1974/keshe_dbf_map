@@ -51,23 +51,20 @@
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
-        <spinneredittext.SpinnerEditText
+        <com.uniquestudio.spinneredittext.SpinnerEditText
             android:id="@+id/confirm_check_people"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
+            android:layout_height="wrap_content" />
 
-        <spinneredittext.SpinnerEditText
+        <com.uniquestudio.spinneredittext.SpinnerEditText
             android:id="@+id/confirm_verify_people"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
+            android:layout_height="wrap_content" />
 
-        <spinneredittext.SpinnerEditText
+        <com.uniquestudio.spinneredittext.SpinnerEditText
             android:id="@+id/confirm_equipment_rating"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-        </spinneredittext.SpinnerEditText>
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="fill_parent"

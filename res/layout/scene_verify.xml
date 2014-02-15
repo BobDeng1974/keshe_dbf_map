@@ -1,114 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
+    <TextView
+        android:id="@+id/check_before_text"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_before_verify"
+        android:textColor="@android:color/black" />
 
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <View
+        android:id="@+id/view1"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="1px"
+        android:layout_below="@id/check_before_text"
+        android:layout_marginTop="2dip"
+        android:background="@android:color/black" />
 
-        <TextView
-            android:id="@+id/check_before_text"
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            
-            android:text="@string/check_before_verify"
-            android:textColor="@android:color/black" />
-
-        <View
-            android:id="@+id/view1"
-            android:layout_width="fill_parent"
-            android:layout_height="1px"
-            android:layout_below="@id/check_before_text"
-            android:layout_marginTop="2dip"
-            android:background="@android:color/black" />
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/view1"
+        android:orientation="horizontal" >
 
         <LinearLayout
-            android:id="@+id/linear1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/view1"
+            android:layout_marginTop="5dip"
+            android:layout_weight="5"
             android:orientation="horizontal" >
 
-            <LinearLayout
+            <TextView
+                style="?android:attr/textAppearanceMedium"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:layout_weight="5"
-                android:orientation="horizontal" >
+                android:layout_weight="7"
+                android:gravity="center"
+                android:text="@string/temperature"
+                android:textColor="@android:color/black" />
 
-                <TextView
-                    style="?android:attr/textAppearanceMedium"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="7"
-                    android:gravity="center"
-                    android:text="@string/temperature"
-                    android:textColor="@android:color/black" />
-
-                <EditText
-                    android:id="@+id/verify_temperature"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:hint="请输入.."
-                                android:digits="-.1234567890"
-                    android:singleLine="true"
-                    android:textColor="@android:color/widget_edittext_dark" />
-            </LinearLayout>
-
-            <LinearLayout
+            <EditText
+                android:id="@+id/verify_temperature"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:layout_weight="5"
-                android:orientation="horizontal" >
-
-                <TextView
-                    style="?android:attr/textAppearanceMedium"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="7"
-                    android:gravity="center"
-                    android:text="@string/humidity"
-                    android:textColor="@android:color/black" />
-
-                <EditText
-                    android:id="@+id/verify_humidity"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-            android:digits="-.1234567890"
-                    android:hint="请输入.."
-                    android:singleLine="true"
-                    android:textColor="@android:color/widget_edittext_dark" />
-            </LinearLayout>
+                android:layout_weight="3"
+                android:digits="-.1234567890"
+                android:hint="请输入.."
+                android:inputType="number"
+                android:singleLine="true"
+                android:textColor="@android:color/widget_edittext_dark" />
         </LinearLayout>
 
-        <View
-            android:id="@+id/view2"
-            android:layout_width="fill_parent"
-            android:layout_height="1px"
-            android:layout_below="@id/linear1"
-            android:layout_marginTop="5dip"
-            android:background="@android:color/black" />
-
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/view2"
-            android:layout_marginBottom="5dip" >
+            android:layout_marginTop="5dip"
+            android:layout_weight="5"
+            android:orientation="horizontal" >
 
-            <ListView
-                android:layout_above="@+id/linear2"
-                android:id="@+id/machine_data_list"
+            <TextView
+                style="?android:attr/textAppearanceMedium"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginTop="5dip"
-                android:background="@drawable/shape"
-                />
-            <!--
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:gravity="center"
+                android:text="@string/humidity"
+                android:textColor="@android:color/black" />
+
+            <EditText
+                android:id="@+id/verify_humidity"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:digits="-.1234567890"
+                android:hint="请输入.."
+                android:inputType="number"
+                android:singleLine="true"
+                android:textColor="@android:color/widget_edittext_dark" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/linear1"
+        android:layout_marginTop="5dip"
+        android:background="@android:color/black" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/view2"
+        android:layout_marginBottom="5dip" >
+
+        <ListView
+            android:id="@+id/machine_data_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/linear2"
+            android:layout_marginTop="5dip"
+            android:background="@drawable/shape" />
+        <!--
             <TextView
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="wrap_content"
@@ -117,42 +114,43 @@
                 android:text="@string/check_after_verify"
                 android:textColor="@android:color/black"
                 android:visibility="gone" />
-            -->
+        -->
+
+        <LinearLayout
+            android:id="@+id/linear2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dip"
+            android:layout_marginTop="5dip"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/verify_read_machine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/read_from_calibrator" />
 
             <LinearLayout
-                android:id="@+id/linear2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="5dip"
-                android:layout_marginTop="5dip"
+                android:layout_gravity="center_vertical"
                 android:orientation="horizontal" >
 
-                <Button
-                    android:id="@+id/verify_read_machine"
+                <TextView
+                    style="?android:attr/textAppearanceMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/read_from_calibrator" />
+                    android:gravity="center"
+                    android:text="@string/made_number"
+                    android:textColor="@android:color/black" />
 
-                <LinearLayout
+                <Spinner
+                    android:id="@+id/verify_made_number"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        style="?android:attr/textAppearanceMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/made_number"
-                        android:textColor="@android:color/black" />
-
-                    <Spinner
-                        android:id="@+id/verify_made_number"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
+
+</RelativeLayout>
