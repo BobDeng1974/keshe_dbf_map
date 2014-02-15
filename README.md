@@ -16,7 +16,7 @@ Constructor
 要导入该工程，需要如下文件：
 
 - android-async-http-1.4.4.jar 用于http协议 https://github.com/zhiwenluo/android-async-http
-- baidumapapi_v2_2_0.jar 用于便利GPS追踪（从百度地图开发者中心下载）
+- baidumapapi_v2_2_0.jar 用于便利GPS追踪（从百度地图管网DEMO里集成了）
 - javadbf.jar 用于解析DBF文件
 - library_ABS 工程 https://github.com/zhiwenluo/library_ABS
 - library_Sliding 工程https://github.com/zhiwenluo/library_Sliding
