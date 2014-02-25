@@ -60,7 +60,7 @@ public class GPSService extends Service {
     /**
      * 最久2分钟上传一次
      */
-    private int timerMinute = 2;
+    private int timerMinute = 4;
 
     Handler handler = new Handler() {
 	@Override

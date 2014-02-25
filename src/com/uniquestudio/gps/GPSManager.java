@@ -39,7 +39,7 @@ public class GPSManager {
     /**
      * 触发坐标上传的半径大小
      */
-    private int minMeters = 120;
+    private int minMeters = 200;
 
     public GPSManager(Context context) {
 	this.mContext = context;
