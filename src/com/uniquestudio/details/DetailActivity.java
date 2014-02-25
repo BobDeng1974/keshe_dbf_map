@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -26,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -68,6 +72,7 @@ import android.widget.ViewAnimator;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.uniquestudio.R;
 import com.uniquestudio.AnalyseTxt.AnalyseTxtUtil;
 import com.uniquestudio.DBFRW.ParseDbf2Map;
@@ -290,16 +295,10 @@ public class DetailActivity extends Activity {
 	tableSealTwo.init(TABLE_SEAL_ARRAY, "表封2:", true);
 	boxSealOne.init(configTxtData.get(OldBox), "盒封1:", true);
 	boxSealTwo.init(configTxtData.get(OldBox), "盒封2:", true);
-//	cabinetSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
-//		cabinetSealOne));
-//	cabinetSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
-//		cabinetSealTwo));
 	tableSealOne.setOpenDialogListener(new myOpenSealInfoDialog(
 		tableSealOne,"旧表封1"));
 	tableSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(
 		tableSealTwo, "旧表封2"));
-//	boxSealOne.setOpenDialogListener(new myOpenSealInfoDialog(boxSealOne));
-//	boxSealTwo.setOpenDialogListener(new myOpenSealInfoDialog(boxSealTwo));
     }
 
     /**
@@ -370,8 +369,13 @@ public class DetailActivity extends Activity {
 	    @Override
 	    public void onClick(View v) {
 		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		getPositionTextView.setText(gpsManager.getNowPosition(Cons_No));
-		//写GPS文件 update db
+		Location nowLocation = gpsManager.WriteLocation(Cons_No);
+		if( nowLocation != null ) { 
+		    httpGetAdress(nowLocation.getLatitude() , nowLocation.getLongitude());
+		    setNavigation.setText(resources.getString(R.string.set_navigation));
+		}
+		else 
+		    getPositionTextView.setText("无法获取,请检查网络状况..");
 	    }
 	});
 	setNavigation.setOnClickListener(new OnClickListener() {
@@ -388,13 +392,58 @@ public class DetailActivity extends Activity {
 		    mLon1 = GPSSearchMap.get(0).get(LONGITUDE);
 		    message = "已定位到目的地,请点击‘到这去’..";
 		}
-		Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+"?q="+message);
-		Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
-		startActivity(mIntent);
+		try {
+		    Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1/*+"?q="+message*/);
+		    Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
+		    startActivity(mIntent);
+		} catch (Exception e) {
+		    System.out.println("没有地图");
+		    new AlertDialog.Builder(DetailActivity.this).setTitle("警告")
+		    .setMessage("未发现地图应用").setPositiveButton("确定",new DialogInterface.OnClickListener() {
+		        @Override
+		        public void onClick(DialogInterface dialog, int which) {
+		    	dialog.dismiss();
+		        }
+		    }).show();
+		}
 	    }
 	});
     }
 
+    private void httpGetAdress(double latitude, double longitude) {
+	    HashMap<String, String> params = new HashMap<String, String>();
+	    params.put("location", latitude + "," + longitude);
+	    params.put("output", "json");
+	    params.put("key", "N7Gqr54UC1aqD9CBT3O8PsWx");
+	    RequestParams requestParams = new RequestParams(params);
+	    AsyncHttpClient httpClient = new AsyncHttpClient();
+	    httpClient.get("http://api.map.baidu.com/geocoder", requestParams, new JsonHttpResponseHandler() {
+		@Override
+		public void onFailure(Throwable e, JSONObject errorResponse) {
+		    getPositionTextView.setText("GPS信息已写入,解析失败");
+		    super.onFailure(e, errorResponse);
+		}
+		@Override
+		public void onSuccess(int statusCode, Header[] headers,
+			org.json.JSONObject response) {
+		    if(response.has("result")) {
+			try {
+			    JSONObject jsonArray = response
+			    	.getJSONObject("result");
+			    if(jsonArray.has("formatted_address")) {
+				String formattedAddress = jsonArray.getString("formatted_address");
+				System.out.println(formattedAddress);
+				getPositionTextView.setText(formattedAddress);
+				return ;
+			    }
+			    getPositionTextView.setText("GPS信息已写入,解析失败");
+			} catch (JSONException e) {
+			    e.printStackTrace();
+			}
+		    }
+		}
+	    });
+    }
     /**
      * 初始化任务信息列表
      */
@@ -672,8 +721,8 @@ public class DetailActivity extends Activity {
 		    } else if(bluetoothSppClient == null ){
 			if(canConnectDefDevice) {
 				// 新线程与蓝牙通信
-			    String address = sharedPreferences.getString("def_device", "");
-			    if(address.equals(""))
+			    String address = sharedPreferences.getString("def_device", "null");
+			    if(address.equals("null"))
 				searchDevice();
 			    else {
 				bluetoothSppClient = new BluetoothSppClient(DetailActivity.this, address, true , mreadMachineHandler);
@@ -1767,28 +1816,6 @@ class MySpinnerListener implements OnItemSelectedListener{
     // /////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void reverseFromAddress(String address) {
-	AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-	asyncHttpClient.get("http://maps.google."
-		+ "com/maps/api/geocode/json?address=" + address
-		+ "&sensor=false", new JsonHttpResponseHandler() {
-	    @Override
-	    public void onFailure(Throwable e, JSONObject errorResponse) {
-		// TODO Auto-generated method stub
-		super.onFailure(e, errorResponse);
-		Toast.makeText(getApplicationContext(), "请检查网络..",
-			Toast.LENGTH_LONG).show();
-	    }
-
-	    @Override
-	    public void onSuccess(int statusCode, JSONObject response) {
-		// TODO Auto-generated method stub
-		super.onSuccess(statusCode, response);
-	    }
-
-	});
-    }
-
     /*
      * (non-Javadoc) 拦截返回键
      * 
@@ -1824,10 +1851,10 @@ class MySpinnerListener implements OnItemSelectedListener{
     protected void onDestroy() {
 	if (mChatService != null)
 	    mChatService.stop();
-	
-	BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-	if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) 
-	    bluetoothAdapter.disable();
+//	
+//	BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//	if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) 
+//	    bluetoothAdapter.disable();
 	super.onDestroy();
     }
     

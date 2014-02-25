@@ -560,6 +560,9 @@ public class BluetoothChatService {
 				    start = false;
 				    frameLength = -1;
 				    System.out.println("frame ok");
+				    //避免在下面把first0xAA置为true
+				    if(length == (byte) 0xAA)
+					continue;
 				}
 			    }
 			}

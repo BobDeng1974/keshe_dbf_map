@@ -11,6 +11,7 @@ import static com.uniquestudio.stringconstant.StringConstant.dnbxxPath;
 import static com.uniquestudio.stringconstant.StringConstant.rwPath;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,7 +61,7 @@ public class RefreshableListViewActivity extends Fragment {
 	super.onViewCreated(view, savedInstanceState);
 	mListView = (RefreshableListView) view.findViewById(R.id.listview);
 	completeNumber = (TextView) view.findViewById(R.id.accomplish_number);
-	
+	mItems = new ArrayList<Map<String,String>>();
 	// 检查dbf文件夹是否存在。不存在则退出
 	if (isDBFExist()) {
 	    mItems = getItems();
@@ -167,7 +169,8 @@ public class RefreshableListViewActivity extends Fragment {
 	    System.out.println("refreshlistview onresume");
 	    mItems.clear();
 	    mItems.addAll(getItems());
-	    myBaseAdapter.notifyDataSetChanged();
+	    if(myBaseAdapter != null)
+		myBaseAdapter.notifyDataSetChanged();
 	}
 	if(progressDialog != null) {
 	    if(progressDialog.isShowing())
@@ -215,29 +218,25 @@ public class RefreshableListViewActivity extends Fragment {
     public  boolean isDBFExist() {
 	// 如果不存在的话，则创建存储目录
 	File mediaStorageDir = new File(dbfPath);
-	if (!mediaStorageDir.exists()) {
-	    if (!mediaStorageDir.mkdirs()) {
-		Log.d("MyCameraApp", "failed to create directory");
-	    }
-	    new AlertDialog.Builder(getActivity())
-		    .setTitle("警告")
-		    .setMessage("未发现dbf文件,请放到"+dbfPath+"下")
-		    .setPositiveButton("确定",
-			    new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,
-					int whichButton) {
-				    getActivity().finish();
-				}
-			    }).show();
-	    return false;
-	} else {
+	if (mediaStorageDir.exists()) {
 	    File rwDBFFile = new File(rwPath);
 	    File dnbxxDBFFile = new File(dnbxxPath);
 	    if(rwDBFFile.exists() && dnbxxDBFFile.exists())
 		return true;
-	    else
-		return false;
+	} else if (!mediaStorageDir.mkdirs()) {
+		Log.d("MyCameraApp", "failed to create directory");
 	}
+	    new AlertDialog.Builder(getActivity())
+	    .setTitle("警告")
+	    .setMessage("未发现dbf文件,请放到"+dbfPath+"下")
+	    .setPositiveButton("确定",
+		    new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,
+				int whichButton) {
+			    getActivity().finish();
+			}
+		    }).show();
+		return false;
     }
     
     /**
@@ -251,7 +250,8 @@ public class RefreshableListViewActivity extends Fragment {
             System.out.println("i need refresh listView");
 	    mItems.clear();
 	    mItems.addAll(getItems());
-	    myBaseAdapter.notifyDataSetChanged();
+	    if(myBaseAdapter != null)
+	  	 myBaseAdapter.notifyDataSetChanged();
         }
     };
     

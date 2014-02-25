@@ -1,12 +1,9 @@
 package com.uniquestudio.slidingmenu;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.WindowManager;
-
 import com.slidingmenu.lib.SlidingMenu;
 import com.uniquestudio.R;
 import com.uniquestudio.gps.GPSService;
@@ -26,7 +23,7 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//启动后台监控GPS坐标
-		Intent intent = new Intent(getApplicationContext(), GPSService.class);
+		Intent intent = new Intent(getApplicationContext() , GPSService.class);
 		getApplicationContext().startService(intent);
 		    
 		getSlidingMenu().setMode(SlidingMenu.LEFT);

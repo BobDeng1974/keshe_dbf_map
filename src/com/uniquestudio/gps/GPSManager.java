@@ -1,53 +1,32 @@
 package com.uniquestudio.gps;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static com.uniquestudio.stringconstant.StringConstant.*;
 
-import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.uniquestudio.DBFRW.WriteDbfFile;
-import com.uniquestudio.details.DetailActivity;
 import com.uniquestudio.refreshablelist.DataBaseService;
 import com.uniquestudio.refreshablelist.MyData;
-import com.uniquestudio.stringconstant.SpinnerString;
-
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
 import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.GpsStatus;
-import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.Toast;
 
 public class GPSManager {
@@ -70,7 +49,7 @@ public class GPSManager {
 	// 获取Location Provider
 	getProvider();
 	// 如果未设置位置源，打开GPS设置界面
-	openGPS();
+	CheckCurrentNetWork();
     }
 
     public  void updateProvider() {
@@ -97,15 +76,6 @@ public class GPSManager {
 	}
     }
 
-    /**
-     * 获取定位获得的点转换得到的地址
-     * 
-     * @return
-     */
-    public List<Address> getAddresses(Location newLocation) {
-	// 显示位置信息到文字标签
-	return this.getNewAddresses(newLocation);
-    }
 
     public Location getMyLastKnownLocation() {
 	Location lastKnownLocation = null;
@@ -121,14 +91,14 @@ public class GPSManager {
     }
 
     // 判断是否开启GPS，若未开启，打开GPS设置界面
-    private void openGPS() {
+    private void CheckCurrentNetWork() {
 	if (isNetworkEnabled()) {
 	    Toast.makeText(mContext, "获取GPS中..", Toast.LENGTH_SHORT).show();
 	    return;
 	}
 	if(isFirstIn) {
 	    isFirstIn = false;
-	    CheckNetwork();
+	    OpenNetwork();
 	}
     }
 
@@ -143,7 +113,9 @@ public class GPSManager {
         // 如果二者都勾选，优先使用GPS,因为GPS定位更精确。
        else if (isGPSEnabled() && isNetworkEnabled())
 	   this.provider = LocationManager.GPS_PROVIDER;
-        
+       else if(!isGPSEnabled() && !isNetworkEnabled()) {
+	   this.provider = LocationManager.NETWORK_PROVIDER;
+       }
 	System.out.println("provider--------------->" + this.provider);
     }
 
@@ -160,47 +132,13 @@ public class GPSManager {
 	Log.e("GPS----------->", latLongString);
 	return;
     }
-
-    private List<Address> getNewAddresses(Location location) {
-	return getAddressbyGeoPoint(location);
-    }
-
-    // 获取地址信息
-    private List<Address> getAddressbyGeoPoint(Location location) {
-	List<Address> result = null;
-	// 先将Location转换为GeoPoint
-	// GeoPoint gp=getGeoByLocation(location);
-	try {
-	    if (location != null) {
-		// 获取Geocoder，通过Geocoder就可以拿到地址信息
-		Geocoder gc = new Geocoder(mContext, Locale.getDefault());
-		result = gc.getFromLocation(location.getLatitude(),
-			location.getLongitude(), 1);
-		System.out.println(result);
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-	// System.out.println("result size------->"+result.size());
-	return result;
-
-    }
+    
     /**	由GPS定位坐标获取地址
      * @return	转换后的地址
      */
-    public String getNowPosition(String cons_no) {
-	String nowPosition = "";
+    public Location WriteLocation(String cons_no) {
 	Location location = this.getMyLastKnownLocation();
-	List<Address> gps = this.getAddresses(location);
-	// System.out.println("GPS------------>" + gps);
 	if(location != null) {
-	    if (gps == null || gps.size() == 0)
-		nowPosition = "获取GPS成功,解析地址失败";
-	    else {
-		Log.e("GPS--------->Address----->", gps.size()+"");
-		Address address = gps.get(0);
-		nowPosition = address.getAddressLine(0);
-	    }
 	    //写入gps信息
 	    DataBaseService dataBaseService = new MyData(mContext);
 	    if(dataBaseService.listMyDataMaps(GPS, null).size() == 0) {
@@ -221,23 +159,7 @@ public class GPSManager {
 		Toast.makeText(mContext, "成功写入GPS信息", Toast.LENGTH_LONG).show();
 	} else
 	    Toast.makeText(mContext, "无法获取,请检查网络状况..",Toast.LENGTH_LONG).show();
-	return nowPosition;
-    }
-    
-    public GeoPoint getGeoPoint(JSONObject jsonObject) {
-        Double lon = new Double(0);
-        Double lat = new Double(0);
-        try {
-            lon = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
-                    .getJSONObject("geometry").getJSONObject("location")
-                    .getDouble("lng");
-            lat = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
-                    .getJSONObject("geometry").getJSONObject("location")
-                    .getDouble("lat");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
+	return location;
     }
     /**
      * 判断GPS是否开启
@@ -249,6 +171,7 @@ public class GPSManager {
 	    Log.e("GPSManager", "isGPSEnabled");
 	    return true;
 	} else {
+//	    Settings.Secure.setLocationProviderEnabled( mContext.getContentResolver(), LocationManager.GPS_PROVIDER, true);
 	    return false;
 	}
     }
@@ -306,7 +229,7 @@ public class GPSManager {
     }
 
     // 没有网络的时候跳转到设置界面
-    public boolean CheckNetwork() {
+    public boolean OpenNetwork() {
 	boolean flag = false;
 	ConnectivityManager cwjManager = (ConnectivityManager) mContext
 		.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -339,26 +262,3 @@ public class GPSManager {
     }
 }
 
-//this.locationManager.addGpsStatusListener(new Listener() {
-//@Override
-//public void onGpsStatusChanged(int event) {
-//	switch (event) {
-//	case GpsStatus.GPS_EVENT_STARTED:
-//	    System.out.println("GpsStatus-------->GPS_EVENT_STARTED");
-//	    provider = LocationManager.GPS_PROVIDER;
-//	    break;
-//
-//	case GpsStatus.GPS_EVENT_STOPPED:
-//	    provider = LocationManager.NETWORK_PROVIDER;
-//	    System.out.println("GpsStatus-------->GPS_EVENT_STOPPED");
-//	    break;
-//
-//	case GpsStatus.GPS_EVENT_FIRST_FIX:
-//	    System.out.println("GpsStatus-------->GPS_EVENT_FIRST_FIX");
-//	    break;
-//
-//	case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-//	    break;
-//	}
-//}
-//});
