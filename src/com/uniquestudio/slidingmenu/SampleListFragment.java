@@ -146,6 +146,7 @@ public class SampleListFragment extends Fragment  implements OnItemClickListener
 		mPd = new ProgressDialog(mContext);
 		mPd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mPd.setMessage("任务更新中..");
+		mPd.setCancelable(false);
 		mPd.show();
 	    super.onPreExecute();
 	}

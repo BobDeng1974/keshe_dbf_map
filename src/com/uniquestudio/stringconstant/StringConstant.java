@@ -23,7 +23,7 @@ public class StringConstant {
     
     public static String PREFS_NAME = "uniquestudio.mydata";
 
-    public static final String DEF_AK = "3323e0313fc29a0263ba3f50fc28791c";//默认AK
+    public static final String DEF_AK = "47IzYKGkpcyliNNhXCQDYfWG";//默认AK
     
     public static String root = Environment.getExternalStorageDirectory()
 		.getAbsolutePath() + "/Android/data/uniquestudio.Electric";

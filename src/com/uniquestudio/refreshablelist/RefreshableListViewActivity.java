@@ -167,8 +167,10 @@ public class RefreshableListViewActivity extends Fragment {
     public void onResume() {
 	if(mListView != null) {
 	    System.out.println("refreshlistview onresume");
-	    mItems.clear();
-	    mItems.addAll(getItems());
+	    if(mItems != null || mItems.size() != 0) {
+		mItems.clear();
+		mItems.addAll(getItems());
+	    }
 	    if(myBaseAdapter != null)
 		myBaseAdapter.notifyDataSetChanged();
 	}

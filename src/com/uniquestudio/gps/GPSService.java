@@ -36,6 +36,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -45,6 +47,7 @@ public class GPSService extends Service {
     private String myAK;
     private String imei = "-1";
     private PendingIntent  pIntent;
+    private WakeLock wakeLock;
     
     private int geoTableID = -1;
     private long lastTimer = 0;
@@ -101,6 +104,11 @@ public class GPSService extends Service {
 	imei = telephonyManager.getDeviceId();
 	
 	httpGetTableId();
+	
+	//电源管理
+        PowerManager pm = (PowerManager) gpsService.getSystemService(Context.POWER_SERVICE); 
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"com.task.TalkMessageService"); 
+        wakeLock.acquire(); 
     }
 
     @Override
@@ -135,6 +143,10 @@ public class GPSService extends Service {
     @Override
     public void onDestroy() {
 	System.out.println("GpsService---------->onDestroy");
+	if (wakeLock != null) { 
+            wakeLock.release(); 
+            wakeLock = null; 
+	}
 	if (gpsManager != null && locationListener != null)
 	    gpsManager.removeLocationListener(locationListener);
 	stopTimerThread = true;
@@ -162,7 +174,7 @@ public class GPSService extends Service {
 	@Override
 	public void onProviderEnabled(String arg0) {
 	    System.out.println("GpsService---------->onProviderEnabled");
-//	    updateLocationListener();
+	    updateLocationListener();
 	}
 
 	@Override
