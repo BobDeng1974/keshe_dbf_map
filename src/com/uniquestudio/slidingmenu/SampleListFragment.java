@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.uniquestudio.R;
 import com.uniquestudio.gps.GPSService;
+import com.uniquestudio.gps.GpsPostUtils;
 import com.uniquestudio.refreshablelist.DBOpenHelper;
 
 public class SampleListFragment extends Fragment  implements OnItemClickListener{
@@ -119,9 +120,12 @@ public class SampleListFragment extends Fragment  implements OnItemClickListener
 	    break;
 	case 5:
 	    //完全退出，杀掉传坐标后台进程
+	    GpsPostUtils.stopPostService(getActivity(), GPSService.class, GPSService.ACTION);
+	    
 	    Intent stopServiceIntent = new Intent(getActivity(), GPSService.class);
 	    getActivity().stopService(stopServiceIntent);
 	    
+//	    getActivity().finish();
 	    Intent intent = new Intent(Intent.ACTION_MAIN);
 	    intent.addCategory(Intent.CATEGORY_HOME);
 	    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

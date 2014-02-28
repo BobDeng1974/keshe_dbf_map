@@ -46,9 +46,9 @@ import android.widget.Toast;
 public class GPSService extends Service {
     private String myAK;
     private String imei = "-1";
-    private PendingIntent  pIntent;
-    private WakeLock wakeLock;
-    
+    private PendingIntent pIntent;
+    private boolean isFirstStart = true;
+
     private int geoTableID = -1;
     private long lastTimer = 0;
     private GPSService gpsService = null;
@@ -56,14 +56,14 @@ public class GPSService extends Service {
     private LocationListener locationListener = null;
     private HashMap<String, String> paramMap = null;
     private RequestParams requestParams = null;
-    
-    private boolean stopTimerThread = false;
-    private boolean lastNetworkState = true;//记录上此网络变化的状态
+
+    private boolean lastNetworkState = true;// 记录上此网络变化的状态
     public static final String NET_ACTION = "android.net.conn.CONNECTIVITY_CHANGE";
+    public static final String ACTION = "com.uniquestudio.gpsService";
     /**
-     * 最久2分钟上传一次
+     * 最久4分钟上传一次
      */
-    private int timerMinute = 4;
+    public static int postMinute = 4;
 
     Handler handler = new Handler() {
 	@Override
@@ -92,8 +92,7 @@ public class GPSService extends Service {
 	gpsManager = new GPSManager(gpsService);
 	locationListener = new myLocationListener();
 	gpsManager.setRequestLocationUpdates(locationListener);
-	new Thread(new TimerThread()).start();
-	stopTimerThread = false;
+
 	// 获取AK值
 	SharedPreferences sharedPreferences = gpsService.getSharedPreferences(
 		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
@@ -102,31 +101,33 @@ public class GPSService extends Service {
 	TelephonyManager telephonyManager = (TelephonyManager) this
 		.getSystemService(Context.TELEPHONY_SERVICE);
 	imei = telephonyManager.getDeviceId();
-	
+
 	httpGetTableId();
-	
-	//电源管理
-        PowerManager pm = (PowerManager) gpsService.getSystemService(Context.POWER_SERVICE); 
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"com.task.TalkMessageService"); 
-        wakeLock.acquire(); 
+
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-	//为了防止service被手机杀掉,在OnDestory中要stopForeground
-	Notification notification = new Notification(com.uniquestudio.R.drawable.ic_launcher,  
-                "GPS后台服务启动..",  
-                System.currentTimeMillis());  
-        pIntent=PendingIntent.getService(this, 0, intent, 0);  
-        notification.setLatestEventInfo(this, "电能表校验",  
-                "GPS后台服务正在运行..", pIntent);  
-          
-        //让该service前台运行，避免手机休眠时系统自动杀掉该服务  
-        //如果 id 为 0 ，那么状态栏的 notification 将不会显示。  
-        startForeground(startId, notification);  
-        
+	// if (isFirstStart) {
+	// // 为了防止service被手机杀掉,在OnDestory中要stopForeground
+	// Notification notification = new Notification(
+	// com.uniquestudio.R.drawable.ic_launcher, "GPS后台服务启动..",
+	// System.currentTimeMillis());
+	// pIntent = PendingIntent.getService(this, 0, intent, 0);
+	// notification.setLatestEventInfo(this, "电能表校验", "GPS后台服务正在运行..",
+	// pIntent);
+	//
+	// // 让该service前台运行，避免手机休眠时系统自动杀掉该服务
+	// // 如果 id 为 0 ，那么状态栏的 notification 将不会显示。
+	// startForeground(startId, notification);
+	// isFirstStart = false;
+	// }
 	System.out.println("GpsService---------->onStart");
-	//使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。
+	new Thread(new TimerThread()).start();
+
+	// wakeLocker postSuccess -> release
+
+	// 使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。
 	return Service.START_REDELIVER_INTENT;
     }
 
@@ -143,15 +144,11 @@ public class GPSService extends Service {
     @Override
     public void onDestroy() {
 	System.out.println("GpsService---------->onDestroy");
-	if (wakeLock != null) { 
-            wakeLock.release(); 
-            wakeLock = null; 
-	}
 	if (gpsManager != null && locationListener != null)
 	    gpsManager.removeLocationListener(locationListener);
-	stopTimerThread = true;
+
 	unregisterReceiver(netConnectReceiver);
-	stopForeground(true);
+	// stopForeground(true);
 	super.onDestroy();
     }
 
@@ -165,9 +162,9 @@ public class GPSService extends Service {
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-//	    updateLocationListener();
+	    // updateLocationListener();
 	    System.out.println("GpsService---------->onProviderDisabled");
-	    creatNotification("GPS设置未打开","点此打开\"基于网络的位置服务\"",0);
+	    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
 	    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG).show();
 	}
 
@@ -184,9 +181,11 @@ public class GPSService extends Service {
     }
 
     public void updateLocationListener() {
+	if(gpsManager != null && locationListener != null) {
 	gpsManager.updateProvider();
 	gpsManager.removeLocationListener(locationListener);
 	gpsManager.setRequestLocationUpdates(locationListener);
+	}
     }
 
     public void httpPostToUpdateMyLocation(Location location) {
@@ -202,8 +201,9 @@ public class GPSService extends Service {
 	    if (location == null) {
 		location = gpsManager.getMyLastKnownLocation();
 		if (location == null) {
-		    creatNotification("GPS设置未打开","点此打开\"基于网络的位置服务\"",0);
-		    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG).show();
+		    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
+		    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG)
+			    .show();
 		    GpsLog.writeLogFile("上传坐标：GPS获取失败");
 		    return;
 		}
@@ -229,20 +229,21 @@ public class GPSService extends Service {
 				Log.e("json-------------->", "onSuccess"
 					+ "-->" + response);
 				// 检查是否返回的是上传成功
-				if (response.has("message")) {
-				    String message = "";
-				    try {
+				try {
+				    if (response.has("message")) {
+					String message = "";
 					message = response.getString("message");
-				    } catch (JSONException e) {
-					e.printStackTrace();
-				    }
-				    if (message.equals("成功")) {
-					creatNotification("成功上传一个坐标.");
+
+					if (message.equals("成功")) {
+					    creatNotification("成功上传一个坐标.");
+					} else {
+					    creatNotification("坐标上传失败.");
+					}
 				    } else {
 					creatNotification("坐标上传失败.");
 				    }
-				} else {
-				    creatNotification("坐标上传失败.");
+				} catch (Exception e) {
+				    e.printStackTrace();
 				}
 			    } else {
 				creatNotification("坐标上传失败.");
@@ -256,7 +257,7 @@ public class GPSService extends Service {
     }
 
     public void httpGetTableId() {
-	if(geoTableID != -1)
+	if (geoTableID != -1)
 	    return;
 	HashMap<String, String> paramTable = new HashMap<String, String>();
 	// 创建表传递的参数
@@ -265,10 +266,10 @@ public class GPSService extends Service {
 	requestParams = new RequestParams(paramTable);
 	LocationHttpClient.get("geodata/v2/geotable/list", requestParams,
 		new JsonHttpResponseHandler() {
-		@Override
-//		public void onSuccess(int statusCode, Header[] headers,
-//			org.json.JSONObject response) {
-		public void onSuccess(int statusCode, JSONObject response) {
+		    @Override
+		    // public void onSuccess(int statusCode, Header[] headers,
+		    // org.json.JSONObject response) {
+		    public void onSuccess(int statusCode, JSONObject response) {
 			super.onSuccess(statusCode, response);
 			try {
 			    if (response.has("geotables")) {
@@ -284,7 +285,8 @@ public class GPSService extends Service {
 					    System.out.println("name------->"
 						    + name);
 					    if (name.equals("staff_" + imei)) {
-						geoTableID =jsonObject.getInt("id");
+						geoTableID = jsonObject
+							.getInt("id");
 						System.out.println("id------->"
 							+ geoTableID);
 						GpsLog.writeLogFile("查询web端表格：成功——id："
@@ -301,7 +303,8 @@ public class GPSService extends Service {
 				GpsLog.writeLogFile("查询web端表格：未找到");
 			    }
 			} catch (JSONException e) {
-			    System.out.println("get tableid exception ___________");
+			    System.out
+				    .println("get tableid exception ___________");
 			    e.printStackTrace();
 			}
 		    }
@@ -319,30 +322,23 @@ public class GPSService extends Service {
     /**
      * Timer
      * 
-     * @author luo 记录两次上传直接的间隔，如果超过5分钟，则手动上传
+     * @author luo 记录两次上传直接的间隔，如果超过一定分钟，则手动上传
      */
     public class TimerThread implements Runnable {
 	@Override
 	public void run() {
-	    while (!stopTimerThread) {
-		try {
-		    Thread.sleep(2 * 60 * 1000);
-		    if ((System.currentTimeMillis() - lastTimer) > timerMinute * 60 * 1000)
-			handler.sendEmptyMessage(1);
-		    Log.e("TimerThread---->", lastTimer + "");
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
-		}
-	    }
-	    Thread.currentThread().interrupt();
+	    if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
+		handler.sendEmptyMessage(1);
+	    // Log.e("TimerThread---->", lastTimer + "");
 	}
     }
 
     private void creatNotification(String message) {
-	creatNotification(message, null , -1);
+	creatNotification(message, null, -1);
     }
-    
-    private void creatNotification(String message, String secondMessage , int action) {
+
+    private void creatNotification(String message, String secondMessage,
+	    int action) {
 	int Notification_ID_BASE = 110;
 	NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 	// 新建状态栏通知
@@ -353,17 +349,19 @@ public class GPSService extends Service {
 	baseNF.tickerText = message;
 	baseNF.flags |= Notification.FLAG_AUTO_CANCEL;
 	// 点击该通知时执行页面跳转
-	Intent notificationIntent  = null;
-	if(action == -1) 
-	    notificationIntent = new Intent(gpsService,LeftAndRightActivity.class);
+	Intent notificationIntent = null;
+	if (action == -1)
+	    notificationIntent = new Intent(gpsService,
+		    LeftAndRightActivity.class);
 	else
-	    notificationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+	    notificationIntent = new Intent(
+		    Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 	PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 		notificationIntent, 0);
 
 	SimpleDateFormat sDateFormat = new SimpleDateFormat("HH:mm:ss");
 	String currentTime = sDateFormat.format(new java.util.Date());
-	if(secondMessage == null)
+	if (secondMessage == null)
 	    secondMessage = currentTime;
 	baseNF.setLatestEventInfo(gpsService, message, secondMessage,
 		contentIntent);
@@ -373,6 +371,7 @@ public class GPSService extends Service {
     BroadcastReceiver netConnectReceiver = new BroadcastReceiver() {
 	State wifiState = null;
 	State mobileState = null;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 	    if (NET_ACTION.equals(intent.getAction())) {
@@ -408,22 +407,5 @@ public class GPSService extends Service {
 	    }
 	}
     };
-    // private final double EARTH_RADIUS = 6378137.0;
-    // /**测量两点间的距离
-    // * @return 米为单位
-    // */
-    // private double gps2m(double lat_a, double lng_a, double lat_b, double
-    // lng_b) {
-    // double radLat1 = (lat_a * Math.PI / 180.0);
-    // double radLat2 = (lat_b * Math.PI / 180.0);
-    // double a = radLat1 - radLat2;
-    // double b = (lng_a - lng_b) * Math.PI / 180.0;
-    // double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
-    // + Math.cos(radLat1) * Math.cos(radLat2)
-    // * Math.pow(Math.sin(b / 2), 2)));
-    // s = s * EARTH_RADIUS;
-    // s = Math.round(s * 10000) / 10000;
-    // System.out.println("距离--->"+s);
-    // return s;
-    // }
+
 }

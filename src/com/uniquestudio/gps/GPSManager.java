@@ -39,7 +39,7 @@ public class GPSManager {
     /**
      * 触发坐标上传的半径大小
      */
-    private int minMeters = 200;
+    private int minMeters = 220;
 
     public GPSManager(Context context) {
 	this.mContext = context;
@@ -127,7 +127,7 @@ public class GPSManager {
 	    double lng = location.getLongitude();
 	    latLongString = "纬度:" + lat + "\n经度:" + lng;
 	} else {
-	    latLongString = "无法获取地理信息";
+	    latLongString = "获取的location为null";
 	}
 	Log.e("GPS----------->", latLongString);
 	return;

@@ -184,6 +184,7 @@ public class RefreshableListViewActivity extends Fragment {
     @Override
     public void onDestroy() {
 	getActivity().unregisterReceiver(refreshReceiver);
+	System.out.println("refreshableListActivity destroy");
 	super.onDestroy();
     }
     

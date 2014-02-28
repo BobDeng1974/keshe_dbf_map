@@ -40,4 +40,5 @@ public class BaseActivity extends SlidingFragmentActivity {
 	}
 	return super.onOptionsItemSelected(item);
     }
+    
 }

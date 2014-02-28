@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentTransaction;
 import com.slidingmenu.lib.SlidingMenu;
 import com.uniquestudio.R;
 import com.uniquestudio.gps.GPSService;
+import com.uniquestudio.gps.GpsPostUtils;
 import com.uniquestudio.refreshablelist.RefreshableListViewActivity;
 
 
@@ -23,8 +24,9 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//启动后台监控GPS坐标
-		Intent intent = new Intent(getApplicationContext() , GPSService.class);
-		getApplicationContext().startService(intent);
+//		Intent intent = new Intent(getApplicationContext() , GPSService.class);
+//		getApplicationContext().startService(intent);
+		GpsPostUtils.startPostService(getApplicationContext() , 2*60 , GPSService.class, GPSService.ACTION);
 		    
 		getSlidingMenu().setMode(SlidingMenu.LEFT);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);

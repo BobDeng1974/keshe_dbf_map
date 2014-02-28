@@ -383,17 +383,18 @@ public class DetailActivity extends Activity {
 	    public void onClick(View arg0) {
 		// 检查gpsdbf里有无数据，无的话输入起点，有的话输入终点
 		// 开启百度导航
-		//默认天安门坐标
-		String mLat1 = "39.915291"; 
-	   	String mLon1 = "116.403857"; 
+		//默认武汉市坐标114.302661,30.592764
+		String mLat1 = "30.598562"; 
+	   	String mLon1 = "114.302661"; 
 	   	String message = "请手动搜索终点位置..";
 		if (GPSSearchMap.size() != 0) {
+		    System.out.println("任务内有目的地GPS");
 		    mLat1 = GPSSearchMap.get(0).get(LATITUDE);
 		    mLon1 = GPSSearchMap.get(0).get(LONGITUDE);
 		    message = "已定位到目的地,请点击‘到这去’..";
 		}
 		try {
-		    Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1/*+"?q="+message*/);
+		    Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+"?z=12"/*+"&q="+message*/);
 		    Intent mIntent = new Intent(Intent.ACTION_VIEW, mUri);
 		    startActivity(mIntent);
 		} catch (Exception e) {
