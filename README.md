@@ -31,8 +31,6 @@ Constructor
 - 最后右健你的工程 - Properties - Android 添加library_Sliding即可
 - 如果报错，是suppor-V4包版本的问题，复制ABS的support包覆盖你的工程的support包
 
-Other
---------
 
 
 
