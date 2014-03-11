@@ -115,7 +115,7 @@ public class GPSService extends Service {
 	// System.currentTimeMillis());
 	// pIntent = PendingIntent.getService(this, 0, intent, 0);
 	// notification.setLatestEventInfo(this, "电能表校验", "GPS后台服务正在运行..",
-	// pIntent);
+	// pIntent);x
 	//
 	// // 让该service前台运行，避免手机休眠时系统自动杀掉该服务
 	// // 如果 id 为 0 ，那么状态栏的 notification 将不会显示。
@@ -208,6 +208,7 @@ public class GPSService extends Service {
 		    return;
 		}
 	    }
+	    GpsLog.writeLogFile("坐标："+location.getLongitude()+","+location.getLatitude()+"上传中");
 	    paramMap.put("longitude", location.getLongitude() + "");
 	    paramMap.put("latitude", location.getLatitude() + "");
 	    requestParams = new RequestParams(paramMap);

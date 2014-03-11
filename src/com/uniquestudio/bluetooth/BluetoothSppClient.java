@@ -69,7 +69,17 @@ public class BluetoothSppClient {
 		    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 		switch (msg.arg1) {
 		case BluetoothChatService.STATE_CONNECTED:
+
 		    System.out.println("hanlder---------->STATE_CONNECTED");
+		    
+		    System.out.println("11111");
+		    try {
+			Thread.sleep(4000);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		    System.out.println("2222");
+		    
 		    byte[] bytes = BuildFrameUtil.FrameBuid(
 			    BluetoothConstant.TYPE_GETFI_FLRD,
 			    "e:\\pecfile.dat"/* "e:\\pecfile.dat" */, -1, -1);

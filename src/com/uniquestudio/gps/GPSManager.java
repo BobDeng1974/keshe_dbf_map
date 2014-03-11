@@ -54,6 +54,7 @@ public class GPSManager {
 
     public  void updateProvider() {
 	this.getProvider();
+	    GpsLog.writeLogFile("坐标来源："+this.provider);
     }
     
     public void setRequestLocationUpdates(LocationListener myLocationListener) {
@@ -141,7 +142,7 @@ public class GPSManager {
 	if(location != null) {
 	    //写入gps信息
 	    DataBaseService dataBaseService = new MyData(mContext);
-	    if(dataBaseService.listMyDataMaps(GPS, null).size() == 0) {
+	    if(dataBaseService.viewMyData(GPS, CONS_NO,new String[]{cons_no}).size() == 0) {
 		//无对应数据则新建
 		ContentValues cv = new ContentValues();
 		cv.put(CONS_NO, cons_no);

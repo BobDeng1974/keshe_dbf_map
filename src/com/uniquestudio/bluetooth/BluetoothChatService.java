@@ -424,7 +424,7 @@ public class BluetoothChatService {
 	    // given BluetoothDevice
 	    Method m;
 	    try {
-		// tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
+//		 tmp = device.createInsecureRfcommSocketToServiceRecord(UUID_SPP);
 		m = device.getClass().getMethod("createRfcommSocket",
 			new Class[] { int.class });
 		tmp = (BluetoothSocket) m.invoke(device, Integer.valueOf(1));
@@ -535,6 +535,7 @@ public class BluetoothChatService {
 		try {
 		    if (mmInStream.available() > 0) {
 			byte length = (byte) mmInStream.read();
+			System.out.println(length);
 			// 开始
 			if (start) {
 			    if (toReceiveLength) {
@@ -559,6 +560,7 @@ public class BluetoothChatService {
 				    receivePosition = 0;
 				    start = false;
 				    frameLength = -1;
+				    first0xAA = false;
 				    System.out.println("frame ok");
 				    //避免在下面把first0xAA置为true
 				    if(length == (byte) 0xAA)
@@ -572,7 +574,7 @@ public class BluetoothChatService {
 				receivedBuffer = new byte[128];
 				receivedBuffer[0] = (byte) 0xAA;
 				receivedBuffer[1] = (byte) 0xAA;
-				first0xAA = false;
+//				first0xAA = false;
 				toReceiveLength = true;
 				start = true;
 				System.out.println("frame start");
@@ -602,7 +604,7 @@ public class BluetoothChatService {
 		for (byte b : buffer) {
 		    mmOutStream.write(b);
 		    try {
-			Thread.sleep(10);
+			Thread.sleep(20);
 		    } catch (InterruptedException e) {
 			e.printStackTrace();
 		    }

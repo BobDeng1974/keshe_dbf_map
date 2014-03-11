@@ -387,11 +387,19 @@ public class DetailActivity extends Activity {
 		String mLat1 = "30.598562"; 
 	   	String mLon1 = "114.302661"; 
 	   	String message = "请手动搜索终点位置..";
+		GPSSearchMap = dataBaseService.viewMyData(GPS, CONS_NO,new String[] { Cons_No });
 		if (GPSSearchMap.size() != 0) {
 		    System.out.println("任务内有目的地GPS");
 		    mLat1 = GPSSearchMap.get(0).get(LATITUDE);
 		    mLon1 = GPSSearchMap.get(0).get(LONGITUDE);
 		    message = "已定位到目的地,请点击‘到这去’..";
+		}else {
+			GPSManager gpsManager = new GPSManager(DetailActivity.this);
+			Location localLocation = gpsManager.getMyLastKnownLocation();
+			if(localLocation != null) {
+			    mLat1 = localLocation.getLatitude() + "";
+			    mLon1 = localLocation.getLongitude() + "";
+			}
 		}
 		try {
 		    Uri mUri = Uri.parse("geo:"+mLat1+","+ mLon1+"?z=12"/*+"&q="+message*/);
