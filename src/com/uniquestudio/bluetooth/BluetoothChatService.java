@@ -56,11 +56,11 @@ public class BluetoothChatService {
     /** 常量:SPP的Service UUID */
     public static final UUID UUID_SPP = UUID
 	    .fromString("00001101-0000-1000-8000-00805F9B34FB");
-    // Unique UUID for this application
-    private static final UUID MY_UUID_SECURE = UUID
-	    .fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-    private static final UUID MY_UUID_INSECURE = UUID
-	    .fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+//    // Unique UUID for this application
+//    private static final UUID MY_UUID_SECURE = UUID
+//	    .fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+//    private static final UUID MY_UUID_INSECURE = UUID
+//	    .fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -422,28 +422,29 @@ public class BluetoothChatService {
 	    int sdk = Integer.parseInt(Build.VERSION.SDK);
 	    // Get a BluetoothSocket for a connection with the
 	    // given BluetoothDevice
-	    Method m;
-	    try {
+//	    Method m;
+//	    try {
 //		 tmp = device.createInsecureRfcommSocketToServiceRecord(UUID_SPP);
-		m = device.getClass().getMethod("createRfcommSocket",
-			new Class[] { int.class });
-		tmp = (BluetoothSocket) m.invoke(device, Integer.valueOf(1));
-	    } catch (Exception e1) {
-		e1.printStackTrace();
-	    }
-	    // try {
-	    // //2.3.3以上的设备需要用这个方式创建通信连接
-	    // if (sdk >= 10) {
-	    // tmp = device.createInsecureRfcommSocketToServiceRecord(UUID_SPP);
-	    // System.out.println("createInsecureRfcommSocketToServiceRecord----->");
-	    // }
-	    // else {
-	    // tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
-	    // System.out.println("createRfcommSocketToServiceRecord----->");
-	    // }
-	    // } catch (IOException e) {
-	    // Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
-	    // }
+////		m = device.getClass().getMethod("createRfcommSocket",
+////			new Class[] { int.class });
+////		tmp = (BluetoothSocket) m.invoke(device, Integer.valueOf(1));
+//	    } catch (Exception e1) {
+//		e1.printStackTrace();
+//		Log.e(TAG, "ConnectThread: Socket creation failed.", e1);
+//	    }
+	     try {
+	     //2.3.3以上的设备需要用这个方式创建通信连接
+	     if (sdk >= 10) {
+	     tmp = device.createInsecureRfcommSocketToServiceRecord(UUID_SPP);
+	     System.out.println("createInsecureRfcommSocketToServiceRecord----->");
+	     }
+	     else {
+	     tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
+	     System.out.println("createRfcommSocketToServiceRecord----->");
+	     }
+	     } catch (IOException e) {
+	     Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+	     }
 	    mmSocket = tmp;
 	}
 
@@ -600,8 +601,9 @@ public class BluetoothChatService {
 	 */
 	public void write(byte[] buffer) {
 	    try {
-		CHexConver.printHexString("write------->", buffer);
-		for (byte b : buffer) {
+		String bufferString = CHexConver.decode(CHexConver.printHexString("write------->", buffer));
+		byte[] bufferBytes = CHexConver.hexStringToBytes(bufferString);
+		for (byte b : bufferBytes) {
 		    mmOutStream.write(b);
 		    try {
 			Thread.sleep(20);

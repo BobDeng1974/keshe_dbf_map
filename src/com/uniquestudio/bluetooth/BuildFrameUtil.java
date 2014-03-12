@@ -351,7 +351,7 @@ public class BuildFrameUtil {
      */
     public static SppMessage AnalyseMyFrame(byte[] frame) {
 	byte[] message = FrameAnalyse(frame);
-	CHexConver.printHexString("", message);
+//	CHexConver.printHexString("", message);
 	SppMessage sppMessage;
 	if (message != null) {
 	    sppMessage = MessageAnalyse(message);

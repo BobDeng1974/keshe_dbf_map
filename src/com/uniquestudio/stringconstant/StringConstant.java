@@ -1,5 +1,6 @@
 package com.uniquestudio.stringconstant;
 
+import android.R.integer;
 import android.os.Environment;
 
 public class StringConstant {
@@ -24,6 +25,10 @@ public class StringConstant {
     public static String PREFS_NAME = "uniquestudio.mydata";
 
     public static final String DEF_AK = "47IzYKGkpcyliNNhXCQDYfWG";//默认AK
+    
+    public static final int DEF_MIN_DISTANCE = 220;
+    
+    public static final int DEF_MIN_MINUTES = 4;
     
     public static String root = Environment.getExternalStorageDirectory()
 		.getAbsolutePath() + "/Android/data/uniquestudio.Electric";

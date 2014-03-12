@@ -8,6 +8,8 @@ import static com.uniquestudio.stringconstant.StringConstant.*;
 import com.uniquestudio.DBFRW.WriteDbfFile;
 import com.uniquestudio.refreshablelist.DataBaseService;
 import com.uniquestudio.refreshablelist.MyData;
+import com.uniquestudio.stringconstant.StringConstant;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
@@ -16,6 +18,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
@@ -39,7 +42,7 @@ public class GPSManager {
     /**
      * 触发坐标上传的半径大小
      */
-    private int minMeters = 220;
+    private int minMeters;
 
     public GPSManager(Context context) {
 	this.mContext = context;
@@ -50,6 +53,11 @@ public class GPSManager {
 	getProvider();
 	// 如果未设置位置源，打开GPS设置界面
 	CheckCurrentNetWork();
+	
+	// 获取半径值
+	SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
+	minMeters = sharedPreferences.getInt("minMeters", StringConstant.DEF_MIN_DISTANCE);
     }
 
     public  void updateProvider() {

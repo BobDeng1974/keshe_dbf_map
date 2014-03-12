@@ -48,6 +48,7 @@ public class RefreshableListViewActivity extends Fragment {
     private TextView completeNumber;
     private MyBaseAdapter myBaseAdapter;
     private ProgressDialog progressDialog;
+    private boolean receiverIsRegisite = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	    Bundle savedInstanceState) {
@@ -183,7 +184,8 @@ public class RefreshableListViewActivity extends Fragment {
 
     @Override
     public void onDestroy() {
-	getActivity().unregisterReceiver(refreshReceiver);
+	if(refreshReceiver != null && receiverIsRegisite)
+	    getActivity().unregisterReceiver(refreshReceiver);
 	System.out.println("refreshableListActivity destroy");
 	super.onDestroy();
     }
@@ -236,7 +238,7 @@ public class RefreshableListViewActivity extends Fragment {
 		    new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog,
 				int whichButton) {
-			    getActivity().finish();
+//			    getActivity().finish();
 			}
 		    }).show();
 		return false;
@@ -255,6 +257,7 @@ public class RefreshableListViewActivity extends Fragment {
 	    mItems.addAll(getItems());
 	    if(myBaseAdapter != null)
 	  	 myBaseAdapter.notifyDataSetChanged();
+	    receiverIsRegisite = true;
         }
     };
     

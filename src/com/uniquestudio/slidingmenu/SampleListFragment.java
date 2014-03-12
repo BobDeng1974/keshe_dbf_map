@@ -49,6 +49,7 @@ public class SampleListFragment extends Fragment  implements OnItemClickListener
 	mItems.add("DBF文件夹");
 	mItems.add("更改AK值");
 	mItems.add("查看设备号");
+	mItems.add("更改上传参数");
 	mItems.add("更新任务");
 	mItems.add("完全退出");
 	SampleAdapter adapter = new SampleAdapter(getActivity());
@@ -111,21 +112,22 @@ public class SampleListFragment extends Fragment  implements OnItemClickListener
 	case 1:
 	case 2:
 	case 3:
+	case 4:
 	    //切换界面的方法接口
 		if(iChangeFragment != null)
 			iChangeFragment.changeFragment(position);
 	    break;
-	case 4:
+	case 5:
 	    new MyUpdateDBTask(getActivity()).execute();
 	    break;
-	case 5:
+	case 6:
 	    //完全退出，杀掉传坐标后台进程
 	    GpsPostUtils.stopPostService(getActivity(), GPSService.class, GPSService.ACTION);
 	    
 	    Intent stopServiceIntent = new Intent(getActivity(), GPSService.class);
 	    getActivity().stopService(stopServiceIntent);
 	    
-//	    getActivity().finish();
+	    getActivity().finish();
 	    Intent intent = new Intent(Intent.ACTION_MAIN);
 	    intent.addCategory(Intent.CATEGORY_HOME);
 	    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

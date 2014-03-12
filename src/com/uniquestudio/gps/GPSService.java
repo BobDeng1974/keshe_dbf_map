@@ -51,6 +51,7 @@ public class GPSService extends Service {
 
     private int geoTableID = -1;
     private long lastTimer = 0;
+    private boolean stopTimerThread = false;
     private GPSService gpsService = null;
     private GPSManager gpsManager = null;
     private LocationListener locationListener = null;
@@ -63,7 +64,7 @@ public class GPSService extends Service {
     /**
      * 最久4分钟上传一次
      */
-    public static int postMinute = 4;
+    public  int postMinute;
 
     Handler handler = new Handler() {
 	@Override
@@ -73,9 +74,13 @@ public class GPSService extends Service {
 	    case 1:
 		httpPostToUpdateMyLocation(null);
 		break;
+	    case 2:
+		removeCallbacks(timerRunnable);
+		break;
 	    default:
 		break;
 	    }
+//	    handler.removeCallbacks(Time);
 	}
     };
 
@@ -92,11 +97,14 @@ public class GPSService extends Service {
 	gpsManager = new GPSManager(gpsService);
 	locationListener = new myLocationListener();
 	gpsManager.setRequestLocationUpdates(locationListener);
+	new Thread(timerRunnable).start();
+	stopTimerThread = false;
 
 	// 获取AK值
 	SharedPreferences sharedPreferences = gpsService.getSharedPreferences(
 		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
 	myAK = sharedPreferences.getString("AK", StringConstant.DEF_AK);
+	postMinute = sharedPreferences.getInt("postMinute", StringConstant.DEF_MIN_MINUTES);
 	// 获取手机设备号
 	TelephonyManager telephonyManager = (TelephonyManager) this
 		.getSystemService(Context.TELEPHONY_SERVICE);
@@ -108,24 +116,21 @@ public class GPSService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-	// if (isFirstStart) {
-	// // 为了防止service被手机杀掉,在OnDestory中要stopForeground
-	// Notification notification = new Notification(
-	// com.uniquestudio.R.drawable.ic_launcher, "GPS后台服务启动..",
-	// System.currentTimeMillis());
-	// pIntent = PendingIntent.getService(this, 0, intent, 0);
-	// notification.setLatestEventInfo(this, "电能表校验", "GPS后台服务正在运行..",
-	// pIntent);x
-	//
-	// // 让该service前台运行，避免手机休眠时系统自动杀掉该服务
-	// // 如果 id 为 0 ，那么状态栏的 notification 将不会显示。
-	// startForeground(startId, notification);
-	// isFirstStart = false;
-	// }
+	 if (isFirstStart) {
+	 // 为了防止service被手机杀掉,在OnDestory中要stopForeground
+	 Notification notification = new Notification(
+	 com.uniquestudio.R.drawable.ic_launcher, "GPS后台服务启动..",
+	 System.currentTimeMillis());
+	 pIntent = PendingIntent.getService(this, 0, intent, 0);
+	 notification.setLatestEventInfo(this, "电能表校验", "GPS后台服务正在运行..",
+	 pIntent);
+	
+	 // 让该service前台运行，避免手机休眠时系统自动杀掉该服务
+	 // 如果 id 为 0 ，那么状态栏的 notification 将不会显示。
+	 startForeground(startId, notification);
+	 isFirstStart = false;
+	 }
 	System.out.println("GpsService---------->onStart");
-	new Thread(new TimerThread()).start();
-
-	// wakeLocker postSuccess -> release
 
 	// 使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。
 	return Service.START_REDELIVER_INTENT;
@@ -146,9 +151,10 @@ public class GPSService extends Service {
 	System.out.println("GpsService---------->onDestroy");
 	if (gpsManager != null && locationListener != null)
 	    gpsManager.removeLocationListener(locationListener);
-
+	
+	stopTimerThread = true;
 	unregisterReceiver(netConnectReceiver);
-	// stopForeground(true);
+	 stopForeground(true);
 	super.onDestroy();
     }
 
@@ -325,14 +331,17 @@ public class GPSService extends Service {
      * 
      * @author luo 记录两次上传直接的间隔，如果超过一定分钟，则手动上传
      */
-    public class TimerThread implements Runnable {
-	@Override
+    private  Runnable timerRunnable = new  Runnable() {
 	public void run() {
-	    if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
-		handler.sendEmptyMessage(1);
-	    // Log.e("TimerThread---->", lastTimer + "");
+	    if(!stopTimerThread) {
+		if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
+		    handler.sendEmptyMessage(1);
+		handler.postDelayed(timerRunnable, 2*60*1000);
+	    }else {
+		handler.sendEmptyMessage(2);
+	    }
 	}
-    }
+    };
 
     private void creatNotification(String message) {
 	creatNotification(message, null, -1);

@@ -79,6 +79,7 @@ import com.uniquestudio.DBFRW.ParseDbf2Map;
 import com.uniquestudio.DBFRW.WriteDbfFile;
 import com.uniquestudio.bluetooth.BluetoothChatService;
 import com.uniquestudio.bluetooth.BluetoothSppClient;
+import com.uniquestudio.bluetooth.CHexConver;
 import com.uniquestudio.bluetooth.DiscoveryDevicesActivity;
 import com.uniquestudio.bluetooth.PecData;
 import com.uniquestudio.gps.GPSManager;
@@ -272,6 +273,7 @@ public class DetailActivity extends Activity {
    	
 	    Intent intentToRefresh = new Intent("com.unique.refresh");  
 	    this.sendBroadcast(intentToRefresh);
+	    
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

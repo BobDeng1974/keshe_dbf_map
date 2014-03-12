@@ -14,7 +14,6 @@ import java.util.Locale;
  * */
 
 public class CHexConver {
-    private final static char[] mChars = "0123456789ABCDEF".toCharArray();
     private final static String mHexStr = "0123456789ABCDEF";
     /**
      * 检查16进制字符串是否有效
@@ -105,22 +104,26 @@ public class CHexConver {
      *            src Byte字符串，每个Byte之间没有分隔符(字符范围:0-9 A-F)
      * @return byte[]
      */
-    public static byte[] hexStr2Bytes(String src) {
-	/* 对输入值进行规范化整理 */
-	src = src.trim().replace(" ", "").toUpperCase(Locale.US);
-	// 处理值初始化
-	int m = 0, n = 0;
-	int l = src.length() / 2; // 计算长度
-	byte[] ret = new byte[l]; // 分配存储空间
+    public static byte[] hexStringToBytes(String hexString) {
+	        hexString = hexString.replaceAll(" ", "");
+	        if (hexString == null || hexString.equals("")) {
+	            return null;
+	        }
+	        hexString = hexString.toUpperCase(Locale.getDefault());
+	        int length = hexString.length() / 2;
+	        char[] hexChars = hexString.toCharArray();
+	        byte[] d = new byte[length];
+	        for (int i = 0; i < length; i++) {
+	            int pos = i * 2;
+	            d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+	        }
+	        return d;
+	    }
+    
+    private static byte charToByte(char c) {
+	        return (byte) "0123456789ABCDEF".indexOf(c);
+	    }
 
-	for (int i = 0; i < l; i++) {
-	    m = i * 2 + 1;
-	    n = m + 1;
-	    ret[i] = (byte) (Integer.decode("0x" + src.substring(i * 2, m)
-		    + src.substring(m, n)) & 0xFF);
-	}
-	return ret;
-    }
 
     public static String parseAscii(String str) {
 	StringBuilder sb = new StringBuilder();
@@ -141,4 +144,23 @@ public class CHexConver {
     return new String(baos.toByteArray());
     }
 
+    
+    /**
+     * bytes转换成十六进制字符串
+     * @param byte[] b byte数组
+     * @param int iLen 取前N位处理 N=iLen
+     * @return String 每个Byte值之间空格分隔
+     */
+	public static String byte2HexStr(byte[] b)
+    {
+        String stmp;
+        StringBuilder sb = new StringBuilder("");
+        for (int n=0; n<b.length; n++)
+        {
+            stmp = Integer.toHexString(b[n] & 0xFF);
+            sb.append((stmp.length()==1)? "0"+stmp : stmp);
+            sb.append(" ");
+        }
+        return sb.toString().trim().toUpperCase(Locale.US);
+    }
 }
