@@ -26,6 +26,7 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 //		启动后台监控GPS坐标
 		Intent intent = new Intent(getApplicationContext() , GPSService.class);
 		getApplicationContext().startService(intent);

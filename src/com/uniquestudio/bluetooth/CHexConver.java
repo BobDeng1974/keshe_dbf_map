@@ -97,28 +97,29 @@ public class CHexConver {
 	return printHexString(hint, bytes);
     }
 
+    
     /**
      * bytes字符串转换为Byte值
-     * 
-     * @param String
-     *            src Byte字符串，每个Byte之间没有分隔符(字符范围:0-9 A-F)
+     * @param String src Byte字符串，每个Byte之间没有分隔符(字符范围:0-9 A-F)
      * @return byte[]
      */
-    public static byte[] hexStringToBytes(String hexString) {
-	        hexString = hexString.replaceAll(" ", "");
-	        if (hexString == null || hexString.equals("")) {
-	            return null;
-	        }
-	        hexString = hexString.toUpperCase(Locale.getDefault());
-	        int length = hexString.length() / 2;
-	        char[] hexChars = hexString.toCharArray();
-	        byte[] d = new byte[length];
-	        for (int i = 0; i < length; i++) {
-	            int pos = i * 2;
-	            d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
-	        }
-	        return d;
-	    }
+    public static byte[] hexStr2Bytes(String src)
+    {
+    	/*对输入值进行规范化整理*/
+    	src = src.trim().replace(" ", "").toUpperCase(Locale.US);
+    	//处理值初始化
+    	int m=0,n=0;
+        int l=src.length()/2; //计算长度
+        byte[] ret = new byte[l]; //分配存储空间
+        
+        for (int i = 0; i < l; i++)
+        {
+            m=i*2+1;
+            n=m+1;
+            ret[i] = (byte)(Integer.decode("0x"+ src.substring(i*2, m) + src.substring(m,n)) & 0xFF);
+        }
+        return ret;
+    }
     
     private static byte charToByte(char c) {
 	        return (byte) "0123456789ABCDEF".indexOf(c);

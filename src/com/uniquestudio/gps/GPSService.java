@@ -336,7 +336,7 @@ public class GPSService extends Service {
 	    if(!stopTimerThread) {
 		if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
 		    handler.sendEmptyMessage(1);
-		handler.postDelayed(timerRunnable, 2*60*1000);
+		handler.postDelayed(timerRunnable, 1*60*1000);
 	    }else {
 		handler.sendEmptyMessage(2);
 	    }
