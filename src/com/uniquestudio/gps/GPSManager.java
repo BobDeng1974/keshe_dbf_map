@@ -62,7 +62,7 @@ public class GPSManager {
 
     public  void updateProvider() {
 	this.getProvider();
-	    GpsLog.writeLogFile("坐标来源："+this.provider);
+	    GpsLog.writeLogFile("坐标来源："+this.provider +"(以下全坐标为它获得)");
     }
     
     public void setRequestLocationUpdates(LocationListener myLocationListener) {

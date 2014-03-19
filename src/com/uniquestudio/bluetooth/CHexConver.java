@@ -108,17 +108,25 @@ public class CHexConver {
     	/*对输入值进行规范化整理*/
     	src = src.trim().replace(" ", "").toUpperCase(Locale.US);
     	//处理值初始化
-    	int m=0,n=0;
-        int l=src.length()/2; //计算长度
-        byte[] ret = new byte[l]; //分配存储空间
-        
-        for (int i = 0; i < l; i++)
-        {
-            m=i*2+1;
-            n=m+1;
-            ret[i] = (byte)(Integer.decode("0x"+ src.substring(i*2, m) + src.substring(m,n)) & 0xFF);
+//    	int m=0,n=0;
+//        int l=src.length()/2; //计算长度
+//        byte[] ret = new byte[l]; //分配存储空间
+//        
+//        for (int i = 0; i < l; i++)
+//        {
+//            m=i*2+1;
+//            n=m+1;
+//            ret[i] = (byte)(Integer.decode("0x"+ src.substring(i*2, m) + src.substring(m,n)) & 0xFF);
+//        }
+//        return ret;
+    	int length = src.length() / 2;
+        char[] hexChars = src.toCharArray();
+        byte[] d = new byte[length];
+        for (int i = 0; i < length; ++i) {
+          int pos = i * 2;
+          d[i] = (byte)(charToByte(hexChars[pos]) << 4 | charToByte(hexChars[(pos + 1)]));  //调用了下方字符转字节的方法
         }
-        return ret;
+        return d;
     }
     
     private static byte charToByte(char c) {
