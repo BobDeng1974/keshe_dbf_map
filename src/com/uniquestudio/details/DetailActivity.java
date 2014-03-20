@@ -273,7 +273,6 @@ public class DetailActivity extends Activity {
    	
 	    Intent intentToRefresh = new Intent("com.unique.refresh");  
 	    this.sendBroadcast(intentToRefresh);
-	    
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,7 +471,7 @@ public class DetailActivity extends Activity {
 	Cons_No = (String) map.get(CONS_NO);
 	Zc_id = (String) map.get(ZC_ID);
 	Task_id = (String) map.get(TASKID);
-	System.out.println(Cons_No+"-"+Zc_id + "-" +Task_id);
+//	System.out.println(Cons_No+"-"+Zc_id + "-" +Task_id);
 	//获取接线方式
 	wiringMode = (String) map.get(WIRING);
 //	System.out.println(wiringMode);
@@ -901,10 +900,16 @@ class MySpinnerListener implements OnItemSelectedListener{
 	    case 1:
 		// 接收完了
 		System.out.println("mreadMachineHandler---1");
+		PecData pecData = null ;
+		if(bluetoothSppClient != null)
+		    pecData = bluetoothSppClient.getPecData();
+		else {
+		    mConversationArrayAdapter.add("解析时出错，请重试...");
+		    break;
+		}
 		verifyReadMachine.setText("读取完成");
 		waitReadMachineDialog.dismiss();
 		readMachineThread.interrupt();
-		PecData pecData = bluetoothSppClient.getPecData();
 		HashMap<String , Object> hashMap = pecData.toList();
 		String stTimer = hashMap.get("Timer").toString();
 		mConversationArrayAdapter.add("Time:" + stTimer);
@@ -920,6 +925,8 @@ class MySpinnerListener implements OnItemSelectedListener{
 		    String key = needData[i];
 		    missionData.put(key,hashMap.get(key));
 		}
+		pecData = null;
+		hashMap = null;
 		break;
 	    case 2:
 		// error
@@ -940,7 +947,8 @@ class MySpinnerListener implements OnItemSelectedListener{
 //		sharedPreferences.edit().putString("def_device" , "").commit();//清除这个默认的mac地址
 		break;
 	    }
-	    bluetoothSppClient.close();
+	    if(bluetoothSppClient != null)
+		bluetoothSppClient.close();
 	    bluetoothSppClient = null;
 	    verifyReadMachine.setEnabled(true);
 	    if(msg.what == 3)
@@ -1810,7 +1818,7 @@ class MySpinnerListener implements OnItemSelectedListener{
 	    @Override
 	    public void run() {
 		try {
-		    Thread.sleep(20 * 1000);
+		    Thread.sleep(10 * 1000);
 		    waitReadMachineDialog.dismiss();
 		    DetailActivity.this.mreadMachineHandler.sendEmptyMessage(0);
 		} catch (InterruptedException e) {
@@ -1860,9 +1868,11 @@ class MySpinnerListener implements OnItemSelectedListener{
 
     @Override
     protected void onDestroy() {
+	System.out.println("detail onDestroy");
 	if (mChatService != null)
 	    mChatService.stop();
-//	
+	if(bluetoothSppClient != null)
+	    bluetoothSppClient.close();
 //	BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 //	if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) 
 //	    bluetoothAdapter.disable();

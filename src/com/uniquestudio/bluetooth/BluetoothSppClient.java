@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 public class BluetoothSppClient {
     private static final int FRAME_MAX_NUM = 30;
-    private static final int DATA_MAX_LEN = 252;
+    public static final int DATA_MAX_LEN = 252;
     private static final int FRAME_MAX_LEN = 255;
     private static final int FILE_BUF_LEN = (FRAME_MAX_NUM * DATA_MAX_LEN);
     private byte[][] glbFileDataBuf = new byte[FRAME_MAX_NUM][DATA_MAX_LEN];
@@ -72,18 +72,10 @@ public class BluetoothSppClient {
 
 		    System.out.println("hanlder---------->STATE_CONNECTED");
 		    
-		    System.out.println("11111");
-		    try {
-			Thread.sleep(4000);
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
-		    System.out.println("2222");
-		    
-		    byte[] bytes = BuildFrameUtil.FrameBuid(
-			    BluetoothConstant.TYPE_GETFI_FLRD,
-			    "e:\\pecfile.dat"/* "e:\\pecfile.dat" */, -1, -1);
-		    sendMyMessage(bytes);
+			    byte[] bytes = BuildFrameUtil.FrameBuid(
+				    BluetoothConstant.TYPE_GETFI_FLRD,
+				    "e:\\pecfile.dat"/* "e:\\pecfile.dat" */, -1, -1);
+			    sendMyMessage(bytes);
 		    break;
 		case BluetoothChatService.STATE_CONNECTING:
 		    // mTitle.setText(R.string.title_connecting);
@@ -99,7 +91,7 @@ public class BluetoothSppClient {
 		}
 		break;
 	    case MESSAGE_WRITE:
-		byte[] writeBuf = (byte[]) msg.obj;
+//		byte[] writeBuf = (byte[]) msg.obj;
 		// construct a string from the buffer
 		break;
 	    case MESSAGE_READ:
@@ -305,8 +297,8 @@ public class BluetoothSppClient {
 		device = intent
 			.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 		try {
-		    BluetoothCtrl.setPin(device, pin); // 置入配对密码
 		    BluetoothCtrl.cancelPairingUserInput(device);
+		    BluetoothCtrl.setPin(device, pin); // 置入配对密码
 		} catch (Exception e) {
 		    Log.d(TAG,
 			    ">>_mPairingRequest err!");

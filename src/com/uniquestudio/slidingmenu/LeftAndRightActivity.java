@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import com.slidingmenu.lib.SlidingMenu;
 import com.uniquestudio.R;
+import com.uniquestudio.bluetooth.BluetoothConstant;
+import com.uniquestudio.bluetooth.BuildFrameUtil;
 import com.uniquestudio.bluetooth.CHexConver;
 import com.uniquestudio.gps.GPSService;
 import com.uniquestudio.gps.GpsPostUtils;

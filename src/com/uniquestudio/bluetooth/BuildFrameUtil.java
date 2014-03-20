@@ -8,7 +8,7 @@ import android.R.integer;
 import android.R.string;
 
 public class BuildFrameUtil {
-    static int DATA_MAX_LEN = 128;
+    public static int DATA_MAX_LEN = 252;
 
     static char auchCRCHi[] = { 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
 	    0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80,
@@ -243,7 +243,7 @@ public class BuildFrameUtil {
 	byte[] receivedMessage = null;
 	byte[] crcBytes = new byte[2];
 	int frameLength = receivedFrame.length;
-	int length = receivedFrame[2];
+	int length = frameLength-3;
 	// 起始符检查
 	if ((receivedFrame[0] != (byte) 0xAA)
 		&& (receivedFrame[1] != (byte) 0xAA))
@@ -376,7 +376,7 @@ public class BuildFrameUtil {
 	int[] Ind = new int[400];// //用来存放第n个逗号的位置。
 	Ind[0] = 0;// 第0个逗号的位置为0；
 	byte[] strDataTemp;
-	int strDataTmpLen = 50;
+	int strDataTmpLen = 1024;
 
 	for (i = 0; i < FileBufLen; i++) {
 	    if (data[i] == ',') {

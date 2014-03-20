@@ -172,8 +172,10 @@ public class RefreshableListViewActivity extends Fragment {
 		mItems.clear();
 		mItems.addAll(getItems());
 	    }
-	    if(myBaseAdapter != null)
+	    if(myBaseAdapter != null) {
 		myBaseAdapter.notifyDataSetChanged();
+		updateCompleteNumber() ;
+	    }
 	}
 	if(progressDialog != null) {
 	    if(progressDialog.isShowing())
@@ -253,10 +255,14 @@ public class RefreshableListViewActivity extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             System.out.println("i need refresh listView");
-	    mItems.clear();
-	    mItems.addAll(getItems());
-	    if(myBaseAdapter != null)
+            if(mItems != null) {
+        	mItems.clear();
+		   mItems.addAll(getItems());
+            }
+	    if(myBaseAdapter != null) {
 	  	 myBaseAdapter.notifyDataSetChanged();
+	  	 updateCompleteNumber();
+	    }
 	    receiverIsRegisite = true;
         }
     };
