@@ -7,7 +7,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/library_Sliding"/>
 	<classpathentry kind="lib" path="libs/android-async-http-1.4.4.jar"/>
-	<classpathentry kind="lib" path="libs/baidumapapi_v2_2_0.jar"/>
 	<classpathentry kind="lib" path="libs/javadbf.jar"/>
+	<classpathentry kind="lib" path="libs/locSDK_4.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -38,7 +38,6 @@ public class LeftAndRightActivity extends BaseActivity implements IChangeFragmen
 		    
 		getSlidingMenu().setMode(SlidingMenu.LEFT);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		
 		// set the Behind View
 		// 此处设置左边菜单
 		SampleListFragment sf = new SampleListFragment(this.getSupportFragmentManager());

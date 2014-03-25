@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.baidu.platform.comapi.map.l;
 import com.uniquestudio.DBFRW.WriteDbfFile;
 import com.uniquestudio.refreshablelist.DataBaseService;
 import com.uniquestudio.refreshablelist.MyData;

@@ -20,7 +20,10 @@
         <service
             android:name=".bluetooth.BluetoothChatService"
             android:process=":remote" />
-
+        <!-- baiduMap location -->
+		<service android:name="com.baidu.location.f" 
+		    android:enabled="true" android:process=":remote"/>
+        
         <activity
             android:name=".slidingmenu.LeftAndRightActivity"
             android:theme="@style/ExampleTheme" >

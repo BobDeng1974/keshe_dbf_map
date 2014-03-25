@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.uniquestudio.httpclient.LocationHttpClient;
@@ -96,6 +98,7 @@ public class GPSService extends Service {
 	// 更新GPS坐标相关
 	gpsManager = new GPSManager(gpsService);
 	locationListener = new myLocationListener();
+	
 	gpsManager.setRequestLocationUpdates(locationListener);
 	new Thread(timerRunnable).start();
 	stopTimerThread = false;
@@ -171,12 +174,14 @@ public class GPSService extends Service {
 	    // updateLocationListener();
 	    System.out.println("GpsService---------->onProviderDisabled");
 	    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
+	    GpsLog.writeLogFile("坐标提供者disabled");
 	    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG).show();
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
 	    System.out.println("GpsService---------->onProviderEnabled");
+	    GpsLog.writeLogFile("坐标提供者enabled");
 	    updateLocationListener();
 	}
 
