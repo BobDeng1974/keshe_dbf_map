@@ -8,8 +8,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.LocationClientOption.LocationMode;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.uniquestudio.httpclient.LocationHttpClient;
@@ -52,11 +55,15 @@ public class GPSService extends Service {
     private boolean isFirstStart = true;
 
     private int geoTableID = -1;
-    private long lastTimer = 0;
-    private boolean stopTimerThread = false;
+    private long lastUpdateTime = 0;//上次上传的时间
+    private String lastPosTime = "" ;//上次获得的坐标点附带的时间属性（字符串）
+//    private boolean stopTimerThread = false;
     private GPSService gpsService = null;
-    private GPSManager gpsManager = null;
-    private LocationListener locationListener = null;
+    
+    public LocationClient mLocationClient = null;
+    public BDLocationListener myLocationListener = new MyLocationListener();
+//    private GPSManager gpsManager = null;
+//    private LocationListener locationListener = null;
     private HashMap<String, String> paramMap = null;
     private RequestParams requestParams = null;
 
@@ -68,41 +75,52 @@ public class GPSService extends Service {
      */
     public  int postMinute;
 
-    Handler handler = new Handler() {
-	@Override
-	public void handleMessage(Message msg) {
-	    super.handleMessage(msg);
-	    switch (msg.what) {
-	    case 1:
-		httpPostToUpdateMyLocation(null);
-		break;
-	    case 2:
-		removeCallbacks(timerRunnable);
-		break;
-	    default:
-		break;
-	    }
-//	    handler.removeCallbacks(Time);
-	}
-    };
+//    Handler handler = new Handler() {
+//	@Override
+//	public void handleMessage(Message msg) {
+//	    super.handleMessage(msg);
+//	    switch (msg.what) {
+//	    case 1:
+//		httpPostToUpdateMyLocation(null);
+//		break;
+//	    case 2:
+//		removeCallbacks(timerRunnable);
+//		break;
+//	    default:
+//		break;
+//	    }
+////	    handler.removeCallbacks(Time);
+//	}
+//    };
 
     @Override
     public void onCreate() {
 	super.onCreate();
 	this.gpsService = this;
 	// 注册网络状态监听
-	IntentFilter netFilter = new IntentFilter(NET_ACTION);
-	registerReceiver(netConnectReceiver, netFilter);
+//	IntentFilter netFilter = new IntentFilter(NET_ACTION);
+//	registerReceiver(netConnectReceiver, netFilter);
 
 	System.out.println("GpsService---------->onCreat");
-	// 更新GPS坐标相关
-	gpsManager = new GPSManager(gpsService);
-	locationListener = new myLocationListener();
+	mLocationClient = new LocationClient(getApplicationContext());
+	mLocationClient.registerLocationListener(myLocationListener);
+	setLocationClientOption(mLocationClient);
+	if(mLocationClient != null ) {
+	    if(!mLocationClient.isStarted())
+		mLocationClient.start();
+	    mLocationClient.requestLocation();
+	    }
+	else
+	    System.out.println("client not started");
 	
-	gpsManager.setRequestLocationUpdates(locationListener);
-	new Thread(timerRunnable).start();
-	stopTimerThread = false;
-
+	
+	// 更新GPS坐标相关
+//	gpsManager = new GPSManager(gpsService);
+//	locationListener = new myLocationListener();
+	
+//	gpsManager.setRequestLocationUpdates(locationListener);
+//	new Thread(timerRunnable).start();
+//	stopTimerThread = false;
 	// 获取AK值
 	SharedPreferences sharedPreferences = gpsService.getSharedPreferences(
 		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
@@ -152,54 +170,59 @@ public class GPSService extends Service {
     @Override
     public void onDestroy() {
 	System.out.println("GpsService---------->onDestroy");
-	if (gpsManager != null && locationListener != null)
-	    gpsManager.removeLocationListener(locationListener);
-	
-	stopTimerThread = true;
-	unregisterReceiver(netConnectReceiver);
+//	if (gpsManager != null && locationListener != null)
+//	    gpsManager.removeLocationListener(locationListener);
+//	
+//	stopTimerThread = true;
+//	unregisterReceiver(netConnectReceiver);
+	if(mLocationClient != null && mLocationClient.isStarted()) {
+	    mLocationClient.unRegisterLocationListener(myLocationListener);
+	    mLocationClient.stop();
+	    mLocationClient = null;
+	}
 	 stopForeground(true);
 	super.onDestroy();
     }
 
-    class myLocationListener implements LocationListener {
-	@Override
-	public void onLocationChanged(Location location) {
-	    System.out.println("GpsService---------->onLocationChanged");
-	    gpsManager.printNewLocation(location);
-	    httpPostToUpdateMyLocation(location);
-	}
+//    class myLocationListener implements LocationListener {
+//	@Override
+//	public void onLocationChanged(Location location) {
+//	    System.out.println("GpsService---------->onLocationChanged");
+//	    gpsManager.printNewLocation(location);
+//	    httpPostToUpdateMyLocation(location);
+//	}
+//
+//	@Override
+//	public void onProviderDisabled(String arg0) {
+//	    // updateLocationListener();
+//	    System.out.println("GpsService---------->onProviderDisabled");
+//	    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
+//	    GpsLog.writeLogFile("坐标提供者disabled");
+//	    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG).show();
+//	}
+//
+//	@Override
+//	public void onProviderEnabled(String arg0) {
+//	    System.out.println("GpsService---------->onProviderEnabled");
+//	    GpsLog.writeLogFile("坐标提供者enabled");
+//	    updateLocationListener();
+//	}
+//
+//	@Override
+//	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+//	    System.out.println("GpsService---------->onStatusChanged");
+//	}
+//    }
 
-	@Override
-	public void onProviderDisabled(String arg0) {
-	    // updateLocationListener();
-	    System.out.println("GpsService---------->onProviderDisabled");
-	    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
-	    GpsLog.writeLogFile("坐标提供者disabled");
-	    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG).show();
-	}
+//    public void updateLocationListener() {
+//	if(gpsManager != null && locationListener != null) {
+//	gpsManager.updateProvider();
+//	gpsManager.removeLocationListener(locationListener);
+//	gpsManager.setRequestLocationUpdates(locationListener);
+//	}
+//    }
 
-	@Override
-	public void onProviderEnabled(String arg0) {
-	    System.out.println("GpsService---------->onProviderEnabled");
-	    GpsLog.writeLogFile("坐标提供者enabled");
-	    updateLocationListener();
-	}
-
-	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-	    System.out.println("GpsService---------->onStatusChanged");
-	}
-    }
-
-    public void updateLocationListener() {
-	if(gpsManager != null && locationListener != null) {
-	gpsManager.updateProvider();
-	gpsManager.removeLocationListener(locationListener);
-	gpsManager.setRequestLocationUpdates(locationListener);
-	}
-    }
-
-    public void httpPostToUpdateMyLocation(Location location) {
+    public void httpPostToUpdateMyLocation(BDLocation location) {
 	// 如果查詢的到对应的表
 	if (geoTableID != -1) {
 	    Log.e("httpPostToUpdateMyLocation", "上传");
@@ -209,8 +232,8 @@ public class GPSService extends Service {
 	    paramMap.put("time", System.currentTimeMillis() + "");
 	    paramMap.put("coord_type", 1 + "");
 	    paramMap.put("title", null);
-	    if (location == null) {
-		location = gpsManager.getMyLastKnownLocation();
+//	    if (location == null) {
+//		location = gpsManager.getMyLastKnownLocation();
 		if (location == null) {
 		    creatNotification("GPS设置未打开", "点此打开\"基于网络的位置服务\"", 0);
 		    Toast.makeText(gpsService, "GPS位置服务未打开", Toast.LENGTH_LONG)
@@ -218,7 +241,9 @@ public class GPSService extends Service {
 		    GpsLog.writeLogFile("上传坐标：GPS获取失败");
 		    return;
 		}
-	    }
+//	    }
+	    lastPosTime = location.getTime();
+	    
 	    GpsLog.writeLogFile("坐标："+location.getLongitude()+","+location.getLatitude()+"上传中");
 	    paramMap.put("longitude", location.getLongitude() + "");
 	    paramMap.put("latitude", location.getLatitude() + "");
@@ -247,6 +272,7 @@ public class GPSService extends Service {
 					message = response.getString("message");
 
 					if (message.equals("成功")) {
+					    lastUpdateTime = System.currentTimeMillis();
 					    creatNotification("成功上传一个坐标.");
 					} else {
 					    creatNotification("坐标上传失败.");
@@ -261,7 +287,6 @@ public class GPSService extends Service {
 				creatNotification("坐标上传失败.");
 			    }
 			    GpsLog.writeLogFile("上传坐标：" + response);
-			    lastTimer = System.currentTimeMillis();
 			}
 
 		    });
@@ -336,17 +361,17 @@ public class GPSService extends Service {
      * 
      * @author luo 记录两次上传直接的间隔，如果超过一定分钟，则手动上传
      */
-    private  Runnable timerRunnable = new  Runnable() {
-	public void run() {
-	    if(!stopTimerThread) {
-		if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
-		    handler.sendEmptyMessage(1);
-		handler.postDelayed(timerRunnable, 1*60*1000);
-	    }else {
-		handler.sendEmptyMessage(2);
-	    }
-	}
-    };
+//    private  Runnable timerRunnable = new  Runnable() {
+//	public void run() {
+//	    if(!stopTimerThread) {
+//		if ((System.currentTimeMillis() - lastTimer) > postMinute * 60 * 1000)
+//		    handler.sendEmptyMessage(1);
+//		handler.postDelayed(timerRunnable, 1*60*1000);
+//	    }else {
+//		handler.sendEmptyMessage(2);
+//	    }
+//	}
+//    };
 
     private void creatNotification(String message) {
 	creatNotification(message, null, -1);
@@ -383,44 +408,106 @@ public class GPSService extends Service {
 	nm.notify(Notification_ID_BASE, baseNF);
     }
 
-    BroadcastReceiver netConnectReceiver = new BroadcastReceiver() {
-	State wifiState = null;
-	State mobileState = null;
+//    BroadcastReceiver netConnectReceiver = new BroadcastReceiver() {
+//	State wifiState = null;
+//	State mobileState = null;
+//
+//	@Override
+//	public void onReceive(Context context, Intent intent) {
+//	    if (NET_ACTION.equals(intent.getAction())) {
+//		// 获取手机的连接服务管理器，这里是连接管理器类
+//		ConnectivityManager cm = (ConnectivityManager) context
+//			.getSystemService(Context.CONNECTIVITY_SERVICE);
+//		wifiState = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+//			.getState();
+//		mobileState = cm
+//			.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+//			.getState();
+//
+//		if (wifiState != null && mobileState != null
+//			&& State.CONNECTED != wifiState
+//			&& State.CONNECTED == mobileState && !lastNetworkState) {
+//		    lastNetworkState = true;
+//		    updateLocationListener();
+//		    httpGetTableId();
+//		    GpsLog.writeLogFile("手机网络连接成功");
+//		} else if (wifiState != null && mobileState != null
+//			&& State.CONNECTED == wifiState
+//			&& State.CONNECTED != mobileState && !lastNetworkState) {
+//		    lastNetworkState = true;
+//		    httpGetTableId();
+//		    updateLocationListener();
+//		    GpsLog.writeLogFile("无线网络连接成功");
+//		} else if (wifiState != null && mobileState != null
+//			&& State.CONNECTED != wifiState
+//			&& State.CONNECTED != mobileState && lastNetworkState) {
+//		    GpsLog.writeLogFile("手机没有任何网络");
+//		    lastNetworkState = false;
+//		}
+//	    }
+//	}
+//    };
+
+    private void setLocationClientOption(LocationClient client) {
+	LocationClientOption option = new LocationClientOption();
+	option.setOpenGps(true);
+	option.setLocationMode(LocationMode.Hight_Accuracy);
+	option.setPriority(LocationClientOption.GpsFirst);
+	option.setProdName("uniquestudio");
+	option.setCoorType("bd09ll");
+	option.setScanSpan(5000);
+	option.setNeedDeviceDirect(false);
+	option.disableCache(true);
+	client.setLocOption(option);
+    }
+    
+    public class MyLocationListener implements BDLocationListener{
 
 	@Override
-	public void onReceive(Context context, Intent intent) {
-	    if (NET_ACTION.equals(intent.getAction())) {
-		// 获取手机的连接服务管理器，这里是连接管理器类
-		ConnectivityManager cm = (ConnectivityManager) context
-			.getSystemService(Context.CONNECTIVITY_SERVICE);
-		wifiState = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-			.getState();
-		mobileState = cm
-			.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
-			.getState();
-
-		if (wifiState != null && mobileState != null
-			&& State.CONNECTED != wifiState
-			&& State.CONNECTED == mobileState && !lastNetworkState) {
-		    lastNetworkState = true;
-		    updateLocationListener();
-		    httpGetTableId();
-		    GpsLog.writeLogFile("手机网络连接成功");
-		} else if (wifiState != null && mobileState != null
-			&& State.CONNECTED == wifiState
-			&& State.CONNECTED != mobileState && !lastNetworkState) {
-		    lastNetworkState = true;
-		    httpGetTableId();
-		    updateLocationListener();
-		    GpsLog.writeLogFile("无线网络连接成功");
-		} else if (wifiState != null && mobileState != null
-			&& State.CONNECTED != wifiState
-			&& State.CONNECTED != mobileState && lastNetworkState) {
-		    GpsLog.writeLogFile("手机没有任何网络");
-		    lastNetworkState = false;
+	public void onReceiveLocation(BDLocation location) {
+	    if (location == null) {
+		GpsLog.writeLogFile("无法获取GPS");
+	          return ;
+	    }
+	    //LocType      61 ： GPS定位结果     161： 表示网络定位结果
+	      StringBuffer sb = new StringBuffer(256);
+	      sb.append("time : ");
+	      sb.append(location.getTime());
+	      sb.append("\nerror code : ");
+	      sb.append(location.getLocType());
+	      sb.append("\nlatitude : ");
+	      sb.append(location.getLatitude());
+	      sb.append("\nlontitude : ");
+	      sb.append(location.getLongitude());
+	      sb.append("\nradius : ");
+	      sb.append(location.getRadius());
+	      if (location.getLocType() == BDLocation.TypeGpsLocation){
+	           sb.append("\nspeed : ");
+	           sb.append(location.getSpeed());
+	           sb.append("\nsatellite : ");
+	           sb.append(location.getSatelliteNumber());
+	           } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
+	           sb.append("\naddr : ");
+	           sb.append(location.getAddrStr());
+	        } 
+	 
+	     System.out.println(sb.toString());
+	     //时间 若停止，则会上传上次获得的点。比较时间即可判断是否为上个点。
+	    if(location.getLocType() == 61 || location.getLocType()==161) {
+		if (lastPosTime.equals(location.getTime())) {
+		    if (System.currentTimeMillis() - lastUpdateTime > postMinute * 1000) {
+			httpPostToUpdateMyLocation(location);
+		    }else {
+			System.out.println("当前未移动");
+		    }
+		}else {
+		    httpPostToUpdateMyLocation(location);
 		}
+	    }else {
+		GpsLog.writeLogFile("定位失败");
 	    }
 	}
-    };
-
+	@Override
+	public void onReceivePoi(BDLocation arg0) {}
+    }
 }
