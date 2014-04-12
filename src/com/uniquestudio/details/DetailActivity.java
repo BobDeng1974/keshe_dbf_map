@@ -70,6 +70,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.LocationClientOption.LocationMode;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -369,14 +374,7 @@ public class DetailActivity extends Activity {
 	getPosition.setOnClickListener(new OnClickListener() {
 	    @Override
 	    public void onClick(View v) {
-		GPSManager gpsManager = new GPSManager(DetailActivity.this);
-		Location nowLocation = gpsManager.WriteLocation(Cons_No);
-		if( nowLocation != null ) { 
-		    httpGetAdress(nowLocation.getLatitude() , nowLocation.getLongitude());
-		    setNavigation.setText(resources.getString(R.string.set_navigation));
-		}
-		else 
-		    getPositionTextView.setText("无法获取,请检查网络状况..");
+		getNowLocation();
 	    }
 	});
 	setNavigation.setOnClickListener(new OnClickListener() {
@@ -419,41 +417,77 @@ public class DetailActivity extends Activity {
 	    }
 	});
     }
-
-    private void httpGetAdress(double latitude, double longitude) {
-	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("location", latitude + "," + longitude);
-	    params.put("output", "json");
-	    params.put("key", "N7Gqr54UC1aqD9CBT3O8PsWx");
-	    RequestParams requestParams = new RequestParams(params);
-	    AsyncHttpClient httpClient = new AsyncHttpClient();
-	    httpClient.get("http://api.map.baidu.com/geocoder", requestParams, new JsonHttpResponseHandler() {
-		@Override
-		public void onFailure(Throwable e, JSONObject errorResponse) {
-		    getPositionTextView.setText("GPS信息已写入,解析失败");
-		    super.onFailure(e, errorResponse);
-		}
-		@Override
-		public void onSuccess(int statusCode, Header[] headers,
-			org.json.JSONObject response) {
-		    if(response.has("result")) {
-			try {
-			    JSONObject jsonArray = response
-			    	.getJSONObject("result");
-			    if(jsonArray.has("formatted_address")) {
-				String formattedAddress = jsonArray.getString("formatted_address");
-				System.out.println(formattedAddress);
-				getPositionTextView.setText(formattedAddress);
-				return ;
-			    }
-			    getPositionTextView.setText("GPS信息已写入,解析失败");
-			} catch (JSONException e) {
-			    e.printStackTrace();
-			}
+    private  void getNowLocation() {
+	LocationClient mLocationClient = new LocationClient(getApplicationContext());
+	LocationClientOption option = new LocationClientOption();
+	option.setLocationMode(LocationMode.Hight_Accuracy);
+	option.setProdName("uniquestudio");
+	option.setCoorType("bd09ll");//gcj02 bd09ll
+	option.setAddrType("all");  
+	option.setNeedDeviceDirect(false);
+	option.setPriority(LocationClientOption.NetWorkFirst);
+	option.disableCache(true);
+	mLocationClient.setLocOption(option);
+	mLocationClient.registerLocationListener(new BDLocationListener() {
+	    @Override
+	    public void onReceivePoi(BDLocation arg0) {}
+	    @Override
+	    public void onReceiveLocation(BDLocation location) {
+		if(location.getLocType() == 61 || location.getLocType()==161) {
+		    if (location.getAddrStr()!= null ){
+			getPositionTextView.setText(location.getAddrStr());
+		    }else {
+			//无法解析地址
+			getPositionTextView.setText("GPS信息已写入,解析失败");
 		    }
+		    setNavigation.setText(resources.getString(R.string.set_navigation));
+		    GPSManager gpsManager = new GPSManager(DetailActivity.this);
+		    gpsManager.WriteLocation(location , Cons_No);
+		}else {
+		    //获取失败
+		    getPositionTextView.setText("无法获取,请检查网络状况..");
 		}
-	    });
+	    }
+	});
+	mLocationClient.start();
+	mLocationClient.requestLocation();
+	mLocationClient.stop();
     }
+    
+//    private void httpGetAdress(double latitude, double longitude) {
+//	    HashMap<String, String> params = new HashMap<String, String>();
+//	    params.put("location", latitude + "," + longitude);
+//	    params.put("output", "json");
+//	    params.put("key", "N7Gqr54UC1aqD9CBT3O8PsWx");
+//	    RequestParams requestParams = new RequestParams(params);
+//	    AsyncHttpClient httpClient = new AsyncHttpClient();
+//	    httpClient.get("http://api.map.baidu.com/geocoder", requestParams, new JsonHttpResponseHandler() {
+//		@Override
+//		public void onFailure(Throwable e, JSONObject errorResponse) {
+//		    getPositionTextView.setText("GPS信息已写入,解析失败");
+//		    super.onFailure(e, errorResponse);
+//		}
+//		@Override
+//		public void onSuccess(int statusCode, Header[] headers,
+//			org.json.JSONObject response) {
+//		    if(response.has("result")) {
+//			try {
+//			    JSONObject jsonArray = response
+//			    	.getJSONObject("result");
+//			    if(jsonArray.has("formatted_address")) {
+//				String formattedAddress = jsonArray.getString("formatted_address");
+//				System.out.println(formattedAddress);
+//				getPositionTextView.setText(formattedAddress);
+//				return ;
+//			    }
+//			    getPositionTextView.setText("GPS信息已写入,解析失败");
+//			} catch (JSONException e) {
+//			    e.printStackTrace();
+//			}
+//		    }
+//		}
+//	    });
+//    }
     /**
      * 初始化任务信息列表
      */

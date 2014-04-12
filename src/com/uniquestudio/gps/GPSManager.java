@@ -5,6 +5,11 @@ import java.util.Map;
 
 import static com.uniquestudio.stringconstant.StringConstant.*;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.LocationClientOption.LocationMode;
 import com.uniquestudio.DBFRW.WriteDbfFile;
 import com.uniquestudio.refreshablelist.DataBaseService;
 import com.uniquestudio.refreshablelist.MyData;
@@ -98,6 +103,7 @@ public class GPSManager {
 	}
 	return lastKnownLocation;
     }
+    
 
     // 判断是否开启GPS，若未开启，打开GPS设置界面
     private void CheckCurrentNetWork() {
@@ -145,8 +151,7 @@ public class GPSManager {
     /**	由GPS定位坐标获取地址
      * @return	转换后的地址
      */
-    public Location WriteLocation(String cons_no) {
-	Location location = this.getMyLastKnownLocation();
+    public void WriteLocation(BDLocation location , String cons_no) {
 	if(location != null) {
 	    //写入gps信息
 	    DataBaseService dataBaseService = new MyData(mContext);
@@ -168,7 +173,6 @@ public class GPSManager {
 		Toast.makeText(mContext, "成功写入GPS信息", Toast.LENGTH_LONG).show();
 	} else
 	    Toast.makeText(mContext, "无法获取,请检查网络状况..",Toast.LENGTH_LONG).show();
-	return location;
     }
     /**
      * 判断GPS是否开启

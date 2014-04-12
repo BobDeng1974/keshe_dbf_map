@@ -1,7 +1,12 @@
 package com.uniquestudio.gps;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -31,6 +36,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -53,10 +59,13 @@ public class GPSService extends Service {
     private String imei = "-1";
     private PendingIntent pIntent;
     private boolean isFirstStart = true;
+    private boolean isFirstGPS = true;
 
     private int geoTableID = -1;
-    private long lastUpdateTime = 0;//上次上传的时间
+    private long lastUpdateTime = System.currentTimeMillis();//上次上传的时间
     private String lastPosTime = "" ;//上次获得的坐标点附带的时间属性（字符串）
+    private BDLocation lastPostGPS = null;//最新获得的有效GPS上传点
+    private List<RequestParams> linkedGPSList = Collections.synchronizedList(new LinkedList<RequestParams>());//存放有效GPS点的数组
 //    private boolean stopTimerThread = false;
     private GPSService gpsService = null;
     
@@ -74,6 +83,10 @@ public class GPSService extends Service {
      * 最久4分钟上传一次
      */
     public  int postMinute;
+    /**
+     * 触发坐标上传的半径大小
+     */
+    private int minMeters;
 
 //    Handler handler = new Handler() {
 //	@Override
@@ -126,6 +139,7 @@ public class GPSService extends Service {
 		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
 	myAK = sharedPreferences.getString("AK", StringConstant.DEF_AK);
 	postMinute = sharedPreferences.getInt("postMinute", StringConstant.DEF_MIN_MINUTES);
+	minMeters = sharedPreferences.getInt("minMeters", StringConstant.DEF_MIN_DISTANCE);
 	// 获取手机设备号
 	TelephonyManager telephonyManager = (TelephonyManager) this
 		.getSystemService(Context.TELEPHONY_SERVICE);
@@ -222,10 +236,14 @@ public class GPSService extends Service {
 //	}
 //    }
 
+    /**
+     * @param location
+     * 上传坐标及其参数的生成
+     */
     public void httpPostToUpdateMyLocation(BDLocation location) {
 	// 如果查詢的到对应的表
 	if (geoTableID != -1) {
-	    Log.e("httpPostToUpdateMyLocation", "上传");
+	    Log.e("httpPostToUpdateMyLocation", "生成参数");
 	    paramMap = new HashMap<String, String>();
 	    paramMap.put("ak", myAK);
 	    paramMap.put("geotable_id", geoTableID + "");
@@ -242,13 +260,28 @@ public class GPSService extends Service {
 		    return;
 		}
 //	    }
-	    lastPosTime = location.getTime();
 	    
 	    GpsLog.writeLogFile("坐标："+location.getLongitude()+","+location.getLatitude()+"上传中");
 	    paramMap.put("longitude", location.getLongitude() + "");
 	    paramMap.put("latitude", location.getLatitude() + "");
 	    requestParams = new RequestParams(paramMap);
-	    LocationHttpClient.post("geodata/v2/poi/create", requestParams,
+	    
+	    linkedGPSList.add(requestParams);
+	    lastPostGPS = location;
+	    
+	    httpPostGPS();//上传坐标点
+	}
+    }
+
+    /**
+     * 上传时的post操作
+     */
+    private void httpPostGPS() {
+	if(linkedGPSList == null || linkedGPSList.size() == 0 ) 
+	    return;
+	    System.out.println("取点上传");
+	    System.out.println(linkedGPSList.size() +":"+linkedGPSList.get(0));
+	LocationHttpClient.post("geodata/v2/poi/create", linkedGPSList.get(0),
 		    new JsonHttpResponseHandler() {
 			@Override
 			public void onFailure(Throwable e,
@@ -273,6 +306,8 @@ public class GPSService extends Service {
 
 					if (message.equals("成功")) {
 					    lastUpdateTime = System.currentTimeMillis();
+					    linkedGPSList.remove(0);
+					    httpPostGPS();//继续上传其他点
 					    creatNotification("成功上传一个坐标.");
 					} else {
 					    creatNotification("坐标上传失败.");
@@ -290,9 +325,11 @@ public class GPSService extends Service {
 			}
 
 		    });
-	}
     }
-
+    
+    /**
+     * 查询表格ID
+     */
     public void httpGetTableId() {
 	if (geoTableID != -1)
 	    return;
@@ -455,7 +492,8 @@ public class GPSService extends Service {
 	option.setPriority(LocationClientOption.GpsFirst);
 	option.setProdName("uniquestudio");
 	option.setCoorType("bd09ll");
-	option.setScanSpan(5000);
+	option.setAddrType("all");  
+	option.setScanSpan(10 * 1000);
 	option.setNeedDeviceDirect(false);
 	option.disableCache(true);
 	client.setLocOption(option);
@@ -469,6 +507,12 @@ public class GPSService extends Service {
 		GpsLog.writeLogFile("无法获取GPS");
 	          return ;
 	    }
+	    if(isFirstGPS) {
+		//第一次启动获取的GPS直接上传，不用检测时间与距离
+		httpPostToUpdateMyLocation(location);
+		isFirstGPS  = false;
+		return;
+	    }
 	    //LocType      61 ： GPS定位结果     161： 表示网络定位结果
 	      StringBuffer sb = new StringBuffer(256);
 	      sb.append("time : ");
@@ -479,35 +523,66 @@ public class GPSService extends Service {
 	      sb.append(location.getLatitude());
 	      sb.append("\nlontitude : ");
 	      sb.append(location.getLongitude());
-	      sb.append("\nradius : ");
-	      sb.append(location.getRadius());
+//	      sb.append("\nradius : ");
+//	      sb.append(location.getRadius());
 	      if (location.getLocType() == BDLocation.TypeGpsLocation){
 	           sb.append("\nspeed : ");
 	           sb.append(location.getSpeed());
 	           sb.append("\nsatellite : ");
 	           sb.append(location.getSatelliteNumber());
-	           } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
+	       } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
 	           sb.append("\naddr : ");
 	           sb.append(location.getAddrStr());
-	        } 
+	       }
 	 
-	     System.out.println(sb.toString());
+//	     System.out.println(sb.toString());
 	     //时间 若停止，则会上传上次获得的点。比较时间即可判断是否为上个点。
 	    if(location.getLocType() == 61 || location.getLocType()==161) {
 		if (lastPosTime.equals(location.getTime())) {
-		    if (System.currentTimeMillis() - lastUpdateTime > postMinute * 1000) {
+		    if (System.currentTimeMillis() - lastUpdateTime > postMinute * 60 * 1000) {
+			System.out.println("超过规定时间没动");
 			httpPostToUpdateMyLocation(location);
 		    }else {
 			System.out.println("当前未移动");
 		    }
-		}else {
+		}else if(getDistance(lastPostGPS, location) > minMeters ){
+		    //移动距离满足条件，上传
+		    System.out.println("移动范围大于最小距离");
 		    httpPostToUpdateMyLocation(location);
+		}else {
+		    System.out.println("距离太近，避免显示太密集，舍弃");
 		}
 	    }else {
 		GpsLog.writeLogFile("定位失败");
 	    }
+	    lastPosTime = location.getTime();
 	}
 	@Override
 	public void onReceivePoi(BDLocation arg0) {}
     }
+    /** 
+     * 计算两点之间距离 
+     * @param start 
+     * @param end 
+     * @return 米 
+     */  
+    public double getDistance(BDLocation start,BDLocation end){  
+	if( start == null) {
+	    return minMeters + 1;
+	}
+	
+        double lat1 = (Math.PI/180)*start.getLatitude();  
+        double lat2 = (Math.PI/180)*end.getLatitude();  
+          
+        double lon1 = (Math.PI/180)*start.getLongitude();  
+        double lon2 = (Math.PI/180)*end.getLongitude();  
+          
+        //地球半径  
+        double R = 6371;  
+          
+        //两点间距离 km，如果想要米的话，结果*1000就可以了  
+        double d =  Math.acos(Math.sin(lat1)*Math.sin(lat2)+Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1))*R;  
+        System.out.println("相距 ：" + d*1000 + "米");
+        return d*1000;  
+    }  
 }
