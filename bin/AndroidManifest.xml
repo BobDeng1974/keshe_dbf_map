@@ -23,6 +23,7 @@
             android:process=":remote" />
         <!-- baiduMap location -->
 		<service android:name="com.baidu.location.f" 
+		    android:permission="android.permission.BAIDU_LOCATION_SERVICE"
 		    android:enabled="true" android:process=":remote"/>
         
         <activity
@@ -63,7 +64,8 @@
     <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<!-- 这个权限用于访问GPS定位-->
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
     <!-- <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"></uses-permission> -->

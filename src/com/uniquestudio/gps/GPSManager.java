@@ -51,18 +51,18 @@ public class GPSManager {
 
     public GPSManager(Context context) {
 	this.mContext = context;
-	// 获取LocationManager服务
-	this.locationManager = (LocationManager) mContext
-		.getSystemService(Context.LOCATION_SERVICE);
-	// 获取Location Provider
-	getProvider();
-	// 如果未设置位置源，打开GPS设置界面
-	CheckCurrentNetWork();
-	
-	// 获取半径值
-	SharedPreferences sharedPreferences = mContext.getSharedPreferences(
-		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
-	minMeters = sharedPreferences.getInt("minMeters", StringConstant.DEF_MIN_DISTANCE);
+//	// 获取LocationManager服务
+//	this.locationManager = (LocationManager) mContext
+//		.getSystemService(Context.LOCATION_SERVICE);
+//	// 获取Location Provider
+//	getProvider();
+//	// 如果未设置位置源，打开GPS设置界面
+//	CheckCurrentNetWork();
+//	
+//	// 获取半径值
+//	SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+//		StringConstant.PREFS_NAME, Context.MODE_PRIVATE);
+//	minMeters = sharedPreferences.getInt("minMeters", StringConstant.DEF_MIN_DISTANCE);
     }
 
     public  void updateProvider() {

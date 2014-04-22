@@ -491,9 +491,9 @@ public class GPSService extends Service {
 	option.setLocationMode(LocationMode.Hight_Accuracy);
 	option.setPriority(LocationClientOption.GpsFirst);
 	option.setProdName("uniquestudio");
-	option.setCoorType("bd09ll");
+	option.setCoorType("wgs84");//WGS-84  1   bd09ll  3
 	option.setAddrType("all");  
-	option.setScanSpan(10 * 1000);
+	option.setScanSpan(15 * 1000);
 	option.setNeedDeviceDirect(false);
 	option.disableCache(true);
 	client.setLocOption(option);

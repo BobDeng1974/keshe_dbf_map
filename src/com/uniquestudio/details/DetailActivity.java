@@ -383,21 +383,22 @@ public class DetailActivity extends Activity {
 		// 检查gpsdbf里有无数据，无的话输入起点，有的话输入终点
 		// 开启百度导航
 		//默认武汉市坐标114.302661,30.592764
-		String mLat1 = "30.598562"; 
-	   	String mLon1 = "114.302661"; 
+		double mLat1 = 30.598562; 
+	   	double mLon1 = 114.302661; 
 	   	String message = "请手动搜索终点位置..";
 		GPSSearchMap = dataBaseService.viewMyData(GPS, CONS_NO,new String[] { Cons_No });
 		if (GPSSearchMap.size() != 0) {
 		    System.out.println("任务内有目的地GPS");
-		    mLat1 = GPSSearchMap.get(0).get(LATITUDE);
-		    mLon1 = GPSSearchMap.get(0).get(LONGITUDE);
+		  //lng:0.01205977756  lat: 0.00353370496
+		    mLat1 = Double.parseDouble(GPSSearchMap.get(0).get(LATITUDE)) - 0.00353370496;
+		    mLon1 = Double.parseDouble(GPSSearchMap.get(0).get(LONGITUDE)) - 0.01205977756;
 		    message = "已定位到目的地,请点击‘到这去’..";
 		}else {
 			GPSManager gpsManager = new GPSManager(DetailActivity.this);
 			Location localLocation = gpsManager.getMyLastKnownLocation();
 			if(localLocation != null) {
-			    mLat1 = localLocation.getLatitude() + "";
-			    mLon1 = localLocation.getLongitude() + "";
+			    mLat1 = localLocation.getLatitude() ;
+			    mLon1 = localLocation.getLongitude();
 			}
 		}
 		try {
@@ -420,12 +421,14 @@ public class DetailActivity extends Activity {
     private  void getNowLocation() {
 	LocationClient mLocationClient = new LocationClient(getApplicationContext());
 	LocationClientOption option = new LocationClientOption();
+	option.setOpenGps(true);
+	
 	option.setLocationMode(LocationMode.Hight_Accuracy);
+	option.setCoorType("bd09ll");//gcj02 bd09ll WGS84 
+	option.setPriority(LocationClientOption.GpsFirst);
 	option.setProdName("uniquestudio");
-	option.setCoorType("bd09ll");//gcj02 bd09ll
 	option.setAddrType("all");  
 	option.setNeedDeviceDirect(false);
-	option.setPriority(LocationClientOption.NetWorkFirst);
 	option.disableCache(true);
 	mLocationClient.setLocOption(option);
 	mLocationClient.registerLocationListener(new BDLocationListener() {
@@ -434,8 +437,10 @@ public class DetailActivity extends Activity {
 	    @Override
 	    public void onReceiveLocation(BDLocation location) {
 		if(location.getLocType() == 61 || location.getLocType()==161) {
+		    System.out.println("LocType="+location.getLocType());
 		    if (location.getAddrStr()!= null ){
 			getPositionTextView.setText(location.getAddrStr());
+			System.out.println("now_position:"+location.getLongitude()+","+location.getLatitude());
 		    }else {
 			//无法解析地址
 			getPositionTextView.setText("GPS信息已写入,解析失败");
